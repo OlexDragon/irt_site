@@ -1,0 +1,12 @@
+package irt.data.pcb;
+
+import irt.data.components.Component;
+import irt.work.TextWork;
+
+public class SoftwareLoadedPopulatedBoard extends Schematic {
+
+	@Override
+	public void setClassId(){
+		setClassId(Component.CLASS_ID_NAME.get(TextWork.SOFT_LOADED_BOARD));
+	}
+}
