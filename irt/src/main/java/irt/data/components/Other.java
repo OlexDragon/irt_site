@@ -1,11 +1,11 @@
 package irt.data.components;
 
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Other extends IC {
 
-	private static final int OTHER = TextWork.OTHER;
+	private static final int OTHER = TextWorker.OTHER;
 
 	@Override
 	public void setClassId() {

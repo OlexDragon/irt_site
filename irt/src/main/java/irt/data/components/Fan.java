@@ -2,23 +2,24 @@ package irt.data.components;
 
 import irt.data.dao.SecondAndThirdDigitsDAO;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Fan extends Component {
 
-	private static final int FAN = TextWork.FAN;
-	public final int CFM 			= 0;
-	public final int DIAMETER 		= 1;
-	public final int MIN_V 			= 2;
-	public final int MAX_V 			= 3;
-	public final int DESCRIPTION	= 4;
-	public final int MANUFACTURE 	= 5;
-	public final int MAN_PART_NUM 	= 6;
-	public final int QUANTITY 		= 7;
-	public final int LOCATION 		= 8;
-	public final int LINK 			= 9;
-	public final int PART_NUMBER 	=10;
-	public final int NUMBER_OF_FIELDS= 11;
+	private static final int FAN = TextWorker.FAN;
+	public static final int CFM 		= 0;
+	public static final int DIAMETER 	= 1;
+	public static final int MIN_V 		= 2;
+	public static final int MAX_V 		= 3;
+	private static final int SHIFT 		= 4;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 
 	@Override
 	public int getFieldsNumber() {
@@ -66,28 +67,8 @@ public class Fan extends Component {
 		case MAX_V:
 			returnStr = getMaxV();
 			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
-			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case MANUFACTURE:
-			returnStr = getManufId();
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -95,51 +76,26 @@ public class Fan extends Component {
 
 	@Override
 	public boolean setValue(int index, String valueStr){
-		boolean isSetted = false;
+		boolean isSet = false;
 		
 		switch(index){
 		case CFM:
-			isSetted = setCFM(valueStr);
+			isSet = setCFM(valueStr);
 			break;
 		case DIAMETER:
-			isSetted = setDiameter(valueStr);
+			isSet = setDiameter(valueStr);
 			break;
 		case MIN_V:
-			isSetted = setMinV(valueStr);
+			isSet = setMinV(valueStr);
 			break;
 		case MAX_V:
-			isSetted = setMaxV(valueStr);
+			isSet = setMaxV(valueStr);
 			break;
-		case PART_NUMBER:
-			if(valueStr!=null
-					&& valueStr.length()==PART_NUMB_SIZE){
-				isSetted = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case MAN_PART_NUM:
-			isSetted = true;
-			super.setValue(super.MAN_PART_NUM, valueStr);
-			break;
-		case MANUFACTURE:
-			isSetted = true;
-			super.setValue(super.MANUFACTURE, valueStr);
-			break;
-		case DESCRIPTION:
-			isSetted = true;
-			super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
-			break;
-		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+		default:
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 		
-		return isSetted;
+		return isSet;
 	}
 
 	private String getCFM() {

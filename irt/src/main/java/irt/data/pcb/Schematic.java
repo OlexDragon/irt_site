@@ -4,7 +4,7 @@ import irt.data.Menu;
 import irt.data.components.Component;
 import irt.data.dao.ComponentDAO;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Schematic extends Board {
 
@@ -22,7 +22,7 @@ public class Schematic extends Board {
 
 	@Override
 	public void setClassId(){
-		setClassId(Component.CLASS_ID_NAME.get(TextWork.SCHEMATIC));
+		setClassId(Component.CLASS_ID_NAME.get(TextWorker.SCHEMATIC));
 	}
 
 	@Override

@@ -1,11 +1,11 @@
 package irt.data.screws;
 
 import irt.data.components.Component;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Spacer extends Screws {
 
-	private static final int SPACER = TextWork.SPACER;
+	private static final int SPACER = TextWorker.SPACER;
 
 	@Override
 	public void setClassId(){

@@ -55,6 +55,7 @@
 	boolean isPS = false;
 	boolean isCM = false;
 	boolean isPO = false;
+	boolean isWO = false;
 	boolean isU = false;
 	boolean isH = false;
 	boolean isLog = false;

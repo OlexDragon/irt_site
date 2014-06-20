@@ -1,11 +1,11 @@
 package irt.data.components;
 
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class VoltageRegulator extends IC {
 
-	private static final int VOLTAGE_REGULATOR = TextWork.VOLTAGE_REGULATOR;
+	private static final int VOLTAGE_REGULATOR = TextWorker.VOLTAGE_REGULATOR;
 
 	@Override
 	public void setClassId() {

@@ -1,5 +1,6 @@
 package irt.data.dao;
 
+import irt.data.Link;
 import irt.data.Menu;
 import irt.data.ValueText;
 import irt.data.companies.Company;
@@ -19,7 +20,7 @@ import irt.table.OrderBy;
 import irt.table.Row;
 import irt.table.Table;
 import irt.work.ComboBoxField;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,6 +29,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -403,41 +405,29 @@ public class ComponentDAO extends DataAccessObject {
 	}
 
 	public Data getData(String partNumber) {
-		Connection conecsion = null;
-		Statement statement = null;
-		ResultSet resultSet = null;
 
 		Data data = null;
+		String query = "SELECT*FROM`irt`.`components`WHERE`part_number`= ?";
 
-		try {
- 			conecsion = getDataSource().getConnection();
-			statement = conecsion.createStatement();
+		try(	Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query);) {
 
-			data = getData(statement, partNumber);
+			statement.setString(1, partNumber);
+
+			try(ResultSet resultSet = statement.executeQuery();){
+
+				if (resultSet.next()){
+					data = new PartNumberDetails(null).getComponent(partNumber.substring(0,3));
+					data.setValue(resultSet);
+				}
+			}
 
 		} catch (SQLException | CloneNotSupportedException e) {
 			new ErrorDAO().saveError(e, "ComponentDAO.getData");
 			throw new RuntimeException(e);
-		} finally {
-			close( resultSet, statement, conecsion);
 		}
 
 	return data;
-	}
-
-	public Data getData(Statement statement, String partNuberStr) throws SQLException, CloneNotSupportedException{
-		Component data = null;
-		if(partNuberStr.length()>3){
-			String query =
-				"SELECT*FROM`irt`.`components`WHERE`part_number`='"+partNuberStr+"'";
-			ResultSet resultSet = statement.executeQuery(query);
-
-			if (resultSet.next()){
-				data = new PartNumberDetails(null).getComponent(partNuberStr.substring(0,3));
-				data.setValue(resultSet);
-			}
-		}
-		return data;
 	}
 
 	public int getComponentId(String partNumber) {
@@ -598,23 +588,27 @@ public class ComponentDAO extends DataAccessObject {
 	}
 
 	public String getPSNewID() {
-		return count(TextWork.COUNT_POWER_SUPPLIES, null);
+		return count(TextWorker.COUNT_POWER_SUPPLIES, null);
 	}
 
 	public String getNewID() {
-		return count(TextWork.COUNT_COMPONENTS, null);
+		return count(TextWorker.COUNT_COMPONENTS, null);
 	}
 
 	public String getNewHarnessID() {
-		return count(TextWork.COUNT_HARNESS, null);
+		return count(TextWorker.COUNT_HARNESS, null);
 	}
 
 	public String getNewMetalID() {
-		return count(TextWork.COUNT_METAL_PARTS, "R01");
+		return count(TextWorker.COUNT_METAL_PARTS, "R01");
 	}
 
 	public String getNewBoardID() {
-		return count(TextWork.COUNT_PCB, "R01");
+		return count(TextWorker.COUNT_PCB, "R01");
+	}
+
+	public String getNewPlugID() {
+		return count(TextWorker.COUNT_PLUGS, null);
 	}
 
 	public Object getNewSequentialNumber(int componentsToCount) {
@@ -622,23 +616,24 @@ public class ComponentDAO extends DataAccessObject {
 	}
 
 	public String count(int countPcb, String revision) {
-		Connection conecsion = null;
-		PreparedStatement statement = null;
-		ResultSet resultSet = null;
 
 		String count = null;
-		String query = "SELECT`part_number`,`s`.`class_id`" +
-							"FROM`irt`.`components`as`c`" +
-						"JOIN`irt`.`second_and_third_digit`as`s`ON`part_number`LIKE concat(`s`.`id_first`,`s`.`id`,'%')" +
-						"JOIN`irt`.`counts`as`co`ON`s`.`class_id`=`co`.`class_id`" +
-						"WHERE `co`.`id`="+countPcb;
+		String query = "SELECT`part_number`,`s`.`class_id`"
+						+ "FROM`irt`.`components` AS `c`"
+					+ "JOIN`irt`.`first_digits`AS`fd`ON`fd`.`part_numbet_first_char`=substring(`c`.`part_number`, 1, 1)"
+					+ "JOIN`irt`.`second_and_third_digit`AS`s`ON`s`.`id_first_digits`=`fd`.`id_first_digits`AND`s`.`id`=substring(`part_number`, 2, 2)"
+					+ "JOIN`irt`.`counts`AS`co`ON`s`.`class_id`=`co`.`class_id`"
+					+ "WHERE`co`.`id`= ? ";
 
 		if(revision!=null)
 			query +=" and`part_number`Like'%"+revision+"'";
-		try {
-			conecsion = getDataSource().getConnection();
-			statement = conecsion.prepareStatement(query);
-			resultSet = statement.executeQuery();
+
+		try(	Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query);) {
+			
+			statement.setInt(1, countPcb);
+
+			try(ResultSet resultSet = statement.executeQuery();){
 
 			String pn;//part number
 			List<Integer> sn = new ArrayList<>();//sequential numbers
@@ -648,29 +643,32 @@ public class ComponentDAO extends DataAccessObject {
 
 				switch(resultSet.getInt(2)){
 
-				case TextWork.POWER_SUPPLY:
+				case TextWorker.POWER_SUPPLY:
 					sn.add(Integer.parseInt(pn.substring(11)));
 					break;
-				case TextWork.IC_RF:
-				case TextWork.IC_NON_RF:
-				case TextWork.MICROCONTROLLER:
-				case TextWork.VOLTAGE_REGULATOR:
-				case TextWork.AMPLIFIER:
-				case TextWork.OTHER:
-				case TextWork.GASKET:
+				case TextWorker.IC_RF:
+				case TextWorker.IC_NON_RF:
+				case TextWorker.MICROCONTROLLER:
+				case TextWorker.VOLTAGE_REGULATOR:
+				case TextWorker.AMPLIFIER:
+				case TextWorker.OTHER:
+				case TextWorker.GASKET:
 					sn.add(Integer.parseInt(pn.substring(5,9)));
 					break;
-				case TextWork.WIRE_HARNESS:
-				case TextWork.CONNECTOR:
+				case TextWorker.PLASTIC_PLARTS:
+					sn.add(Integer.parseInt(pn.substring(5)));
+					break;
+				case TextWorker.WIRE_HARNESS:
+				case TextWorker.CONNECTOR:
 					sn.add(Integer.parseInt(pn.substring(9)));
 					break;
-				case TextWork.CABLES:
+				case TextWorker.CABLES:
 					sn.add(Integer.parseInt(pn.substring(13)));
 					break;
-				case TextWork.SCREW:
-				case TextWork.NUT:
-				case TextWork.WASHER:
-				case TextWork.SPACER:
+				case TextWorker.SCREW:
+				case TextWorker.NUT:
+				case TextWorker.WASHER:
+				case TextWorker.SPACER:
 					sn.add(Integer.parseInt(pn.substring(6)));
 					break;
 				default:
@@ -683,12 +681,12 @@ public class ComponentDAO extends DataAccessObject {
 						break;
 					}
 			}
+			}
 		} catch (SQLException e) {
 			new ErrorDAO().saveError(e, "ComponentDAO.count");
 			throw new RuntimeException(e);
-		} finally {
-			close(resultSet, statement, conecsion);
 		}
+
 		if(count==null)
 			count = "0";
 	return count;
@@ -907,26 +905,74 @@ public class ComponentDAO extends DataAccessObject {
 		}  finally { close(resultSet, statement, conecsion); }
 	}
 
+	public Component[] getComponents(Long[] ids, MenuDAO.OrderBy orderBy){
+		Component[] components;
+
+		if(ids==null || ids.length==0)
+			return null;
+
+		String query = "SELECT*FROM`irt`.`components`WHERE`id`IN(" +Arrays.toString(ids).replace("[", "").replace("]", "")+ ")";
+		if(orderBy!=null)
+			query += "ORDER BY "+orderBy;
+
+		try(	Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query)) {
+
+			logger.trace(query);
+
+			try(ResultSet resultSet = statement.executeQuery()){
+				components = getComponents(resultSet);
+				logger.trace("{}", (Object[])components);
+			}
+
+		} catch (SQLException e) {
+			new ErrorDAO().saveError(e, "ComponentDAO.getComponents(Long[] ids, MenuDAO.OrderBy orderBy)");
+			throw new RuntimeException(e);
+		}
+		return components;
+	}
+
+	private Component[] getComponents(ResultSet resultSet) throws SQLException {
+
+		Component[] components = null;
+		if (resultSet.last()){
+			int index = resultSet.getRow();
+			if(index>0){
+				components = new Component[index];
+				do
+					components[--index] = new Component(
+							resultSet.getInt("id"),
+							resultSet.getString("part_number"),
+							resultSet.getString("manuf_part_number"),
+							resultSet.getString("manuf_id"),
+							resultSet.getString("description"),
+							resultSet.getString("qty"),
+							resultSet.getString("location"),
+							new Link(resultSet.getInt("link"), null),
+							resultSet.getString("footprint"),
+							resultSet.getString("schematic_letter"),
+							resultSet.getString("schematic_part"));
+				while(resultSet.previous());
+			}
+		}
+
+		return components;
+	}
+
 	public Component getComponent(int componentId) {
-		Connection conecsion = null;
-		Statement statement = null;
-		ResultSet resultSet = null;
 
 		Component component = null;
 
-		try {
-			conecsion = getDataSource().getConnection();
-			statement = conecsion.createStatement();
-
+		try(	Connection conecsion = getDataSource().getConnection();
+				Statement statement = conecsion.createStatement();) {
+			
 			component = getComponent(statement, componentId);
 
 		} catch (SQLException | CloneNotSupportedException e) {
 			new ErrorDAO().saveError(e, "ComponentDAO.getComponent");
 			throw new RuntimeException(e);
-		} finally {
-			close(resultSet, statement, conecsion);
-		}
-		
+		} 
+
 	return component;
 	}
 

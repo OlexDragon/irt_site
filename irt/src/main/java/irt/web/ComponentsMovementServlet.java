@@ -7,12 +7,11 @@ import irt.data.dao.KitDAO;
 import irt.data.partnumber.PartNumber;
 import irt.data.user.UserBean;
 import irt.data.user.UsersLogsIn;
+import irt.work.HttpWorker;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -52,7 +51,6 @@ public class ComponentsMovementServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-
 		UserBean userBean = null;
 		try {
 			userBean = UsersLogsIn.getUserBean(request, response);
@@ -70,8 +68,8 @@ public class ComponentsMovementServlet extends HttpServlet {
 		if(cm==null)
 			partNumber.setComponentsMovement(cm = new ComponentsMovement());
 
-		long componentId = getComponentId(request);
-		Long[] componentsIds = getComponentsIds(request);
+		Long componentId 		= HttpWorker.getId(request);
+		Long[] componentsIds 	= HttpWorker.getIds(request);
 
 		cm.setShowAll(request.getParameter("show_all")!=null);
 		String pn = request.getParameter("pn");
@@ -130,7 +128,7 @@ public class ComponentsMovementServlet extends HttpServlet {
 				if(link!=null){
 					if(componentsIds!=null)
 						cm.add(componentsIds, link);
-					else if(componentId>0)
+					else if(componentId != null)
 						cm.add(componentId, link);
 				}
 				logger.trace("id={}, pn={}, link={}", componentId, pn, link);
@@ -141,32 +139,6 @@ public class ComponentsMovementServlet extends HttpServlet {
 		request.setAttribute("back_page", HTTP_ADDRESS);
 		request.setAttribute("cm", cm);
 		jsp.forward(request, response);
-	}
-
-	private Long[] getComponentsIds(HttpServletRequest request) {
-		String componentsIdsStr = request.getParameter("ids");
-		List<Long> componentsIds = new ArrayList<>();
-
-		if(componentsIdsStr!=null)
-		for (String s : componentsIdsStr.split(",")) {
-			long componentId = getComponentId(s);
-			if (componentId > 0)
-				componentsIds.add(componentId);
-		}
-
-		return componentsIds.isEmpty() ? null : componentsIds.toArray(new Long[componentsIds.size()]);
-	}
-
-	private long getComponentId(HttpServletRequest request) {
-		String componentIdStr = request.getParameter("id");
-		return getComponentId(componentIdStr);
-	}
-
-	private long getComponentId(String componentIdStr) {
-		long componentId = 0;
-		if(componentIdStr!=null && !(componentIdStr = componentIdStr.replaceAll("\\D", "")).isEmpty())
-			componentId = Long.parseLong(componentIdStr);
-		return componentId;
 	}
 
 	private void setCompponentsToMove(HttpServletRequest request, ComponentsMovement cm) {

@@ -4,12 +4,13 @@ import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class IC extends Component {
 
-	private static final int IC_RF = TextWork.IC_RF;
+	private static final int IC_RF = TextWorker.IC_RF;
 
 	public final int MAN_PART_NUM	= 0;
 	public final int MANUFACTURE 	= 1;
@@ -52,7 +53,7 @@ public class IC extends Component {
 	@Override
 	public void setMenu() {
 		if(packMenu==null)
-			packMenu = new MenuDAO().getMenu("ic_package","description");
+			packMenu = new MenuDAO().getMenu("ic_package", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -140,13 +141,13 @@ public class IC extends Component {
 				if(isExist = (tmpComp = new ComponentDAO().getByMPN(valueStr))!=null)
 					setValues(tmpComp);
 				else{
-					super.setValue(super.MAN_PART_NUM, valueStr);
+					super.setValue(Data.MAN_PART_NUM, valueStr);
 					isExist = false;
 				}
 
 				isSetted = true;
 			}else{
-				super.setValue(super.MAN_PART_NUM, null);
+				super.setValue(Data.MAN_PART_NUM, null);
 				isExist = false;
 			}
 			break;
@@ -157,16 +158,16 @@ public class IC extends Component {
 		case DESCRIPTION:
 			setPartNumber(getClassId()+getManufactureIdQ()+"????"+getPackageQ()+getLeadsNumberQ());
 			isSetted = valueStr!=null && !valueStr.isEmpty();
-			super.setValue(super.DESCRIPTION, valueStr);
+			super.setValue(Data.DESCRIPTION, valueStr);
 			break;
 		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
+			isSetted = super.setValue(Data.QUANTITY, valueStr);
 			break;
 		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
+			isSetted = super.setValue(Data.LOCATION, valueStr);
 			break;
 		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+			isSetted = super.setValue(Data.LINK, valueStr);
 		}
 		
 		return isSetted;
@@ -177,8 +178,9 @@ public class IC extends Component {
 	}
 
 	private String getManufactureIdQ() {
-		return (getManufactureId().length()!=0)
-				? getManufactureId()
+		String manufactureId = getManufactureId();
+		return (manufactureId.length()!=0)
+				? manufactureId
 						: "??";
 	}
 
@@ -299,10 +301,10 @@ public class IC extends Component {
 	@Override
 	public boolean isSet() {
 		return 		!getManufPartNumber().isEmpty() 
-				&&	TextWork.isValid(getManufactureId())
+				&&	TextWorker.isValid(getManufactureId())
 				&&	!getDescription().isEmpty()
-				&&	TextWork.isValid(getPackage())
-				&&	TextWork.isValid(getLeadsNumber());
+				&&	TextWorker.isValid(getPackage())
+				&&	TextWorker.isValid(getLeadsNumber());
 	}
 
 	@Override

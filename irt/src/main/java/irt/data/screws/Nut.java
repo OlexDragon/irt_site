@@ -1,11 +1,11 @@
 package irt.data.screws;
 
 import irt.data.components.Component;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Nut extends Screws{
 
-	private static final int NUT = TextWork.NUT;
+	private static final int NUT = TextWorker.NUT;
 
 	@Override
 	public void setClassId(){

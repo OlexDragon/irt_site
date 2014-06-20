@@ -3,26 +3,28 @@ package irt.data.components;
 import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Cable extends Component {
 
-	private static final int CABLES = TextWork.CABLES;
+	private static final int CABLES = TextWorker.CABLES;
 
 	public final int CON1_TYPE		= 0;
 	public final int CON2_TYPE		= 1;
 	public final int CABLE_TYPE		= 2;
 	public final int LENGTH			= 3;
 	public final int ID				= 4;
-	public final int DESCRIPTION	= 5;
-	public final int MANUFACTURE 	= 6;
-	public final int MAN_PART_NUM 	= 7;
-	public final int QUANTITY 		= 8;
-	public final int LOCATION 		= 9;
-	public final int LINK 			= 10;
-	public final int PART_NUMBER 	= 11;
-	public final int NUMBER_OF_FIELDS= 12;
+	private static final int SHIFT 		= 5;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 	@Override
 	public int getFieldsNumber() {
 		return NUMBER_OF_FIELDS;
@@ -45,11 +47,11 @@ public class Cable extends Component {
 	@Override
 	public void setMenu() {
 		if(titlesMenu==null)
-			titlesMenu = new MenuDAO().getMenu("cable_titles", "sequence");
+			titlesMenu = new MenuDAO().getMenu("cable_titles", OrderBy.SEQUENCE);
 		if(connectorMenu==null)
-			connectorMenu = new MenuDAO().getMenu("cab_con_type", "description");
+			connectorMenu = new MenuDAO().getMenu("cab_con_type", OrderBy.DESCRIPTION);
 		if(cableMenu==null)
-			cableMenu = new MenuDAO().getMenu("cable_type", "description");
+			cableMenu = new MenuDAO().getMenu("cable_type", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -111,28 +113,8 @@ public class Cable extends Component {
 		case ID:
 			returnStr = getID();
 			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case MANUFACTURE:
-			returnStr = super.getValue(super.MANUFACTURE);
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
-			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -158,33 +140,8 @@ public class Cable extends Component {
 		case CABLE_TYPE:
 			setCableType(valueStr);
 			break;
-		case PART_NUMBER:
-			if(valueStr!=null
-					&& valueStr.length()==PART_NUMB_SIZE){
-				isSet = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case MAN_PART_NUM:
-			isSet = super.setValue(super.MAN_PART_NUM, valueStr);
-			break;
-		case MANUFACTURE:
-			isSet = super.setValue(super.MANUFACTURE, valueStr);
-			break;
-		case DESCRIPTION:
-			isSet = valueStr!=null && !valueStr.isEmpty();
-			super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSet = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSet = super.setValue(super.LOCATION, valueStr);
-			break;
-		case LINK:
-			isSet = super.setValue(super.LINK, valueStr);
 		default:
-			isSet = false;
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 		
 		return isSet;
@@ -218,7 +175,7 @@ public class Cable extends Component {
 
 		if(isSet()){
 			if(getID().isEmpty()){
-				setPartNumber(getClassId()+getCon1TypeQ()+getCon2TypeQ()+getCableTypeQ()+getLengthQ()+String.format("%03s", new ComponentDAO().getNewSequentialNumber(TextWork.COUNT_CABLE)));
+				setPartNumber(getClassId()+getCon1TypeQ()+getCon2TypeQ()+getCableTypeQ()+getLengthQ()+String.format("%03s", new ComponentDAO().getNewSequentialNumber(TextWorker.COUNT_CABLE)));
 			}
 		}else
 			resetSequentialNunber();

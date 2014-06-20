@@ -38,7 +38,7 @@ public class Purchase {
 	public static final int PAGE_MOVEMENT	= 1;
 	public static final int PAGE_VENDORS	= 2;
 	public static final int PAGE_CM			= 3;
-	public static final Menu PAGE_MENU	= new MenuDAO().getMenu("po_page","description");
+	public static final Menu PAGE_MENU	= new MenuDAO().getMenu("po_page", irt.data.dao.MenuDAO.OrderBy.DESCRIPTION);
 	public static final String PAGE_PURCHASE_STR	= PAGE_MENU.getDescription(PAGE_PURCHASE);
 	public static final String PAGE_MOVEMENT_STR	= PAGE_MENU.getDescription(PAGE_MOVEMENT);
 	public static final String PAGE_VENDOR_STR		= PAGE_MENU.getDescription(PAGE_VENDORS);

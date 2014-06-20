@@ -4,12 +4,12 @@ import irt.data.Menu;
 import irt.data.components.Component;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
+import irt.work.TextWorker.PartNumberFirstChar;
 
 public class Screws extends Component {
-
-	private static final String SCREWS = TextWork.SCREWS;
 
 	public final int SCR_NUMBER		= 0;
 	public final int SEQ_NUMBER		= 1;
@@ -31,7 +31,7 @@ public class Screws extends Component {
 
 	@Override
 	public void setClassId(){
-		setClassId(SCREWS);
+		setClassId(""+PartNumberFirstChar.SCREWS.getFirstDigit().getFirstChar());
 	}
 
 	@Override
@@ -42,8 +42,8 @@ public class Screws extends Component {
 	@Override
 	public void setMenu() {
 		if(titlesMenu==null){
-			titlesMenu 		= new MenuDAO().getMenu(new String[]{"scr_titles","titles"}, "sequence");
-			scrNumberMenu 	= new MenuDAO().getMenu("scr_number", 	"sequence");
+			titlesMenu 		= new MenuDAO().getMenu(new String[]{"scr_titles","titles"}, OrderBy.SEQUENCE);
+			scrNumberMenu 	= new MenuDAO().getMenu("scr_number", OrderBy.SEQUENCE);
 		}
 	}
 
@@ -179,7 +179,7 @@ public class Screws extends Component {
 		boolean isSet = isSetSeqNumber();
 		if(isSet){
 			if(getSeqNumber().isEmpty()){
-				setPartNumber(get()+getScrNumberQ() + String.format("%3s", new ComponentDAO().getNewSequentialNumber(TextWork.COUNT_SCREW)).replaceAll(" ", "0"));
+				setPartNumber(get()+getScrNumberQ() + String.format("%3s", new ComponentDAO().getNewSequentialNumber(TextWorker.COUNT_SCREW)).replaceAll(" ", "0"));
 			}
 		}else
 			resetSequentialNunber();

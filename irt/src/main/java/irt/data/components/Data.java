@@ -2,9 +2,12 @@ package irt.data.components;
 
 import irt.data.Error;
 import irt.data.Link;
+import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.LinkDAO;
 import irt.data.dao.ManufactureDAO;
+import irt.data.dao.MenuDAO;
+import irt.data.dao.SecondAndThirdDigitsDAO;
 import irt.data.manufacture.Manufacture;
 import irt.data.partnumber.PartNumber;
 import irt.data.partnumber.PartNumberDetails;
@@ -14,7 +17,10 @@ import irt.work.InputTitles;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -24,21 +30,30 @@ import org.apache.logging.log4j.core.Logger;
 public abstract class Data {
 
     protected final Logger logger = (Logger) LogManager.getLogger(getClass().getName());
+    protected static final Logger loggerComponent = (Logger) LogManager.getLogger("static.Component.logger");
+
+	public static final Map<Integer, String> CLASS_ID_NAME = new SecondAndThirdDigitsDAO().getMapIdClass();
+	public static final Map<String, Integer> CLASS_NAME_ID = new SecondAndThirdDigitsDAO().getMapClassId();
 
     public final int PART_NUMB_SIZE;
 
-	public final int DESCRIPTION	= 0;
-	public final int MANUFACTURE 	= 1;
-	public final int MAN_PART_NUM 	= 2;
-	public final int QUANTITY 		= 3;
-	public final int LOCATION 		= 4;
-	public final int LINK 			= 5;
-	public final int PART_NUMBER 	= 6;
-	public final int NUMBER_OF_FIELDS= 7;
+	public final static int DESCRIPTION		= 0;
+	public final static int MANUFACTURE 	= 1;
+	public final static int MAN_PART_NUM 	= 2;
+	public final static int QUANTITY 		= 3;
+	public final static int LOCATION 		= 4;
+	public final static int LINK 			= 5;
+	public final static int PART_NUMBER 	= 6;
+	public final static int NUMBER_OF_FIELDS= 7;
 
 	public int getFieldsNumber() {
 		return NUMBER_OF_FIELDS;
 	}
+
+	protected final String DATABASE_NAME_FOR_TITLES;
+	protected static final MenuDAO MENU_DAO = new MenuDAO();
+	protected Menu titlesMenu;
+	protected List<Menu> menusForHtmlSelects = new ArrayList<>();
 
 	private int id = -1;
 
@@ -67,6 +82,7 @@ public abstract class Data {
 
 	public Data(){
 		logger.info("constructor: public {}()", getClass().getSimpleName());
+		DATABASE_NAME_FOR_TITLES = getDatabaseNameForTitles();
 		setClassId();
 		PART_NUMB_SIZE = getPartNumberSize();
 		setPartNumber(getClassId());
@@ -74,13 +90,38 @@ public abstract class Data {
 		setTitles();
 	}
 
+	protected String getDatabaseNameForTitles() {
+		return null;
+	}
+
+	public abstract 	void 	setClassId();
 	public abstract 	int 	getPartNumberSize();
 	public abstract 	String 	getDataId();
 	public abstract 	String 	getPartNumberF();
 	public abstract 	String 	getValue();
 	protected abstract 	String 	getPartType(String partNumber);
-	public abstract 	void 	setClassId();
 
+	public void setMenu(){
+		if(DATABASE_NAME_FOR_TITLES!=null){
+			titlesMenu = MENU_DAO.getMenu(DATABASE_NAME_FOR_TITLES, irt.data.dao.MenuDAO.OrderBy.SEQUENCE);
+
+			Menu menu;
+			for(int i=0; i<10; i++){
+
+				menu = MENU_DAO.getMenu(DATABASE_NAME_FOR_TITLES+i, irt.data.dao.MenuDAO.OrderBy.SEQUENCE);
+
+				if(menu!=null)
+					menusForHtmlSelects.add(menu);
+				else
+					break;
+			}
+		}
+	}
+
+	public void setTitles() {
+		if(titlesMenu!=null)
+			setTitles(new InputTitles( titlesMenu.getKeys(),titlesMenu.getDescriptions()));
+	}
 
 	/**
 	 * Set Values by part number from database
@@ -117,6 +158,38 @@ public abstract class Data {
 		}
 	}
 
+	public String getValue(int index){
+		String returnStr = "";
+
+		switch(index){
+		case PART_NUMBER:
+			returnStr = getPartNumber();
+			break;
+		case MAN_PART_NUM:
+			returnStr = getManufPartNumber();
+			break;
+		case MANUFACTURE:
+			returnStr = getManufId();
+			break;
+		case DESCRIPTION:
+			returnStr = getDescription();
+			break;
+		case QUANTITY:
+			returnStr = getQuantityStr();
+			break;
+		case LOCATION:
+			returnStr = getLocation();
+			break;
+		case LINK:
+			Link link = getLink();
+			returnStr = (link!=null)
+							? link.getHTML()
+									:"";
+		}
+		
+		return returnStr;
+	}
+
 	public boolean setValue(int index, String valueStr){
 		boolean hasSet = valueStr!=null && !valueStr.trim().isEmpty();
 
@@ -145,37 +218,6 @@ public abstract class Data {
 		}
 		
 		return hasSet;
-	}
-
-	public String getValue(int index){
-		String returnStr = "";
-
-		switch(index){
-		case PART_NUMBER:
-			returnStr = getPartNumber();
-			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case MANUFACTURE:
-			returnStr = getManufId();
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
-		}
-		
-		return returnStr;
 	}
 
 	public void setValue(ResultSet resultSet) throws SQLException, CloneNotSupportedException{
@@ -271,8 +313,6 @@ public abstract class Data {
 		this.quantityStr = quantityStr!=null && !(quantityStr = quantityStr.replaceAll("\\D", "")).isEmpty() ? quantityStr :null;
 	}
 
-	public abstract void setTitles();
-
 	public void setTitles(InputTitles titles) {
 		this.titles = titles;
 	}
@@ -328,8 +368,6 @@ public abstract class Data {
 	public String getManufPartNumber() 	{ return manufPartNumber;	}
 	public String getDbVoltage()		{ return dbVoltage;			}
 	public String getPartNumber()		{ return partNumber;	}
-
-	public void setMenu(){	}
 	public void setPartNumber(String partNumberStr) {
 		int partNumberSize = getPartNumberSize();
 		if(partNumberSize>0)
@@ -370,7 +408,7 @@ public abstract class Data {
 	public boolean isEdit() {
 		boolean isEdit = false;
 
-		if(oldData!=null){
+		if(oldData!=null && id>0){
 			isEdit = !equalsValues(oldData);
 		}
 
@@ -407,16 +445,14 @@ public abstract class Data {
 	}
 
 	public static Data parseData(String dataStr) throws CloneNotSupportedException {
+		loggerComponent.entry(dataStr);
 		Data data = null;
 
 		int startIndex = dataStr.indexOf("[")+1;
-		boolean containsOrderBy = dataStr.contains("orderBy");
-		int lastIndex = containsOrderBy ? dataStr.lastIndexOf("orderBy") : dataStr.lastIndexOf("]");
+		int lastIndex  = dataStr.lastIndexOf("]");
 		if(startIndex>0 && lastIndex>0){
 			HashMap<String, String> map = new HashMap<>();
 			valuesToMap(dataStr.substring(startIndex, lastIndex), map);
-			if(containsOrderBy)
-				map.put("orderBy", dataStr.substring(lastIndex+"orderBy".length()+1));
 
 			data = PartNumber.parsePartNumber(map.get("partNumber"));
 			if(data!=null){
@@ -476,6 +512,7 @@ public abstract class Data {
 	}
 
 	private static void valuesToMap(String dataStr, HashMap<String, String> map) {
+		loggerComponent.entry(dataStr);
 		String[] split = dataStr.split(", ");
 		for(String s:split){
 			String[] values = s.split("=");
@@ -531,7 +568,7 @@ public abstract class Data {
 			}
 		} else {
 			if(!error.isError())
-					setError(getPartNumber() + " - do not exist. <small>(E035)</small>");
+					setError(getPartNumberF() + " - do not exist. <small>(E035)</small>");
 			}
 		return tblStr;
 	}

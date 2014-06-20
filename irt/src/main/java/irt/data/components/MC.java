@@ -1,11 +1,11 @@
 package irt.data.components;
 
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class MC extends IC {
 
-	private static final int MICROCONTROLLER = TextWork.MICROCONTROLLER;
+	private static final int MICROCONTROLLER = TextWorker.MICROCONTROLLER;
 
 	@Override
 	public void setClassId() {

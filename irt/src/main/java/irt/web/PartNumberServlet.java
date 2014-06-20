@@ -2,7 +2,6 @@ package irt.web;
 
 import irt.data.Browser;
 import irt.data.CookiesWorker;
-import irt.data.Error;
 import irt.data.HTMLWork;
 import irt.data.ToDoClass;
 import irt.data.ToDoClass.ToDo;
@@ -17,6 +16,7 @@ import irt.data.user.LogIn;
 import irt.data.user.UserBean;
 import irt.data.user.UsersLogsIn;
 import irt.table.OrderBy;
+import irt.work.TextWorker.PartNumberFirstChar;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -41,9 +41,6 @@ public class PartNumberServlet extends HttpServlet {
 	public static final String HTTP_ADDRESS = "part-numbers";
 
 	private RequestDispatcher jsp;
-
-//	private Browser browser;
-	private Error error = new Error();
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -76,7 +73,7 @@ public class PartNumberServlet extends HttpServlet {
 
 		ToDoClass toDoClass = getToDoClass(request, "TODO");
 
-		OrderBy orderBy = getOrderBy(request);
+		OrderBy orderBy = getOrderBy(request, response);
 		if(orderBy == null)
 			orderBy = new OrderBy("`part_number`");
 		logger.trace("{}, {}", tmpStr, orderBy);
@@ -88,6 +85,7 @@ public class PartNumberServlet extends HttpServlet {
 
 		request.setAttribute("back_page", HTTP_ADDRESS );
 		request.setAttribute("component", component!=null ? component : new Unknown());
+		request.setAttribute("orderBy", orderBy);
 		request.setAttribute("browser", browser);
 		request.setAttribute("todo", toDoClass);
 		request.setAttribute("partNumber", partNumber);
@@ -108,7 +106,6 @@ public class PartNumberServlet extends HttpServlet {
 
 		Component component = null;
 		String tmpStr = CookiesWorker.getCookieValue(request,  "component");
-		logger.trace("{}, {}, {}, {}", browser, userBean, logIn, tmpStr);
 
 		if(tmpStr!=null)
 			try {
@@ -125,8 +122,26 @@ public class PartNumberServlet extends HttpServlet {
 		ToDoClass search = getToDoClass(request, "SEARCH");
 
 		PartNumber partNumber = PartNumber.getPartNumber(request.getRemoteHost());
-		logger.trace("{}, {}, {}, {}", component, pnt, pressedButton, tmpStr);
-		logger.trace("{}, {}", toDoClass, partNumber);
+
+		logger.trace("\n\t"
+				+ "browser:\t{}\n\t"
+				+ "userBean:\t{}\n\t"
+				+ "logIn:\t{}\n\t"
+				+ "tmpStr:\t{}\n\t"
+				+ "component:\t{},\n\t"
+				+ "pnt:\t{},\n\t"
+				+ "pressedButton:\t{},\n\t"
+				+ "toDoClass:\t{},\n\t"
+				+ "partNumber:\t{}",
+				browser,
+				userBean,
+				logIn,
+				tmpStr,
+				component,
+				pnt,
+				pressedButton,
+				toDoClass,
+				partNumber);
 
 		if(pressedButton!=null)
 		switch(pressedButton){
@@ -149,12 +164,12 @@ public class PartNumberServlet extends HttpServlet {
 			CookiesWorker.addCookie(request, response, "SEARCH", search, 7*24*60*60);
 			break;
 		case "submit-price":
-			toDoClass = new ToDoClass(ToDo.PRICE, component.getId());
-			CookiesWorker.addCookie(request, response, "TODO", toDoClass, 7*24*60*60);
+			search = new ToDoClass(ToDo.PRICE, component.getId());
+			CookiesWorker.addCookie(request, response, "SEARCH", search, 7*24*60*60);
 			break;
 		case "submit_show":
-			toDoClass = new ToDoClass(ToDo.PROJECT_SERARCH, "___"+component.getPartNumber().substring(3,9)+"%");
-			CookiesWorker.addCookie(request, response, "TODO", toDoClass, 7*24*60*60);
+			search = new ToDoClass(ToDo.PROJECT_SERARCH, "___"+component.getPartNumber().substring(3,9)+"%");
+			CookiesWorker.addCookie(request, response, "SEARCH", search, 7*24*60*60);
 			break;
 		case "submit-cancel":
 			component = new PartNumberDetails(null).getComponent(component.getClassId());
@@ -166,7 +181,7 @@ public class PartNumberServlet extends HttpServlet {
 					response.sendRedirect("add-link");
 					return;
 				}else
-					component.setError("You do not have permission.");
+					component.getError().setErrorMessage("You do not have permission.");
 			}else{
 				response.sendRedirect("login?bp="+HTTP_ADDRESS);
 				return;
@@ -216,27 +231,42 @@ public class PartNumberServlet extends HttpServlet {
 			}else{
 				int componentId = component.getId();
 				if(componentId>0){
-						response.sendRedirect("components_movement?l="+HTTP_ADDRESS+"&id="+componentId);
-						return;
+					response.sendRedirect("components_movement?l="+HTTP_ADDRESS+"&id="+componentId);
+					return;
 				}else
-					component.setError("Enter the part number. <small>(E056)</small>");
+					component.getError().setErrorMessage("Enter the part number. <small>(E056)</small>");
+			}
+			break;
+		case "submit_to_wo":
+			names = Init.getFieldsNames(request, "checked");
+			if(names.size()>0){
+				String componentsIds = getComponentsIds(names);
+				response.sendRedirect(WorkOrderServlet.HTTP_ADDRESS+"?l="+HTTP_ADDRESS+componentsIds);
+				return;
+			}else{
+				int componentId = component.getId();
+				if(componentId>0){
+					response.sendRedirect(WorkOrderServlet.HTTP_ADDRESS+"?l="+HTTP_ADDRESS+"&id="+componentId);
+					return;
+				}else
+					component.getError().setErrorMessage("Enter the part number. <small>(E056)</small>");
 			}
 			break;
 		case "submit-part":
 			if(!component.getPartNumber().equals(pnt.replaceAll("-", ""))){
 				if(new ComponentDAO().setSchematicPart(userBean.getID(), component.getId(), pnt.toUpperCase()))
-					component.setError(pnt+ " synbol name is saved","cBlue");
+					component.getError().setErrorMessage(pnt+ " synbol name is saved","cBlue");
 				else
-					component.setError("Error. <small>(E057)</small>");
+					component.getError().setErrorMessage("Error. <small>(E057)</small>");
 			}else
-				component.setError("Type the symbol name.");
+				component.getError().setErrorMessage("Type the symbol name.");
 			break;
 		case "submit-letter":
 			if(!component.getPartNumber().equals(pnt.replaceAll("-", ""))){
 				new ComponentDAO().setSchematicLetter(userBean.getID(),component.getId(), pnt.toUpperCase());
-				component.setError(pnt+ " letter is saved","cBlue");
+				component.getError().setErrorMessage(pnt+ " letter is saved","cBlue");
 			}else
-				component.setError("Type the schematic letter."); 
+				component.getError().setErrorMessage("Type the schematic letter."); 
 			break;
 		case "submit_qty_add":
 			if(userBean!=null)
@@ -269,7 +299,13 @@ public class PartNumberServlet extends HttpServlet {
 			}
 		}
 
-		logger.trace("exit with:\n\tHTTP_ADDRESS:\t{}\n\tcomponent:\t{},\n\tbrowser:\t{},\n\ttoDoClass:\t{},\n\tpartNumber:\t{}\n\tsearch:\t\t{}",
+		logger.trace("exit with:\n\t"
+				+ "HTTP_ADDRESS:\t{}\n\t"
+				+ "component:\t{}\n\tb"
+				+ "rowser:\t{}\n\t"
+				+ "toDoClass:\t{}\n\t"
+				+ "partNumber:\t{}\n\t"
+				+ "search:\t\t{}",
 				HTTP_ADDRESS,
 				component,
 				browser,
@@ -278,6 +314,7 @@ public class PartNumberServlet extends HttpServlet {
 				search);
 		request.setAttribute("back_page", HTTP_ADDRESS );
 		request.setAttribute("component", component);
+		request.setAttribute("orderBy", getOrderBy(request, response));
 		request.setAttribute("browser", browser);
 		request.setAttribute("todo", toDoClass);
 		request.setAttribute("partNumber", partNumber);
@@ -306,9 +343,9 @@ public class PartNumberServlet extends HttpServlet {
 			int id = userBean.getID();
 
 			if ((component.getId()<=0 && new ComponentDAO().insert(component, id)) || (component.getId()>0 && new ComponentDAO().update(component, id, isAdmin)))
-				component.setError(component.getPartNumberF()+" - have been added.");
+				component.getError().setErrorMessage(component.getPartNumberF()+" - have been added.");
 			else
-				component.setError("Database Error. <small>(E036)</small>");
+				component.getError().setErrorMessage("Database Error. <small>(E036)</small>");
 		};
 	}
 
@@ -333,16 +370,26 @@ public class PartNumberServlet extends HttpServlet {
 	private Component getComponent(HttpServletRequest req, Component component, boolean isAdmin) {
 		logger.entry(isAdmin, component);
 
-		String descriptionFirst = req.getParameter("first");
-		String descriptionSecond = req.getParameter("second");
+		String selectedFirst = req.getParameter("first");
+		String selectedSecond = req.getParameter("second");
+
+		logger.trace("\n\tselectedFirst:\t'{}'\n\tselectedSecond:\t'{}'", selectedFirst, selectedSecond);
+
 		boolean isSet = true;
 
 		Component c;
-		if (descriptionFirst != null && !descriptionFirst.isEmpty() && descriptionFirst.charAt(0) != '-') {
-			if (component == null || component.getClassId().charAt(0) != descriptionFirst.charAt(0) || descriptionSecond == null || descriptionSecond.equals("-"))
-				c = new PartNumberDetails(component).getComponent(descriptionFirst);
+		if (selectedFirst != null && !selectedFirst.isEmpty() && selectedFirst.charAt(0) != '-') {
+
+			char firstChar = PartNumberFirstChar.valueOf(Integer.parseInt(selectedFirst)).getFirstDigit().getFirstChar();
+
+			if (	component == null ||
+					component.getClassId().charAt(0) != firstChar ||
+					selectedSecond == null ||
+					selectedSecond.equals("-"))
+
+				c = new PartNumberDetails(component).getComponent(selectedFirst);
 			else
-				c = new PartNumberDetails(component).getComponent(descriptionFirst + descriptionSecond);
+				c = new PartNumberDetails(component).getComponent(firstChar + selectedSecond);
 
 			if (c != null) {
 
@@ -356,24 +403,26 @@ public class PartNumberServlet extends HttpServlet {
 				isSet = false;
 
 			if (!isSet)
-				error.setErrorMessage("All fields must be filled. <small>(E034)</small>");
+				component.getError().setErrorMessage("All fields must be filled. <small>(E034)</small>");
 			else if (c == null)
-				error.setErrorMessage("Coming soon");
+				component.getError().setErrorMessage("Coming soon");
 		}else
 			c = new Unknown();
 
-		return c;
+		return logger.exit(c);
 	}
 
-	private OrderBy getOrderBy(HttpServletRequest request) {
+	private OrderBy getOrderBy(HttpServletRequest request, HttpServletResponse response) {
 
 		OrderBy orderBy = OrderBy.getOrderBy(request);
 
 		String orderByStr = request.getParameter("ob");//order by
 		if(orderByStr!=null){
 			orderBy.setOrderBy(orderByStr);
-		}
+			CookiesWorker.addCookie(request, response, "ob", orderBy, 7*24*60*60);
+		}else
+			orderBy = OrderBy.parseOrderBy(CookiesWorker.getCookieValue(request, "ob"));
 
-		return orderBy;
+		return orderBy!=null ? orderBy : new OrderBy("part_number");
 	}
 }

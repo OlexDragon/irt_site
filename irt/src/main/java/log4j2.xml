@@ -8,12 +8,21 @@
 	</Appenders>
 
 	<Loggers>
-		<logger name="irt.web.ComponentsMovementServlet" 	level="all" />
+		<logger name="irt.web.ComponentsMovementServlet" 	level="WARN" />
 		<logger name="irt.web.PartNumberServlet" 			level="all" />
+		<logger name="irt.web.WorkOrderServlet" 			level="WARN" />
 
 		<logger name="irt.data.partnumber.PartNumber"		level="all" />
+		<logger name="irt.data.partnumber.PartNumberDetails" level="all" />
 
-		<logger name="irt.data.components.Component" 		level="all" />
+		<logger name="irt.data.components.Component" 		level="WARN" />
+
+		<logger name="irt.data.dao.MenuDAO" 				level="WARN" />
+		<logger name="irt.data.dao.SecondAndThirdDigitsDAO" level="WARN" />
+
+		<logger name="irt.data.workorder.WorkOrder"			level="WARN" />
+
+		<logger name="static.Component.logger"				level="all" />
 
 		<Root level="WARN">
 			<AppenderRef ref="STDOUT" />

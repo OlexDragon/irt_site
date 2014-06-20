@@ -13,7 +13,7 @@ import irt.data.partnumber.PartNumberDetails;
 import irt.table.HTMLHeader;
 import irt.table.Row;
 import irt.table.Table;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -520,7 +520,7 @@ public class ComponentsMovementDAO extends DataAccessObject {
 
 	public Table getOneComponentHistory(String historyOf) {
 
-		String pn = TextWork.pnValidation(historyOf);
+		String pn = TextWorker.pnValidation(historyOf);
 
 			String query = "(SELECT	 `md`.`id_movement`AS`ID`," +
 									"`m`.`date_time`AS`Date`," +

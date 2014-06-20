@@ -1,11 +1,11 @@
 package irt.data.screws;
 
 import irt.data.components.Component;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Washer extends Screws {
 
-	private static final int WASHER = TextWork.WASHER;
+	private static final int WASHER = TextWorker.WASHER;
 
 	@Override
 	public void setClassId(){

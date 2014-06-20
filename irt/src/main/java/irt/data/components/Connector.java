@@ -4,12 +4,13 @@ import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Connector extends Component {
 	
-	private static final int CONNECTOR = TextWork.CONNECTOR;
+	private static final int CONNECTOR = TextWorker.CONNECTOR;
 	public final int MAN_PART_NUM	= 0;
 	public final int CONTACT_NUMBER	= 1;
 	public final int MALE_FEMALE	= 2;
@@ -52,9 +53,9 @@ public class Connector extends Component {
 	@Override
 	public void setMenu() {
 		if(typeMenu==null)
-			typeMenu = new MenuDAO().getMenu("con_type","description");
+			typeMenu = new MenuDAO().getMenu("con_type", OrderBy.DESCRIPTION);
 		if(maleFemaleMenu==null)
-			maleFemaleMenu = new MenuDAO().getMenu("M_F","description");
+			maleFemaleMenu = new MenuDAO().getMenu("M_F", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -156,13 +157,13 @@ public class Connector extends Component {
 				if(isExist = (tmpComp = new ComponentDAO().getByMPN(valueStr))!=null)
 					setValues(tmpComp);
 				else{
-					super.setValue(super.MAN_PART_NUM, valueStr);
+					super.setValue(Data.MAN_PART_NUM, valueStr);
 					isExist = false;
 				}
 
 				isSetted = true;
 			}else{
-				super.setValue(super.MAN_PART_NUM, null);
+				super.setValue(Data.MAN_PART_NUM, null);
 				isSetted = false;
 			}
 			break;
@@ -171,16 +172,16 @@ public class Connector extends Component {
 			setManufId(valueStr);
 			break;
 		case DESCRIPTION:
-			isSetted = super.setValue(super.DESCRIPTION, valueStr);
+			isSetted = super.setValue(Data.DESCRIPTION, valueStr);
 			break;
 		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
+			isSetted = super.setValue(Data.QUANTITY, valueStr);
 			break;
 		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
+			isSetted = super.setValue(Data.LOCATION, valueStr);
 			break;
 		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+			isSetted = super.setValue(Data.LINK, valueStr);
 		}
 		
 		return isSetted;
@@ -198,7 +199,7 @@ public class Connector extends Component {
 
 	private boolean setContacts(String valueStr) {
 		boolean isSetted = false;
-		int value = new Value(valueStr, TextWork.CAPACITOR).getIntValue();
+		int value = new Value(valueStr, TextWorker.CAPACITOR).getIntValue();
 		if (value != 0){
 			isSetted = true;
 			valueStr = String.format("%3s", value).replaceAll(" ", "0");
@@ -285,7 +286,7 @@ public class Connector extends Component {
 		String tmpStr = getClassId()+getContactsQ()+getFeMaleQ()+getTypeQ();
 		
 		if(isSet()){
-			tmpStr += TextWork.addZeroInFront(new ComponentDAO().getNewID(), 4); 
+			tmpStr += TextWorker.addZeroInFront(new ComponentDAO().getNewID(), 4); 
 			isSetted = true;
 		}else
 			tmpStr += "????";

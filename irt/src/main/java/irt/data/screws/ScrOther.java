@@ -1,11 +1,11 @@
 package irt.data.screws;
 
 import irt.data.components.Component;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class ScrOther extends Screws{
 
-	private static final int SCR_OTHER = TextWork.SCR_OTHER;
+	private static final int SCR_OTHER = TextWorker.SCR_OTHER;
 
 	@Override
 	public void setClassId(){
