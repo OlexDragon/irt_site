@@ -2,13 +2,13 @@ package irt.data.pcb;
 
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class BootloaderLoadedPopulatedBoard extends PopulatedBoard {
 
 	@Override
 	public void setClassId(){
-		setClassId(new SecondAndThirdDigitsDAO().getClassID(TextWork.BOOTLOADER_LOADED_BOARD));
+		setClassId(new SecondAndThirdDigitsDAO().getClassID(TextWorker.BOOTLOADER_LOADED_BOARD));
 	}
 
 	@Override

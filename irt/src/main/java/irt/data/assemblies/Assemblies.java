@@ -2,24 +2,27 @@ package irt.data.assemblies;
 
 import irt.data.Menu;
 import irt.data.components.Component;
+import irt.data.components.Data;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
-import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker.PartNumberFirstChar;
 
 public class Assemblies extends Component {
 
 	private static final int P_N_SIZE = 12;//TODO
 
-	public final int TOP_LEVEL	 	= 0;
-	public final int OPTION		 	= 1;
-	public final int REVISION	 	= 2;
-	public final int DESCRIPTION	= 3;
-	public final int QUANTITY 		= 4;
-	public final int LOCATION 		= 5;
-	public final int LINK 			= 6;
-	public final int PART_NUMBER 	= 7;
-	public final int NUMBER_OF_FIELDS= 8;
+	public static final int TOP_LEVEL	= 0;
+	public static final int OPTION		= 1;
+	public static final int REVISION	= 2;
+	private static final int SHIFT 		= 3;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 
 	@Override
 	public int getFieldsNumber() {
@@ -27,12 +30,11 @@ public class Assemblies extends Component {
 	}
 
 	private static String classIdStr;
-	private static Menu titlesMenu;
 	private static Menu topMenu;
 
 	@Override
 	public void setClassId(){
-		setClassId(TextWork.ASSEMBLIES);
+		setClassId(""+PartNumberFirstChar.ASSEMBLIES.getFirstDigit().getFirstChar());
 	}
 
 	@Override
@@ -41,17 +43,16 @@ public class Assemblies extends Component {
 	}
 
 	@Override
-	public void setTitles() {
-		setTitles(new InputTitles( titlesMenu.getKeys(),titlesMenu.getDescriptions()));
+	public void setMenu() {
+		super.setMenu();
+		if(classIdStr==null || !classIdStr.equals(getClassId())){
+			classIdStr = getClassId();
+		}
 	}
 
 	@Override
-	public void setMenu() {
-		if(classIdStr==null || !classIdStr.equals(getClassId())){
-			titlesMenu = new MenuDAO().getMenu("assem_titles", "sequence");
-			topMenu = new MenuDAO().getTopComponentsMenu("assemblied");
-			classIdStr = getClassId();
-		}
+	protected String getDatabaseNameForTitles() {
+		return "assem_titles";
 	}
 
 	@Override
@@ -74,7 +75,18 @@ public class Assemblies extends Component {
 			valueStr = getRevision();
 			menu = new ComponentDAO().getRevisions(getPartNumber());
 		}
-		return getOptionHTML((menu!=null)?menu.getKeys():null, (menu!=null)?menu.getDescriptions():null, valueStr);
+
+		String[] keys;
+		String[] descriptions;
+		if(menu!=null){
+			keys = menu.getKeys();
+			descriptions = menu.getDescriptions();
+		}else{
+			keys = null;
+			descriptions = null;
+		}
+
+		return getOptionHTML(keys, descriptions, valueStr);
 	}
 
 	@Override
@@ -91,22 +103,8 @@ public class Assemblies extends Component {
 		case REVISION:
 			returnStr = getRevision();
 			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
-			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -126,26 +124,8 @@ public class Assemblies extends Component {
 		case REVISION:
 			isSet = setRevision(valueStr);
 			break;
-		case PART_NUMBER:
-			if(valueStr!=null
-					&& valueStr.length()==PART_NUMB_SIZE){
-				isSet = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case DESCRIPTION:
-			isSet = valueStr!=null && !valueStr.isEmpty();
-			super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSet = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSet = super.setValue(super.LOCATION, valueStr);
-			break;
-		case LINK:
-			isSet
-			= super.setValue(super.LINK, valueStr);
+		default:
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 
 		return isSet;
@@ -156,8 +136,9 @@ public class Assemblies extends Component {
 	}
 
 	private String getTopLevelQ() {
-		return (getTopLevel().length()!=0)
-				? getTopLevel()
+		String topLevel = getTopLevel();
+		return (topLevel.length()!=0)
+				? topLevel
 						: "?????";
 	}
 
@@ -174,7 +155,8 @@ public class Assemblies extends Component {
 	}
 
 	protected String get() {
-		return getClassId().length()==1 ? getClassId()+"??" : getClassId();
+		String classId = getClassId();
+		return classId.length()==1 ? classId+"??" : classId;
 	}
 
 	private String getOption() {
@@ -182,8 +164,9 @@ public class Assemblies extends Component {
 	}
 
 	private String getOptionQ() {
-		return (getOption().length()!=0)
-				? getOption()
+		String option2 = getOption();
+		return (option2.length()!=0)
+				? option2
 						: "?";
 	}
 

@@ -2,13 +2,13 @@ package irt.data.pcb;
 
 import irt.data.components.Component;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class BareBoard extends Board {
 
 	@Override
 	public void setClassId(){
-		setClassId(Component.CLASS_ID_NAME.get(TextWork.BARE_BOARD));
+		setClassId(Component.CLASS_ID_NAME.get(TextWorker.BARE_BOARD));
 	}
 
 	@Override

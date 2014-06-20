@@ -4,8 +4,10 @@ import irt.data.Menu;
 import irt.data.components.Component;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
+import irt.work.TextWorker.PartNumberFirstChar;
 
 public class MetalParts extends Component {
 
@@ -34,7 +36,7 @@ public class MetalParts extends Component {
 
 	@Override
 	public void setClassId(){
-		setClassId(TextWork.METAL_PARTS);
+		setClassId(""+PartNumberFirstChar.METAL_PARTS.getFirstDigit().getFirstChar());
 	}
 
 	@Override
@@ -50,9 +52,9 @@ public class MetalParts extends Component {
 	@Override
 	public void setMenu() {
 		if(getClassIdStr()==null || !getClassIdStr().equals(getClassId())){
-			titlesMenu = new MenuDAO().getMenu("metal_titles", "sequence");
-			f1Menu = new MenuDAO().getMenu("metal_f1","description");
-			f2Menu = new MenuDAO().getMenu("metal_f2","description");
+			titlesMenu = new MenuDAO().getMenu("metal_titles", OrderBy.SEQUENCE);
+			f1Menu = new MenuDAO().getMenu("metal_f1", OrderBy.DESCRIPTION);
+			f2Menu = new MenuDAO().getMenu("metal_f2", OrderBy.DESCRIPTION);
 			setClassIdStr(getClassId());
 		}
 	}
@@ -320,11 +322,11 @@ public class MetalParts extends Component {
 
 	@Override
 	public boolean isSet() {
-		return 		TextWork.isValid(getFinish1()) 
-				&&	TextWork.isValid(getFinish2())
+		return 		TextWorker.isValid(getFinish1()) 
+				&&	TextWorker.isValid(getFinish2())
 				&&	!getOption().isEmpty()
 				&&	!getDescription().isEmpty()
-				&&	TextWork.isValid(getRevision());
+				&&	TextWorker.isValid(getRevision());
 	}
 
 	public static Menu getF1Menu() {

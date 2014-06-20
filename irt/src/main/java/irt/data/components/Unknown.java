@@ -29,7 +29,7 @@ public class Unknown extends Component {
 
 	@Override
 	public void setClassId() {
-
+		setClassId("Unknown");
 	}
 
 	@Override

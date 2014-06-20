@@ -3,11 +3,12 @@ package irt.data.components;
 import irt.data.Menu;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.data.dao.MenuDAO.OrderBy;
+import irt.work.TextWorker;
 
 public class RF_PowerFET extends Isolator {
 	
-	private static final int FET = TextWork.FET;
+	private static final int FET = TextWorker.FET;
 
 	@Override
 	public void setClassId(){
@@ -21,12 +22,12 @@ public class RF_PowerFET extends Isolator {
 
 	@Override
 	public Menu getPackages() {
-		return new MenuDAO().getMenu("fet_type","description");
+		return new MenuDAO().getMenu("fet_type", OrderBy.DESCRIPTION);
 	}
 
 	@Override
 	public Menu getTypes() {
-		return new MenuDAO().getMenu("fet_package","description");
+		return new MenuDAO().getMenu("fet_package", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -39,7 +40,7 @@ public class RF_PowerFET extends Isolator {
 
 	@Override
 	protected Menu getTitlesMenu() {
-		return new MenuDAO().getMenu("fet_titles","sequence");
+		return new MenuDAO().getMenu("fet_titles", OrderBy.SEQUENCE);
 	}
 
 	@Override

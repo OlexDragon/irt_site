@@ -3,26 +3,28 @@ package irt.data.components;
 import irt.data.Menu;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.text.DecimalFormat;
 
 public class Inductor extends Component {
 
-	private static final int INDUCTOR = TextWork.INDUCTOR;
-	public final int VALUE			= 0;
-	public final int PRECISION 		= 1;
-	public final int PACKAGE 		= 2;
-	public final int CURRENT 		= 3;
-	public final int DESCRIPTION 	= 4;
-	public final int MANUFACTURE 	= 5;
-	public final int MAN_PART_NUM 	= 6;
-	public final int QUANTITY 		= 7;
-	public final int LOCATION 		= 8;
-	public final int LINK 			= 9;
-	public final int PART_NUMBER 	=10;
-	public final int NUMBER_OF_FIELDS= 11;
+	private static final int INDUCTOR = TextWorker.INDUCTOR;
+	public static final int VALUE		= 0;
+	public static final int PRECISION 	= 1;
+	public static final int PACKAGE 	= 2;
+	public static final int CURRENT 	= 3;
+	private static final int SHIFT 		= 4;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 
 	private static Menu typeMenu;
 	private static Menu precisionMenu;
@@ -51,13 +53,13 @@ public class Inductor extends Component {
 	@Override
 	public void setMenu() {
 		if(typeMenu==null){
-			typeMenu = new MenuDAO().getMenu("size","description");
+			typeMenu = new MenuDAO().getMenu("size", OrderBy.DESCRIPTION);
 			if(typeMenu!=null)
-				typeMenu.add( new MenuDAO().getMenu("ic_package","description"));
+				typeMenu.add( new MenuDAO().getMenu("ic_package", OrderBy.DESCRIPTION));
 		}
 
 		if(precisionMenu==null){
-			precisionMenu = new MenuDAO().getMenu("precision","description");
+			precisionMenu = new MenuDAO().getMenu("precision", OrderBy.DESCRIPTION);
 		}
 	}
 
@@ -103,28 +105,8 @@ public class Inductor extends Component {
 		case CURRENT:
 			returnStr = getCurrent().isEmpty() ? "" : new  Value(getCurrent(), Value.CURRENT).toValueString();
 			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
-			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case MANUFACTURE:
-			returnStr = getManufId();
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -132,48 +114,26 @@ public class Inductor extends Component {
 
 	@Override
 	public boolean setValue(int index, String valueStr) {
-		boolean isSetted = false;
+		boolean isSet = false;
 
 		switch (index) {
 		case VALUE:
-			isSetted = setValue(valueStr);
+			isSet = setValue(valueStr);
 			break;
 		case PRECISION:
-			isSetted = setPrecision(valueStr);
+			isSet = setPrecision(valueStr);
 			break;
 		case CURRENT:
-			isSetted = setCurrent(valueStr);
+			isSet = setCurrent(valueStr);
 			break;
 		case PACKAGE:
-			isSetted = setPackage(valueStr);
+			isSet = setPackage(valueStr);
 			break;
-		case PART_NUMBER:
-			if (valueStr!=null
-					&& valueStr.length() == PART_NUMB_SIZE) {
-				isSetted = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case MAN_PART_NUM:
-			isSetted = super.setValue(super.MAN_PART_NUM, valueStr);
-			break;
-		case MANUFACTURE:
-			isSetted = super.setValue(super.MANUFACTURE, valueStr);
-			break;
-		case DESCRIPTION:
-			isSetted = super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
-			break;
-		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+		default:
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 
-		return isSetted;
+		return isSet;
 	}
 
 	@Override
@@ -191,7 +151,7 @@ public class Inductor extends Component {
 		boolean isSetted = false;
 		
 		if(valueStr!=null && !valueStr.isEmpty()){
-			Value value = new Value(valueStr, TextWork.INDUCTOR);
+			Value value = new Value(valueStr, TextWorker.INDUCTOR);
 			valueStr = value.toString();
 			setPartNumber(getClassId()+valueStr+getPrecisionQ()+getPackageQ()+getCurrentQ());
 			setDbValue(value.toValueString());
@@ -267,7 +227,7 @@ public class Inductor extends Component {
 		boolean isSetted = false;
 		
 		if(valueStr!=null && !valueStr.isEmpty()){
-			valueStr = new Value(valueStr, TextWork.CURRENT).toString();
+			valueStr = new Value(valueStr, TextWorker.CURRENT).toString();
 			setPartNumber(getClassId()+getValueQ()+getPrecisionQ()+getPackageQ()+valueStr);
 			isSetted = true;
 		}else
@@ -304,7 +264,7 @@ public class Inductor extends Component {
 
 	@Override
 	public String getPartNumberF() {
-		return TextWork.getPartNumber(getPartNumber(), 3, 10, PART_NUMB_SIZE, PART_NUMB_SIZE);
+		return TextWorker.getPartNumber(getPartNumber(), 3, 10, PART_NUMB_SIZE, PART_NUMB_SIZE);
 	}
 
 	@Override

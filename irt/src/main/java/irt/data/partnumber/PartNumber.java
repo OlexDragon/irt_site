@@ -32,6 +32,8 @@ import org.apache.logging.log4j.core.Logger;
 
 public class PartNumber {
 
+	private static final CostDAO COST_DAO = new CostDAO();
+
 	private static final Logger logger = (Logger) LogManager.getLogger();
 
 	private char selectedFirstChar;
@@ -138,23 +140,36 @@ public class PartNumber {
 			logger.trace("{}", component);
 
 			if(component==null){
+				String errorMessage;
 				if(partNumberStr.replace("?", "").length() < 3){
-					if((component = new PartNumberDetails(null).getComponent(""+partNumberStr.charAt(0)))==null)
-						error.setErrorMessage("Part number is not correct. <small>(E030)</small>");
-					else
-						error.setErrorMessage("Part number is not correct. <small>(E001)</small>");
+					if((component = new PartNumberDetails(null).getComponent(""+partNumberStr.charAt(0)))==null){
+						errorMessage = "Part number is not correct. <small>(E030)</small>";
+						logger.info(errorMessage);
+						error.setErrorMessage(errorMessage);
+					}else{
+						errorMessage = "Part number is not correct. <small>(E001)</small>";
+						logger.info(errorMessage);
+						error.setErrorMessage(errorMessage);
+					}
 				}else{
 					String classId = partNumberStr.substring(0, 3);
 					component = new PartNumberDetails(null).getComponent(classId);
 					if(component!=null){
 						component.setPartNumber(partNumberStr);
 						String partNumberF = component.getPartNumberF();
-						if (component.getPartNumber().contains("?"))
-							error.setErrorMessage("Part number '" +partNumberF+ "' is not correct. <small>(E031)</small>");
-						else
-							error.setErrorMessage(partNumberF+" - do not exist. <small>(E032)</small>");
+						if (component.getPartNumber().contains("?")){
+							errorMessage = "Part number '" +partNumberF+ "' is not correct. <small>(E031)</small>";
+							logger.info(errorMessage);
+							error.setErrorMessage(errorMessage);
+						}else{
+							errorMessage = partNumberF+" - do not exist. <small>(E032)</small>";
+							logger.info(errorMessage);
+							error.setErrorMessage(errorMessage);
+						}
 					}else
-						error.setErrorMessage("Part number is not correct. <small>(E033)</small>");
+						errorMessage = "Part number is not correct. <small>(E033)</small>";
+						logger.info(errorMessage);
+						error.setErrorMessage(errorMessage);
 				}
 			}
 		}else{
@@ -293,7 +308,7 @@ public class PartNumber {
 	}
 	
 	public boolean hasCost(){
-		return component!=null ? new CostDAO().hasCost(component.getId()) : false;
+		return component!=null ? COST_DAO.hasCost(component.getId()) : false;
 	}
 
 	public boolean hasBom(){ String pn = component!=null ? component.getManufPartNumber() : null;
@@ -355,8 +370,11 @@ public class PartNumber {
 	}
 
 	public Table getPrices() {
-		cost = new CostDAO().getCost(component.getId());
-		table = cost.getComponentTable();
+		if(component!=null){
+			cost = COST_DAO.getCost(component.getId());
+			if(cost!=null)
+				table = cost.getComponentTable();
+		}
 		return table;
 	}
 

@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context>
-  <Resource name="datasource" 
-            type="javax.sql.DataSource"
-            auth="Container"
-            maxActive="40"
-            maxIdle="0" 
-            maxWait="10000"
-            username="irt" 
-            password="vsat" 
-            driverClassName="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://localhost:3306/irt?autoReconnect=true" />
+<Context path="/irt">
+  <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" maxActive="40" maxIdle="0" maxWait="10000" name="datasource" password="vsat" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/irt?autoReconnect=true" username="irt"/>
 </Context>

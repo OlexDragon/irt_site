@@ -1,6 +1,6 @@
 package irt.product;
 
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -137,7 +137,7 @@ public class BomRef {
 	 * @param references String with references separated by spaces or dashes
 	 */
 	public void addReferences(String references) {
-		addReferencesNumber(TextWork.getFirstLetters(references), getIntArray(references));
+		addReferencesNumber(TextWorker.getFirstLetters(references), getIntArray(references));
 	}
 
 	/**

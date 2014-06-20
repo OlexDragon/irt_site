@@ -5,7 +5,7 @@ import irt.data.dao.ComponentDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
 import irt.table.OrderBy;
 import irt.table.Table;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Search {
 
@@ -22,7 +22,7 @@ public class Search {
 	public Table componentBy(String partNumberStr, OrderBy orderBy) {
 		Table table = null;
 
-		if((table = new ComponentDAO().getComponentsTable(TextWork.pnValidation(partNumberStr), orderBy))!=null)
+		if((table = new ComponentDAO().getComponentsTable(TextWorker.pnValidation(partNumberStr), orderBy))!=null)
 			table.setClassName("border");
 
 		return table;

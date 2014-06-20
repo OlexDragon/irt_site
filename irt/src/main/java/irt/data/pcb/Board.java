@@ -3,8 +3,10 @@ package irt.data.pcb;
 import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.data.metal.MetalParts;
-import irt.work.TextWork;
+import irt.work.TextWorker;
+import irt.work.TextWorker.PartNumberFirstChar;
 
 public class Board extends MetalParts {
 
@@ -23,7 +25,7 @@ public class Board extends MetalParts {
 
 	@Override
 	public void setClassId(){
-		setClassId(TextWork.BOARD);
+		setClassId(""+PartNumberFirstChar.BOARD.getFirstDigit().getFirstChar());
 	}
 
 	@Override
@@ -39,10 +41,10 @@ public class Board extends MetalParts {
 	@Override
 	public void setMenu() {
 		if(getClassIdStr()==null || !getClassIdStr().equals(getClassId())){
-			setF1Menu(new MenuDAO().getMenu("board_mat","description"));
-			setF2Menu(new MenuDAO().getMenu("board_type","description"));
+			setF1Menu(new MenuDAO().getMenu("board_mat", OrderBy.DESCRIPTION));
+			setF2Menu(new MenuDAO().getMenu("board_type", OrderBy.DESCRIPTION));
 			setClassIdStr(getClassId());
-			titlesMenu = new MenuDAO().getMenu("board_title", "sequence");
+			titlesMenu = new MenuDAO().getMenu("board_title", OrderBy.SEQUENCE);
 		}
 	}
 
@@ -161,7 +163,7 @@ public class Board extends MetalParts {
 
 		if(isSet()){
 			if(getID().isEmpty()){
-				tmpStr += TextWork.addZeroInFront(getNewID(), 4);
+				tmpStr += TextWorker.addZeroInFront(getNewID(), 4);
 				setPartNumber(tmpStr+getMaterialQ()+getTypeQ()+getRevisionQ());
 			}
 			isSetted = true;

@@ -4,8 +4,10 @@ import irt.data.Menu;
 import irt.data.components.Component;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
+import irt.work.TextWorker.PartNumberFirstChar;
 
 public class TopLevel extends Component {
 
@@ -40,7 +42,7 @@ public class TopLevel extends Component {
 
 	@Override
 	public void setClassId(){
-		setClassId(TextWork.TOP);
+		setClassId(""+PartNumberFirstChar.TOP.getFirstDigit().getFirstChar());
 	}
 
 	@Override
@@ -62,20 +64,20 @@ public class TopLevel extends Component {
 	public void setMenu() {
 		MenuDAO menuDAO = new MenuDAO();
 
-		titlesMenu = menuDAO.getMenu("top_titles", "sequence");
+		titlesMenu = menuDAO.getMenu("top_titles", OrderBy.SEQUENCE);
 
 		setFreqMenuDAO(menuDAO);
 
-		packMenu = menuDAO.getMenu("top_pack","description");
-		deviceMenu = menuDAO.getMenu("top_device", "description");
-		confMenu = menuDAO.getMenu("top_config","description");
+		packMenu = menuDAO.getMenu("top_pack", OrderBy.DESCRIPTION);
+		deviceMenu = menuDAO.getMenu("top_device", OrderBy.DESCRIPTION);
+		confMenu = menuDAO.getMenu("top_config", OrderBy.DESCRIPTION);
 	}
 
 	protected void setFreqMenuDAO(MenuDAO menuDAO) {
-		freqMenu = menuDAO.getMenu("band","description");
-		freqMenu.add(menuDAO.getMenu("band_uc","description"));
-		freqMenu.add(menuDAO.getMenu("band_buc","description"));
-		freqMenu.add(menuDAO.getMenu("band_dc","description"));
+		freqMenu = menuDAO.getMenu("band", OrderBy.DESCRIPTION);
+		freqMenu.add(menuDAO.getMenu("band_uc", OrderBy.DESCRIPTION));
+		freqMenu.add(menuDAO.getMenu("band_buc", OrderBy.DESCRIPTION));
+		freqMenu.add(menuDAO.getMenu("band_dc", OrderBy.DESCRIPTION));
 	}
 
 	@Override
@@ -374,7 +376,7 @@ public class TopLevel extends Component {
 
 	@Override
 	public String getPartNumberF() {
-		return TextWork.getPartNumber(getPartNumber(), 3, 10, 14, PART_NUMB_SIZE);
+		return TextWorker.getPartNumber(getPartNumber(), 3, 10, 14, PART_NUMB_SIZE);
 	}
 
 	protected void setFreqMenu(Menu menu) {

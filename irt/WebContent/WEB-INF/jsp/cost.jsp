@@ -3,6 +3,7 @@
 <%@ page import="irt.data.purchase.Cost"%>
 <%@ page import="irt.data.dao.BomDAO"%>
 <%@ page import="irt.data.dao.MenuDAO"%>
+<%@ page import="irt.data.dao.MenuDAO.OrderBy"%>
 <%@ page import="irt.data.dao.ComponentDAO"%>
 <%@ page import="irt.data.dao.CompanyDAO"%>
 <%@ page import="irt.data.HTMLWork" %>
@@ -31,7 +32,7 @@
 		<input type="hidden" id="scrolly" name="scrolly" value="<%=request.getParameter("scrolly")%>" />
 		<input type="hidden" id="position" name="position" value="<%=cost.getPosition()%>" />
 		<input type="hidden" id="what" name="what" />
-		<%=HTMLWork.getHtmlSelect(new MenuDAO().getComboBoxFields("cost_class"), classId, "class_id", "onchange=\"oneClick('submit')\"", "Select")%>
+		<%=HTMLWork.getHtmlSelect(new MenuDAO().getComboBoxFields("cost_class", OrderBy.DESCRIPTION), classId, "class_id", "onchange=\"oneClick('submit')\"", "Select")%>
 <%	if(!classId.isEmpty() && !classId.equals("Select")){
 %>		<%=HTMLWork.getHtmlSelect(new ComponentDAO().getComboBoxFields(classId), componentId, "component_id", "onchange=\"oneClick('submit')\"", "Select")%>
 <%	}

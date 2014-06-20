@@ -13,14 +13,16 @@ public class FirstDigitDAO extends DataAccessObject {
 
 //	private Logger logger = Logger.getLogger(this.getClass());
 
-	public FirstDigit get(char id) {
-		return get(""+id);
+	public FirstDigit get(int id) {
+		//		logger.debug("get(String description); description = " + description);
+		return getFirstDigit("SELECT*FROM`irt`.`first_digits`WHERE`id_first_digits`="+id);
 	}
 
-	public FirstDigit get(String id) {
-		//		logger.debug("get(String description); description = " + description);
+	public FirstDigit get(char partNumberFirstChar) {
+		return getFirstDigit("SELECT*FROM`irt`.`first_digits`WHERE`part_numbet_first_char`='"+partNumberFirstChar+"'");
+	}
 
-		String query = "SELECT*FROM`irt`.`first_digit`WHERE`id`='"+id+"'";
+	private FirstDigit getFirstDigit(String query) {
 		try(Connection conecsion = getDataSource().getConnection();
 			PreparedStatement statement = conecsion.prepareStatement(query);
 			ResultSet resultSet = statement.executeQuery();) {
@@ -28,9 +30,9 @@ public class FirstDigitDAO extends DataAccessObject {
 			if (!resultSet.next()) {
 				return null;
 			}
-			return new FirstDigit(resultSet);
+			return new FirstDigit(resultSet.getInt("id_first_digits"), resultSet.getString("part_numbet_first_char").charAt(0), resultSet.getString("description"));
 		} catch (SQLException e) {
-			new ErrorDAO().saveError(e, "FirstDigitDAO.get");
+			new ErrorDAO().saveError(e, "FirstDigitDAO.getFirstDigit");
 			throw new RuntimeException(e);
 		}
 	}
@@ -39,13 +41,13 @@ public class FirstDigitDAO extends DataAccessObject {
 
 		LinkedList<FirstDigit> firstDigitList = new LinkedList<FirstDigit>();
 
-		String query = "SELECT*FROM`IRT`.`first_digit`ORDER BY`description`";
+		String query = "SELECT*FROM`IRT`.`first_digits`ORDER BY`description`";
 		try(Connection conecsion = getDataSource().getConnection();
 				PreparedStatement statement = conecsion.prepareStatement(query);
 				ResultSet resultSet = statement.executeQuery();) {
 
 			while (resultSet.next()) {
-				firstDigitList.add(new FirstDigit(resultSet));
+				firstDigitList.add(new FirstDigit(resultSet.getInt("id_first_digits"), resultSet.getString("part_numbet_first_char").charAt(0), resultSet.getString("description")));
 			}
 		} catch (SQLException e) {
 			new ErrorDAO().saveError(e, "FirstDigitDAO.getAll");

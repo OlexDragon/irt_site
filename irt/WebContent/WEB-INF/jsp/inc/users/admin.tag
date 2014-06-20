@@ -25,7 +25,7 @@
 <tr>
 	<td></td>
 	<td></td>
-	<td></td>
+	<td><input type="checkbox" name="u_flag_workOrder" id="u_flag_workOrder" <%=HTMLWork.getChecked(userToEdit.isWorkOrder())%> /><label for="u_flag_workOrder">Work Order</label></td>
 	<td><input type="checkbox" name="u_flag_deviceTypeUpdate" id="u_flag_deviceTypeUpdate" <%=HTMLWork.getChecked(userToEdit.isDeviceTypeUpdate())%> /><label for="u_flag_deviceTypeUpdate">Device Type Update</label></td>
 </tr>
 </table>

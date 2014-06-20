@@ -3,7 +3,7 @@ package irt.product;
 import irt.data.components.Component;
 import irt.data.components.Data;
 import irt.data.dao.ComponentDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class BomUnit extends BomRef implements BomUnitInterface {
 
@@ -40,7 +40,7 @@ public class BomUnit extends BomRef implements BomUnitInterface {
 
 	public void setRefLetters(String reference) {
 		if(reference!=null && !reference.isEmpty() && component!=null){
-			String refLetter = TextWork.getFirstLetters(reference);
+			String refLetter = TextWorker.getFirstLetters(reference);
 			if(component.getSchematicLetter()==null)
 				new ComponentDAO().setRefLetters(component.getId(), refLetter);
 			else if(!refLetter.equals(component.getSchematicLetter()))

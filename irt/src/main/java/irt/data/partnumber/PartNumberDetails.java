@@ -21,10 +21,12 @@ import irt.data.components.Inductor;
 import irt.data.components.Isolator;
 import irt.data.components.MC;
 import irt.data.components.Other;
+import irt.data.components.PlasticParts;
 import irt.data.components.PowerSupply;
 import irt.data.components.RF_PowerFET;
 import irt.data.components.Resistor;
 import irt.data.components.Transistor;
+import irt.data.components.Unknown;
 import irt.data.components.Varicap;
 import irt.data.components.VoltageRegulator;
 import irt.data.components.WireHarness;
@@ -47,6 +49,8 @@ import irt.data.pcb.PopulatedBoard;
 import irt.data.pcb.Project;
 import irt.data.pcb.Schematic;
 import irt.data.pcb.SoftwareLoadedPopulatedBoard;
+import irt.data.row.RawMaterial;
+import irt.data.row.Wire;
 import irt.data.screws.Nut;
 import irt.data.screws.ScrOther;
 import irt.data.screws.Screw;
@@ -60,218 +64,258 @@ import irt.data.top.Sspb;
 import irt.data.top.TopLevel;
 import irt.web.Init;
 import irt.work.InputTitle;
-import irt.work.TextWork;
+import irt.work.TextWorker;
+import irt.work.TextWorker.PartNumberFirstChar;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 
 
 public class PartNumberDetails {
 
 	Component component;
 
-	//	private Logger logger = Logger.getLogger(this.getClass());
+	private Logger logger = (Logger) LogManager.getLogger();
 
 	public PartNumberDetails(Component component) {
 		this.component = component;
 	}
 
 	public Component getComponent(String componentId) {
+		logger.entry(componentId);
 
-		if (componentId!=null && !componentId.equalsIgnoreCase((component!=null)?component.getClassId():null)) {
+		if (componentId!=null && (component==null || !componentId.equalsIgnoreCase(component.getClassId()))) {
 
 			componentId = componentId.toUpperCase();
-			if(componentId.length()==1)
-				switch (componentId) {
-				case TextWork.TOP:
+			if(componentId.length()==1){
+
+				PartNumberFirstChar firstChar;
+				char charAt = componentId.charAt(0);
+				if(Character.isDigit(charAt)) {
+					int parseInt = Integer.parseInt(componentId);
+					firstChar = parseInt==0 ? PartNumberFirstChar.valueOf(charAt) : PartNumberFirstChar.valueOf(parseInt);
+				} else
+					firstChar = PartNumberFirstChar.valueOf(charAt);
+
+				logger.trace("firstChar = {}", firstChar);
+				if(firstChar!=null)
+				switch (firstChar) {
+				case TOP:
 					component = new TopLevel();
 					break;			
-				case TextWork.ASSEMBLIES:
+				case ASSEMBLIES:
 					component = new Assemblies();
 					break;			
-				case TextWork.BOARD:
+				case BOARD:
 					component = new Board();
 					break;
-				case TextWork.METAL_PARTS:
+				case METAL_PARTS:
 					component = new MetalParts();
 					break;
-				case TextWork.COMPONENT:
+				case COMPONENT:
 					component = new Component();
 					break;
-				case TextWork.SCREWS:
+				case SCREWS:
 					component = new Screws();
+					break;
+				case RAW_MATERIAL:
+					component = new RawMaterial();
+					break;
+				default:
+					component = new Unknown();
 				}
-			else {
+			}else {
 				Integer id = Component.CLASS_NAME_ID.get(componentId);
+				logger.trace("\n\tclass ID:\t{}\n\tcomponentId:\t{}", id, componentId);
 				if(id!=null)
 				switch (id) {
 //Top ASSemblies
-				case TextWork.FREQUENCY_CONVERTER:
+				case TextWorker.FREQUENCY_CONVERTER:
 					component = new FrequencyConverter();
 					break;
-				case TextWork.REDUNDANT:
+				case TextWorker.REDUNDANT:
 					component = new RedundantSystem();
 					break;
-				case TextWork.SSPA:
+				case TextWorker.SSPA:
 					component = new Sspa();
 					break;
-				case TextWork.SSPB:
+				case TextWorker.SSPB:
 					component = new Sspb();
 					break;
 //Assemblies
-				case TextWork.CARRIER_ASSEMBLIES:
+				case TextWorker.CARRIER_ASSEMBLIES:
 					component = new CarrierAssy();
 					break;
-				case TextWork.COVER_ASSEMBLIES:
+				case TextWorker.COVER_ASSEMBLIES:
 					component = new CoverAssy();
 					break;
-				case TextWork.ENCLOSURE_ASSEMBLIES:
+				case TextWorker.ENCLOSURE_ASSEMBLIES:
 					component = new EnclosureAssy();
 					break;
-				case TextWork.KIT_ASSEMBLIES:
+				case TextWorker.KIT_ASSEMBLIES:
 					component = new KitAssy();
 					break;
-				case TextWork.SWALL_ASSEMBLIES:
+				case TextWorker.SWALL_ASSEMBLIES:
 					component = new SWallAssy();
 					break;
-				case TextWork.WG_ASSEMBLIES:
+				case TextWorker.WG_ASSEMBLIES:
 					component = new WGAssy();
 					break;
 //Board
-				case TextWork.BARE_BOARD:
+				case TextWorker.BARE_BOARD:
 					component = new BareBoard();
 					break;
-				case TextWork.POPULATED_BOARD:
+				case TextWorker.POPULATED_BOARD:
 					component = new PopulatedBoard();
 					break;
-				case TextWork.SOFT_LOADED_BOARD:
+				case TextWorker.SOFT_LOADED_BOARD:
 					component = new SoftwareLoadedPopulatedBoard();
 					break;
-				case TextWork.SCHEMATIC:
+				case TextWorker.SCHEMATIC:
 					component = new Schematic();
 					break;
-				case TextWork.GERBER:
+				case TextWorker.GERBER:
 					component = new Gerber();
 					break;
-				case TextWork.PROJECT:
+				case TextWorker.PROJECT:
 					component = new Project();
 					break;
 //Metal Parts
-				case TextWork.BRACKET:
+				case TextWorker.BRACKET:
 					component = new Bracket();
 					break;
-				case TextWork.CARRIER:
+				case TextWorker.CARRIER:
 					component = new Carrier();
 					break;
-				case TextWork.COVER:
+				case TextWorker.COVER:
 					component = new Cover();
 					break;
-				case TextWork.DEVICE_BLOK:
+				case TextWorker.DEVICE_BLOK:
 					component = new DeviceBlock();
 					break;
-				case TextWork.ENCLOSURE:
+				case TextWorker.ENCLOSURE:
 					component = new Enclosure();
 					break;
-				case TextWork.SHEET_METAL_BACKET:
+				case TextWorker.SHEET_METAL_BACKET:
 					component = new SheetMetalBracket();
 					break;
-				case TextWork.SHEET_METAL_ENCLOSURE:
+				case TextWorker.SHEET_METAL_ENCLOSURE:
 					component = new SheetMetalEnclosure();
 					break;
-				case TextWork.SHEET_METAL_FLAT:
+				case TextWorker.SHEET_METAL_FLAT:
 					component = new SheetMetalFlat();
 					break;
-				case TextWork.WALLS:
+				case TextWorker.WALLS:
 					component = new Walls();
 					break;
-				case TextWork.HEATING:
+				case TextWorker.HEATING:
 					component = new Heating();
 					break;
-				case TextWork.WAVEGUIDE:
+				case TextWorker.WAVEGUIDE:
 					component = new Waveguide();
 					break;
 //Components
-				case TextWork.OTHER:
+				case TextWorker.OTHER:
 					component = new Other();
 					break;
-				case TextWork.VARICAP:
+				case TextWorker.VARICAP:
 					component = new Varicap();
 					break;
-				case TextWork.TRANSISTOR:
+				case TextWorker.TRANSISTOR:
 					component = new Transistor();
 					break;
-				case TextWork.POWER_SUPPLY:
+				case TextWorker.POWER_SUPPLY:
 					component = new PowerSupply();
 					break;
-				case TextWork.FET:
+				case TextWorker.FET:
 					component = new RF_PowerFET();
 					break;
-				case TextWork.ISOLATOR:
+				case TextWorker.ISOLATOR:
 					component = new Isolator();
 					break;
-				case TextWork.CONNECTOR:
+				case TextWorker.CONNECTOR:
 					component = new Connector();
 					break;
-				case TextWork.FAN:
+				case TextWorker.FAN:
 					component = new Fan();
 					break;
-				case TextWork.INDUCTOR:
+				case TextWorker.INDUCTOR:
 					component = new Inductor();
 					break;
-				case TextWork.RESISTOR:
+				case TextWorker.RESISTOR:
 					component = new Resistor();
 					break;
-				case TextWork.CAPACITOR:
+				case TextWorker.CAPACITOR:
 					component = new Capacitor();
 					break;
-				case TextWork.VOLTAGE_REGULATOR:
+				case TextWorker.VOLTAGE_REGULATOR:
 					component = new VoltageRegulator();
 					break;
-				case TextWork.MICROCONTROLLER:
+				case TextWorker.MICROCONTROLLER:
 					component = new MC();
 					break;
-				case TextWork.IC_RF:
+				case TextWorker.IC_RF:
 					component = new IC();
 					break;
-				case TextWork.IC_NON_RF:
+				case TextWorker.IC_NON_RF:
 					component = new IC_NonRF();
 					break;
-				case TextWork.DIODE:
+				case TextWorker.DIODE:
 					component = new Diode();
 					break;
-				case TextWork.AMPLIFIER:
+				case TextWorker.AMPLIFIER:
 					component = new Amplifier();
 					break;
-				case TextWork.WIRE_HARNESS:
+				case TextWorker.WIRE_HARNESS:
 					component = new WireHarness();
 					break;
-				case TextWork.CABLES:
+				case TextWorker.CABLES:
 					component = new Cable();
 					break;
-				case TextWork.GASKET:
+				case TextWorker.GASKET:
 					component = new Gasket();
 					break;
 //Screw
-				case TextWork.SCREW:
+				case TextWorker.SCREW:
 					component = new Screw();
 					break;
-				case TextWork.WASHER:
+				case TextWorker.WASHER:
 					component = new Washer();
 					break;
-				case TextWork.SPACER:
+				case TextWorker.SPACER:
 					component = new Spacer();
 					break;
-				case TextWork.NUT:
+				case TextWorker.NUT:
 					component = new Nut();
 					break;
-				case TextWork.SCR_OTHER:
+				case TextWorker.SCR_OTHER:
 					component = new ScrOther();
 					break;
+				case TextWorker.PLASTIC_PLARTS:
+					component = new PlasticParts();
+					break;
+//Raw Materials
+				case TextWorker.WIRE:
+					component = new Wire();
+					break;
 				default:
-					component = new Component();
+					component = new Unknown();
 				}
-				else
-					component.setError("The Part Number can not start from '"+componentId+"'.");
+				else{
+					component = new Unknown();
+					String errorMessage = "The Part Number can not start from '"+componentId+"'.";
+					component.setError(errorMessage);
+					logger.error(errorMessage);
+				}
 			}
+		}else if(component==null){
+			component = new Unknown();
+			String errorMessage = "The Part Number can not start from '" + componentId + "'.";
+			component.setError(errorMessage);
+			logger.error(errorMessage);
 		}
 
+		logger.trace("EXIT\n\tcomponent:\t{}", component);
 		return component;
 	}
 

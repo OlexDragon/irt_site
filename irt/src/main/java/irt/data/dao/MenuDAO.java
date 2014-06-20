@@ -4,7 +4,7 @@ import irt.data.Menu;
 import irt.data.ValueText;
 import irt.data.companies.Place;
 import irt.work.ComboBoxField;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +17,23 @@ import java.util.List;
 
 public class MenuDAO extends DataAccessObject {
 
-	public Menu getMenu(String[] menuNames, String orderBy) {
+	public enum OrderBy{
+		DESCRIPTION	("`description`"),
+		SEQUENCE	("`sequence`"	);
+
+		private String orderBy;
+
+		private OrderBy(String orderBy){
+			this.orderBy = orderBy;
+		}
+
+		@Override
+		public String toString(){
+			return orderBy;
+		}
+	}
+
+	public Menu getMenu(String[] menuNames, OrderBy orderBy) {
 		String query = null;
 
 		if(menuNames!=null && menuNames.length!=0){
@@ -26,16 +42,18 @@ public class MenuDAO extends DataAccessObject {
 			for(int i=1; i<menuNames.length; i++)
 				whereClause += "OR`name`='"+menuNames[i]+"'";
 
-			query = "SELECT`id`,`description`FROM`irt`.`arrays`WHERE"+whereClause+(orderBy!=null ? "ORDER BY`"+orderBy+"`" : "");
+			query = "SELECT`id`,`description`FROM`irt`.`arrays`WHERE"+whereClause+(orderBy!=null ? "ORDER BY"+orderBy : "");
 		}
 		return getMenu(query);
 	}
 
-	public Menu getMenu(String menuName, String orderBy) {
+	public Menu getMenu(String menuName, OrderBy orderBy) {
 		String query = null;
 
 		if(menuName!=null && !menuName.isEmpty())
-			query = "SELECT`id`,`description`FROM`irt`.`arrays`WHERE`name`='"+ menuName+"'"+(orderBy!=null ? "ORDER BY`"+orderBy+"`" : "");
+			query = "SELECT`id`,`description`FROM`irt`.`arrays`WHERE`name`='"+ menuName+"'";
+		if(orderBy!=null)
+			query += "ORDER BY"+orderBy;
 
 		return getMenu(query);
 	}
@@ -194,7 +212,7 @@ public class MenuDAO extends DataAccessObject {
 		Connection conecsion = null;
 		Statement statement = null;
 		ResultSet resultSet = null;
-		partNumberStr = TextWork.pnValidation(partNumberStr);
+		partNumberStr = TextWorker.pnValidation(partNumberStr);
 		if(partNumberStr.length()>8)
 			partNumberStr = partNumberStr.substring(0,8)+'%';
 
@@ -230,34 +248,37 @@ public class MenuDAO extends DataAccessObject {
 		return menu;
 	}
 
-	public ComboBoxField[] getComboBoxFields(String name){
-		Connection conecsion = null;
-		PreparedStatement statement = null;
-		ResultSet resultSet = null;
+	public ComboBoxField[] getComboBoxFields(String name, OrderBy orderBy){
+		logger.entry(name, orderBy);
 
 		ComboBoxField[] cbFields = null;
 
-		String query = "SELECT`id`,`description`FROM`irt`.`arrays`WHERE`name`='"+name+"'ORDER BY`description`";
-		try {
-			conecsion = getDataSource().getConnection();
-			statement = conecsion.prepareStatement(query);
-			resultSet = statement.executeQuery();
+		String query = "SELECT`id`,`description`FROM`irt`.`arrays`WHERE`name`=?";
 
-			if (resultSet.last()){
-				int index = resultSet.getRow();
-				cbFields = new ValueText[index];
-				cbFields[--index] = new ValueText(resultSet.getString("id"), resultSet.getString("description"));
-				while(resultSet.previous())
-					cbFields[--index] = new ValueText(resultSet.getString("id"), resultSet.getString("description"));					
+		if(orderBy!=null)
+			query += " ORDER BY"+orderBy;
+
+		try(	Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query);) {
+
+			statement.setString(1, name);
+
+			try(ResultSet resultSet = statement.executeQuery()){
+
+				if (resultSet.last()){
+					int index = resultSet.getRow();
+					logger.debug("result Length: {}, query: {}, ? = {}", index, query, name);
+					cbFields = new ValueText[index];
+					cbFields[--index] = new ValueText(resultSet.getString("id"), resultSet.getString("description"));
+					while(resultSet.previous())
+						cbFields[--index] = new ValueText(resultSet.getString("id"), resultSet.getString("description"));					
+				}
 			}
-
 		} catch (SQLException e) {
 			new ErrorDAO().saveError(e, "MenuDAO.getComboBoxFields");
 			throw new RuntimeException(e);
-		} finally {
-			close(resultSet, statement, conecsion);
 		}
 		
-	return cbFields;
+	return logger.exit(cbFields);
 	}
 }

@@ -11,13 +11,14 @@
 <%	}
 	if(ub.isSellers() || ub.isStock() || ub.isEditCompanies()){%>
 		<li class="<%=isPO ? "active" : "passive" %>"><a href="sellers">Purchase Order</a></li>
+<%}	if(ub.isWorkOrder()){
+%>		<li class="<%=isWO ? "active" : "passive" %>"><a href="work-orders" >Work Orders</a></li>
 <%}
 	if(ub.isUser()){
 %>		<li class="<%=isU ? "active" : "passive" %>"><a href="users">Users</a></li>
 <%	}
-}%>	<li class="<%=isH ? "active" : "passive" %>"><a href="history">History</a></li>
-	<li class="passive"><a href="/lab<%=ub.getID()>0 ? "?li="+Base64.encodeBase64URLSafeString(logIn.toString().getBytes()) : "?lo=true" %>" >Lab</a></li>
-		<jsp:useBean id="back_page" scope="request" type="java.lang.String" />
+%>	<li class="<%=isH ? "active" : "passive" %>"><a href="history">History</a></li>
+<%}%>		<jsp:useBean id="back_page" scope="request" type="java.lang.String" />
 	<li class="<%=isLog ? "active" : "passive" %>"><a href="login?bp=<%=back_page%>"><%=(logIn!=null && logIn.isValid()) ? "Logout" : "Login"%></a></li>
 </ul>
 

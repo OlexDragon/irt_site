@@ -4,12 +4,13 @@ import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Diode extends Component {
 
-	private static final int DIODE = TextWork.DIODE;
+	private static final int DIODE = TextWorker.DIODE;
 
 	public final int MAN_PART_NUM	= 0;
 	public final int TYPE 			= 1;
@@ -61,11 +62,11 @@ public class Diode extends Component {
 	}
 
 	public Menu getPackages() {
-		return new MenuDAO().getMenu("ic_package","description");
+		return new MenuDAO().getMenu("ic_package", OrderBy.DESCRIPTION);
 	}
 
 	public Menu getTypes() {
-		return new MenuDAO().getMenu("diode_type","description");
+		return new MenuDAO().getMenu("diode_type", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -165,26 +166,26 @@ public class Diode extends Component {
 						getError().setErrorMessage("Manufacture P/N '"+getManufPartNumber()
 								+"' - alredy exist.<br />P/N - "+tmpComp.getPartNumberF());				
 				}else{
-					super.setValue(super.MAN_PART_NUM, valueStr);
+					super.setValue(Data.MAN_PART_NUM, valueStr);
 					isSetted = true;
 				}
 			}else
-				super.setValue(super.MAN_PART_NUM, null);
+				super.setValue(Data.MAN_PART_NUM, null);
 			break;
 		case MANUFACTURE:
-			isSetted = super.setValue(super.MANUFACTURE, valueStr);
+			isSetted = super.setValue(Data.MANUFACTURE, valueStr);
 			break;
 		case DESCRIPTION:
-			isSetted = super.setValue(super.DESCRIPTION, valueStr);
+			isSetted = super.setValue(Data.DESCRIPTION, valueStr);
 			break;
 		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
+			isSetted = super.setValue(Data.QUANTITY, valueStr);
 			break;
 		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
+			isSetted = super.setValue(Data.LOCATION, valueStr);
 			break;
 		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+			isSetted = super.setValue(Data.LINK, valueStr);
 		}
 			
 		return isSetted;
@@ -212,7 +213,7 @@ public class Diode extends Component {
 		String tmpStr = getClassId();
 		
 		if(isSet()){
-			tmpStr += TextWork.addZeroInFront(new ComponentDAO().getNewID(), 4); 
+			tmpStr += TextWorker.addZeroInFront(new ComponentDAO().getNewID(), 4); 
 			isSetted = true;
 		}else
 			tmpStr += "????";

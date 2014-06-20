@@ -4,7 +4,7 @@ import irt.data.components.Capacitor;
 import irt.data.components.Component;
 import irt.data.components.Value;
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,10 +171,10 @@ public class BillOfMaterialsValidation {
 				int classId = new SecondAndThirdDigitsDAO().getClassID(unit.getClassId());
 				Component compUnit = unit.getComponent();
 
-				if(classId==TextWork.RESISTOR || classId==TextWork.CAPACITOR || classId==TextWork.INDUCTOR){
+				if(classId==TextWorker.RESISTOR || classId==TextWorker.CAPACITOR || classId==TextWorker.INDUCTOR){
 
 					if(valueStr==null || valueStr.isEmpty() || compUnit.getValue().equals(new Value(valueStr, classId).toString())){
-						if(voltageStr!=null && !compUnit.getValue(Capacitor.VOLTAGE).equals(new Value(voltageStr, TextWork.VOLTAGE).toValueString()))
+						if(voltageStr!=null && !compUnit.getValue(Capacitor.VOLTAGE).equals(new Value(voltageStr, TextWorker.VOLTAGE).toValueString()))
 							unit.addError("Voltage - "+voltageStr+" do not match with part number "+compUnit.getPartNumberF());
 					}else//match
 						unit.addError("Value - "+valueStr+" not match with "+compUnit.getPartNumberF());

@@ -4,26 +4,28 @@ import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class PowerSupply extends Component {
 
-	private static final int POWER_SUPPLY = TextWork.POWER_SUPPLY;
-	public final int TYPE 			= 0;
-	public final int INPUT 			= 1;
-	public final int OUTPUT 		= 2;
-	public final int OUTPUT_VOLTAGE	= 3;
-	public final int PACKAGE 		= 4;
-	public final int ID			 	= 5;
-	public final int DESCRIPTION 	= 6;
-	public final int MANUFACTURE 	= 7;
-	public final int MAN_PART_NUM	= 8;
-	public final int LINK 			= 9;
-	public final int QUANTITY 		= 10;
-	public final int LOCATION 		= 11;
-	public final int PART_NUMBER 	= 12;
-	public final int NUMBER_OF_FIELDS= 13;
+	private static final int POWER_SUPPLY = TextWorker.POWER_SUPPLY;
+	public static final int TYPE 			= 0;
+	public static final int INPUT 			= 1;
+	public static final int OUTPUT 			= 2;
+	public static final int OUTPUT_VOLTAGE	= 3;
+	public static final int PACKAGE 		= 4;
+	public static final int ID			 	= 5;
+	private static final int SHIFT 			= 6;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 
 	@Override
 	public int getFieldsNumber() {
@@ -56,15 +58,15 @@ public class PowerSupply extends Component {
 	@Override
 	public void setMenu() {
 		if(packMenu==null)
-			packMenu = new MenuDAO().getMenu("ps_package","description");
+			packMenu = new MenuDAO().getMenu("ps_package", OrderBy.DESCRIPTION);
 		if(typeMenu==null)
-			typeMenu = new MenuDAO().getMenu("ps_type","description");
+			typeMenu = new MenuDAO().getMenu("ps_type", OrderBy.DESCRIPTION);
 		if(inputMenu==null)
-			inputMenu = new MenuDAO().getMenu("ps_input","description");
+			inputMenu = new MenuDAO().getMenu("ps_input", OrderBy.DESCRIPTION);
 		if(outputsMenu==null)
-			outputsMenu = new MenuDAO().getMenu("ps_outputs","description");
+			outputsMenu = new MenuDAO().getMenu("ps_outputs", OrderBy.DESCRIPTION);
 		if(outVMenu==null)
-			outVMenu = new MenuDAO().getMenu("ps_out_v","sequence");
+			outVMenu = new MenuDAO().getMenu("ps_out_v", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -125,25 +127,8 @@ public class PowerSupply extends Component {
 		case ID:
 			returnStr = getID();
 			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
-			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -151,55 +136,31 @@ public class PowerSupply extends Component {
 
 	@Override
 	public boolean setValue(int index, String valueStr) {
-		boolean isSetted = false;
+		boolean isSet = false;
 		switch(index){
 		case TYPE:
-			isSetted = setType(valueStr);
+			isSet = setType(valueStr);
 			break;
 		case INPUT:
-			isSetted = setInput(valueStr);
+			isSet = setInput(valueStr);
 			break;
 		case OUTPUT:
-			isSetted = setOutput(valueStr);
+			isSet = setOutput(valueStr);
 			break;
 		case OUTPUT_VOLTAGE:
-			isSetted = setOutV(valueStr);
+			isSet = setOutV(valueStr);
 			break;
 		case PACKAGE:
-			isSetted = setPackage(valueStr);
+			isSet = setPackage(valueStr);
 			break;
 		case ID:
-			isSetted = setComponentId();
+			isSet = setComponentId();
 			break;
-		case PART_NUMBER:
-			if(valueStr!=null
-					&& valueStr.length()==PART_NUMB_SIZE){
-				isSetted = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case MAN_PART_NUM:
-			isSetted = true;
-			super.setValue(super.MAN_PART_NUM, valueStr);
-			break;
-		case MANUFACTURE:
-			isSetted = true;
-			super.setValue(super.MANUFACTURE, valueStr);
-			break;
-		case DESCRIPTION:
-			isSetted = true;
-			super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
-		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+		default:
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 		
-		return isSetted;
+		return isSet;
 	}
 
 	private String getType() {
@@ -353,7 +314,7 @@ public class PowerSupply extends Component {
 
 		if(isSet()){
 			if(getID().isEmpty()){
-				tmpStr += TextWork.addZeroInFront(new ComponentDAO().getPSNewID(), 2); 
+				tmpStr += TextWorker.addZeroInFront(new ComponentDAO().getPSNewID(), 2); 
 				setPartNumber(tmpStr);
 			}
 			isSetted = true;

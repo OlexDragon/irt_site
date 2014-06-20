@@ -1,11 +1,12 @@
 package irt.data.components;
 
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Amplifier extends IC {
 
-	private static final int AMPLIFIER = TextWork.AMPLIFIER;
+	private static final SecondAndThirdDigitsDAO SECOND_AND_THIRD_DIGITS_DAO = new SecondAndThirdDigitsDAO();
+	private static final int AMPLIFIER = TextWorker.AMPLIFIER;
 
 	@Override
 	public void setClassId() {
@@ -16,7 +17,7 @@ public class Amplifier extends IC {
 	protected String getPartType(String partNumber) {
 		String str = null;
 		if(partNumber!=null && partNumber.length()>12){
-			str = new SecondAndThirdDigitsDAO().getClassDescription(AMPLIFIER);
+			str = SECOND_AND_THIRD_DIGITS_DAO.getClassDescription(AMPLIFIER);
 		}
 		return str;
 	}

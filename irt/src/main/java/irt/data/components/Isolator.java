@@ -2,25 +2,28 @@ package irt.data.components;
 
 import irt.data.Menu;
 import irt.data.dao.MenuDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.data.dao.SecondAndThirdDigitsDAO;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Isolator extends Component {
 	
-	private static final int ISOLATOR = TextWork.ISOLATOR;
+
+	private static final int ISOLATOR = TextWorker.ISOLATOR;
 	public static final int BAND 			= 0;
 	public static final int POWER 			= 1;
 	public static final int PACKAGE 		= 2;
 	public static final int TYPE 			= 3;
-	public static final int DESCRIPTION	= 4;
-	public static final int MANUFACTURE 	= 5;
-	public static final int MAN_PART_NUM 	= 6;
-	public static final int QUANTITY 		= 7;
-	public static final int LOCATION 		= 8;
-	public static final int LINK 			= 9;
-	public static final int PART_NUMBER 	=10;
-	public static final int NUMBER_OF_FIELDS= 11;
+	private static final int SHIFT 			= 4;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 
 	@Override
 	public int getFieldsNumber() {
@@ -56,21 +59,21 @@ public class Isolator extends Component {
 			activeClass = getClassId();
 			packMenu = getPackages();
 			typeMenu = getTypes();
-			bandMenu = new MenuDAO().getMenu("band","description");
+			bandMenu = new MenuDAO().getMenu("band", OrderBy.DESCRIPTION);
 		}
 	}
 
 	protected Menu getTitlesMenu() {
-		return new MenuDAO().getMenu("isol_titles","sequence");
+		return new MenuDAO().getMenu("isol_titles", OrderBy.DESCRIPTION);
 	}
 
 	public Menu getPackages() {
-		return new MenuDAO().getMenu("isol_package","description");
+		return new MenuDAO().getMenu("isol_package", OrderBy.DESCRIPTION);
 	}
 
 
 	public Menu getTypes() {
-		return new MenuDAO().getMenu("isol_type","description");
+		return new MenuDAO().getMenu("isol_type", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -123,28 +126,8 @@ public class Isolator extends Component {
 		case POWER:
 			returnStr = getPower();
 			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
-			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case MANUFACTURE:
-			returnStr = getManufId();
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -152,48 +135,26 @@ public class Isolator extends Component {
 
 	@Override
 	public boolean setValue(int index, String valueStr){
-		boolean isSetted = false;
+		boolean isSet = false;
 		
 		switch(index){
 		case BAND:
-			isSetted = setBand(valueStr);
+			isSet = setBand(valueStr);
 			break;
 		case TYPE:
-			isSetted = setType(valueStr);
+			isSet = setType(valueStr);
 			break;
 		case PACKAGE:
-			isSetted = setPackage(valueStr);
+			isSet = setPackage(valueStr);
 			break;
 		case POWER:
-			isSetted = setPower(valueStr);
+			isSet = setPower(valueStr);
 			break;
-		case PART_NUMBER:
-			if(valueStr!=null
-					&& valueStr.length()==PART_NUMB_SIZE){
-				isSetted = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case MAN_PART_NUM:
-			isSetted = super.setValue(super.MAN_PART_NUM, valueStr);
-			break;
-		case MANUFACTURE:
-			isSetted = super.setValue(super.MANUFACTURE, valueStr);
-			break;
-		case DESCRIPTION:
-			isSetted = super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
-			break;
-		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+		default:
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 		
-		return isSetted;
+		return isSet;
 	}
 
 	protected String getBand() {
@@ -305,6 +266,6 @@ public class Isolator extends Component {
 
 	@Override
 	public String getPartNumberF() {
-		return TextWork.getPartNumber(getPartNumber(), 3, 8, PART_NUMB_SIZE, PART_NUMB_SIZE);
+		return TextWorker.getPartNumber(getPartNumber(), 3, 8, PART_NUMB_SIZE, PART_NUMB_SIZE);
 	}
 }

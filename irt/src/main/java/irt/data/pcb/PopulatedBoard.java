@@ -4,7 +4,8 @@ import irt.data.Menu;
 import irt.data.components.Component;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
-import irt.work.TextWork;
+import irt.data.dao.MenuDAO.OrderBy;
+import irt.work.TextWorker;
 
 public class PopulatedBoard extends Board {
 
@@ -27,7 +28,7 @@ public class PopulatedBoard extends Board {
 
 	@Override
 	public void setClassId(){
-		setClassId(Component.CLASS_ID_NAME.get(TextWork.POPULATED_BOARD));
+		setClassId(Component.CLASS_ID_NAME.get(TextWorker.POPULATED_BOARD));
 	}
 
 	@Override
@@ -35,14 +36,14 @@ public class PopulatedBoard extends Board {
 		if(getClassIdStr()==null || !getClassIdStr().equals(getClassId())){
 			setF1Menu(new ComponentDAO().getByClassId("PCB", 6));//TODO
 			setClassIdStr(getClassId());
-			titlesMenu = new MenuDAO().getMenu("pcb_as_title", "sequence");
+			titlesMenu = new MenuDAO().getMenu("pcb_as_title", OrderBy.SEQUENCE);
 		}
 
 		if(detailsMenu==null){
 			MenuDAO dao = new MenuDAO();
-			detailsMenu = dao.getMenu("details","description");
+			detailsMenu = dao.getMenu("details", OrderBy.DESCRIPTION);
 			if(detailsMenu!=null)
-				detailsMenu.add(dao.getMenu("board_type","description"));
+				detailsMenu.add(dao.getMenu("board_type", OrderBy.DESCRIPTION));
 		}
 	}
 

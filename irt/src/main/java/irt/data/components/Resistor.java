@@ -3,25 +3,27 @@ package irt.data.components;
 import irt.data.Menu;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.text.DecimalFormat;
 
 public class Resistor extends Component {
 
-	private static final int RESISTOR = TextWork.RESISTOR;
-	public final int VALUE = 0;
-	public final int PRECISION = 1;
-	public final int SIZE = 2;
-	public final int DESCRIPTION = 3;
-	public final int MANUFACTURE = 4;
-	public final int MAN_PART_NUM = 5;
-	public final int QUANTITY = 6;
-	public final int LOCATION = 7;
-	public final int LINK = 8;
-	public final int PART_NUMBER =9;
-	public final int NUMBER_OF_FIELDS= 10;
+	private static final int RESISTOR = TextWorker.RESISTOR;
+	public static final int VALUE 		= 0;
+	public static final int PRECISION 	= 1;
+	public static final int SIZE 		= 2;
+	private static final int SHIFT 		= 5;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 
 	private static Menu precisionMenu;
 	private static Menu sizeMenu;
@@ -53,11 +55,11 @@ public class Resistor extends Component {
 	@Override
 	public void setMenu() {
 		if(precisionMenu==null){
-			precisionMenu = new MenuDAO().getMenu("prec_res","description");
+			precisionMenu = new MenuDAO().getMenu("prec_res", OrderBy.DESCRIPTION);
 		}
 
 		if(sizeMenu==null){
-			sizeMenu = new MenuDAO().getMenu("size_res","description");
+			sizeMenu = new MenuDAO().getMenu("size_res", OrderBy.DESCRIPTION);
 		}
 	}
 
@@ -93,7 +95,7 @@ public class Resistor extends Component {
 
 		switch(index){
 		case VALUE:
-			returnStr = getValue().isEmpty() ? "" : new  Value(getValue(), TextWork.RESISTOR).toValueString();
+			returnStr = getValue().isEmpty() ? "" : new  Value(getValue(), TextWorker.RESISTOR).toValueString();
 			break;
 		case PRECISION:
 			returnStr = getPrecision();
@@ -101,28 +103,8 @@ public class Resistor extends Component {
 		case SIZE:
 			returnStr = getSize();
 			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
-			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case MANUFACTURE:
-			returnStr = getManufId();
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -130,48 +112,23 @@ public class Resistor extends Component {
 
 	@Override
 	public boolean setValue(int index, String valueStr){
-		boolean isSetted = false;
+		boolean isSet = false;
 		
 		switch(index){
 		case VALUE:
-			isSetted = setValue(valueStr);
+			isSet = setValue(valueStr);
 			break;
 		case PRECISION:
-			isSetted = setPrecision(valueStr);
+			isSet = setPrecision(valueStr);
 			break;
 		case SIZE:
-			isSetted = setSize(valueStr);
+			isSet = setSize(valueStr);
 			break;
-		case PART_NUMBER:
-			if(valueStr!=null
-					&& valueStr.length()==14){
-				isSetted = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case MAN_PART_NUM:
-			isSetted = true;
-			super.setValue(super.MAN_PART_NUM, valueStr);
-			break;
-		case MANUFACTURE:
-			isSetted = true;
-			super.setValue(super.MANUFACTURE, valueStr);
-			break;
-		case DESCRIPTION:
-			isSetted = true;
-			super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
-			break;
-		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+		default:
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 		
-		return isSetted;
+		return isSet;
 	}
 
 	@Override
@@ -218,7 +175,7 @@ public class Resistor extends Component {
 		boolean isSetted = false;
 		
 		if(valueStr!=null && !valueStr.isEmpty()){
-			Value value = new Value(valueStr, TextWork.RESISTOR);
+			Value value = new Value(valueStr, TextWorker.RESISTOR);
 			valueStr = value.toString();
 			setPartNumber(getClassId()+valueStr+getPrecisionQ()+getSizeQ());
 			setDbValue(value.toValueString());

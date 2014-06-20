@@ -1,19 +1,19 @@
 package irt.data.components;
 
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.text.DecimalFormat;
 
 public class Value {
 
-	public static final int VOLTAGE 	= TextWork.VOLTAGE;
-	public static final int RESISTOR 	= TextWork.RESISTOR;
-	public static final int CAPACITOR 	= TextWork.CAPACITOR;
-	public static final int INDUCTOR 	= TextWork.INDUCTOR;
-	public static final int POWER 		= TextWork.POWER;
-	public static final int CURRENT 	= TextWork.CURRENT;
-	public static final int LENGTH_SM 	= TextWork.LENGTH_SM;
-	public static final int NUMBER 		= TextWork.NEMBER;
+	public static final int VOLTAGE 	= TextWorker.VOLTAGE;
+	public static final int RESISTOR 	= TextWorker.RESISTOR;
+	public static final int CAPACITOR 	= TextWorker.CAPACITOR;
+	public static final int INDUCTOR 	= TextWorker.INDUCTOR;
+	public static final int POWER 		= TextWorker.POWER;
+	public static final int CURRENT 	= TextWorker.CURRENT;
+	public static final int LENGTH_SM 	= TextWorker.LENGTH_SM;
+	public static final int NUMBER 		= TextWorker.NEMBER;
 
 	private int componentType;
 	private long value;

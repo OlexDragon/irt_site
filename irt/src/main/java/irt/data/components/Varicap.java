@@ -1,11 +1,11 @@
 package irt.data.components;
 
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 public class Varicap extends Capacitor {
 	
-	private static final int VARICAP = TextWork.VARICAP;
+	private static final int VARICAP = TextWorker.VARICAP;
 
 	@Override
 	public void setClassId() {

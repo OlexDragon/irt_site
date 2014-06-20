@@ -12,7 +12,7 @@ import irt.product.BomUnitInterface;
 import irt.table.HTMLHeader;
 import irt.table.OrderBy;
 import irt.table.Table;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -91,9 +91,9 @@ public class BomDAO extends DataAccessObject {
 	public String getDate() {
 		Calendar calendar = Calendar.getInstance();
 		String date = calendar.get(Calendar.YEAR)+"."
-				+ TextWork.addZeroInFront(
+				+ TextWorker.addZeroInFront(
 						"" + (calendar.get(Calendar.MONTH)+1), 2)+"."
-				+ TextWork.addZeroInFront(
+				+ TextWorker.addZeroInFront(
 						"" + calendar.get(Calendar.DATE), 2);
 		return date;
 	}
@@ -392,7 +392,7 @@ public class BomDAO extends DataAccessObject {
 			int index = 1;
 			while(resultSet.next()){
 				pdfPTable.addCell(new Phrase(""+index++,font));
-				addRowToPdfTable(pdfPTable,resultSet,font, s);
+				addRowToPdfTable(pdfPTable,resultSet,font);
 			}
 
 			pdfPTable.setHeaderRows(2);
@@ -505,7 +505,7 @@ public class BomDAO extends DataAccessObject {
 		return statement.executeQuery(query);	
 	}
 
-	private HelpClass addRowToPdfTable(PdfPTable pdfPTable, ResultSet resultSet, Font font, Statement s) throws SQLException {
+	private HelpClass addRowToPdfTable(PdfPTable pdfPTable, ResultSet resultSet, Font font) throws SQLException {
 
 		HelpClass hc = null;
 		if(new ComponentDAO().isExists(resultSet.getString(PART_NUMBER))){
@@ -515,7 +515,7 @@ public class BomDAO extends DataAccessObject {
 			PdfPCell pdfPCell = new PdfPCell();
 			PdfPCell pdfPCell2 = new PdfPCell();
 
-			hc = new HelpClass(resultSet.getString(PART_NUMBER), pdfPCell, pdfPCell2, font, s);
+			hc = new HelpClass(resultSet.getString(PART_NUMBER), pdfPCell, pdfPCell2, font);
 
 			Thread t = new  Thread(hc);
 			t.start();
@@ -557,10 +557,10 @@ public class BomDAO extends DataAccessObject {
 		int id = new SecondAndThirdDigitsDAO().getClassID(comp.getClassId());
 
 		switch(id){
-		case TextWork.CAPACITOR:
+		case TextWorker.CAPACITOR:
 			value = comp.getValue(Capacitor.VOLTAGE);
-		case TextWork.INDUCTOR:
-		case TextWork.RESISTOR:
+		case TextWorker.INDUCTOR:
+		case TextWorker.RESISTOR:
 			value = comp.getValue(Capacitor.VALUE)+(value.isEmpty() ? "" : ", "+value);
 		}
 		return value;
@@ -828,26 +828,24 @@ public class BomDAO extends DataAccessObject {
 		private PdfPCell pdfPCell1;
 		private PdfPCell pdfPCell2;
 		private Font font;
-		private Statement statement;
 
-		public HelpClass(String partNumberStr, PdfPCell pdfPCell1, PdfPCell pdfPCell2, Font font, Statement statement) {
+		public HelpClass(String partNumberStr, PdfPCell pdfPCell1, PdfPCell pdfPCell2, Font font) {
 			this.partNumberStr = partNumberStr;
 			this.pdfPCell1 = pdfPCell1;
 			this.pdfPCell2 = pdfPCell2;
 			this.font = font;
-			this.statement = statement;
 		}
 
 		@Override
 		public void run() {
 			Data comp;
-			try {
+			try(Connection connection = getDataSource().getConnection();) {
 				synchronized (BomDAO.this) {
-					comp = new ComponentDAO().getData(statement, partNumberStr);
+					comp = new ComponentDAO().getData(partNumberStr);
 				}
-			} catch (SQLException | CloneNotSupportedException e) {
-				new ErrorDAO().saveError(e, "BomDAO.getData");
-				throw new RuntimeException(e);
+			} catch (SQLException ex) {
+				new ErrorDAO().saveError(ex, "BomDAO.getData");
+				throw new RuntimeException(ex);
 			}
 
 			pdfPCell1.addElement(new Phrase(new Chunk(getValue(comp),font)));

@@ -2,18 +2,12 @@ package irt.data.components;
 
 import irt.data.Link;
 import irt.data.dao.ComponentDAO;
-import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.work.InputTitles;
-import irt.work.TextWork;
-
-import java.util.Map;
+import irt.work.TextWorker;
+import irt.work.TextWorker.PartNumberFirstChar;
 
 import org.apache.commons.io.FilenameUtils;
 
 public class Component extends Data{
-
-	public static final Map<Integer, String> CLASS_ID_NAME = new SecondAndThirdDigitsDAO().getMapIdClass();
-	public static final Map<String, Integer> CLASS_NAME_ID = new SecondAndThirdDigitsDAO().getMapClassId();
 
 	public Component(){	}
 
@@ -49,7 +43,7 @@ public class Component extends Data{
 
 	@Override
 	public void setClassId(){
-		setClassId(TextWork.COMPONENT);
+		setClassId(""+PartNumberFirstChar.COMPONENT.getFirstDigit().getFirstChar());
 	}
 
 	@Override
@@ -58,9 +52,8 @@ public class Component extends Data{
 	}
 
 	@Override
-	public void setTitles() {
-		setTitles( new InputTitles(new String[] { "Description",	"Mfr",	"Mfr P/N" },
-									new String[] { "text",			"select",		"text"}));
+	protected String getDatabaseNameForTitles() {
+		return "comp_titles";
 	}
 
 	public String getSelectOptionHTML(int index) {
@@ -69,24 +62,26 @@ public class Component extends Data{
 
 	@Override
 	public String getPartNumberF() {
-		return TextWork.getPartNumber(getPartNumber(), 3, 9, (PART_NUMB_SIZE==14)?14:13, PART_NUMB_SIZE);
+		return TextWorker.getPartNumber(getPartNumber(), 3, 9, (PART_NUMB_SIZE==14)?14:13, PART_NUMB_SIZE);
 	}
 
 	public String getPartNumber() {
-		return (super.getPartNumber()!=null)
-				? super.getPartNumber()
+		String partNumber = super.getPartNumber();
+		return (partNumber!=null)
+				? partNumber
 						: "";
 	}
 
 	public String getManufPartNumber() {
-		return (super.getManufPartNumber()!=null)
-				? super.getManufPartNumber()
+		String manufPartNumber = super.getManufPartNumber();
+		return (manufPartNumber!=null)
+				? manufPartNumber
 						: "";
 	}
 	
 	public boolean isSet() {
 		String partNumber = getPartNumber();
-		return partNumber!=null && partNumber.length()==PART_NUMB_SIZE && TextWork.isValid(partNumber);
+		return partNumber!=null && partNumber.length()==PART_NUMB_SIZE && TextWorker.isValid(partNumber);
 	}
 
 	@Override
@@ -95,18 +90,23 @@ public class Component extends Data{
 	}
 
 	public String getValue(int first, int and) {
-		String returnStr = "";
+		String returnStr;
+		int length = getPartNumber().length();
 
-		if(getPartNumber().length()>and)
+		if(length>and)
 			returnStr = getPartNumber().substring(first,and);
-		
-		return (!returnStr.contains("?"))
-								? returnStr
-										: "";
+
+		else if(length==and && length>first)
+			returnStr = getPartNumber().substring(first);
+
+		else
+			returnStr = "";
+
+		return returnStr.contains("?") ? "" : returnStr;
 	}
 	
 	public String getInt(String valueStr, int minNumberOfDijits) {
-		return String.format("%"+minNumberOfDijits+"s", new Value(valueStr, TextWork.CAPACITOR).getIntValue()).replaceAll(" ", "0");
+		return String.format("%"+minNumberOfDijits+"s", new Value(valueStr, TextWorker.CAPACITOR).getIntValue()).replaceAll(" ", "0");
 	}
 
 	public boolean isTheSameLink(String fileName) {

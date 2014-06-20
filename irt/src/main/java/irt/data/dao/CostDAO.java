@@ -9,6 +9,7 @@ import irt.data.purchase.ForPrice;
 import irt.data.purchase.Price;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -99,9 +100,6 @@ public class CostDAO extends DataAccessObject {
 	}
 
 	public Cost getCost(String topComponentIdStr){
-		Connection conecsion = null;
-		Statement statement = null;
-		ResultSet resultSet = null;
 		Cost cost = null;
 
 
@@ -109,21 +107,23 @@ public class CostDAO extends DataAccessObject {
 								"`irt`.part_number(part_number)AS`pn`," +
 								"`description`" +
 							"FROM`irt`.`components`" +
-						"WHERE`id`="+topComponentIdStr;
-		try {
-			conecsion = getDataSource().getConnection();
-			statement = conecsion.createStatement();
-			resultSet = statement.executeQuery(query);
+						"WHERE`id`=?";
+		int id = -1;
+		String partNumberStr = null;
+		String description = null;
+		try(	Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query);) {
 
-			int id = -1;
-			String partNumberStr = null;
-			String description = null;
-			if(resultSet.next()){
-				id = resultSet.getInt("id");
-				partNumberStr = resultSet.getString("pn");
-				description = resultSet.getString("description");
+			statement.setString(1, topComponentIdStr);
+			
+			try (ResultSet resultSet = statement.executeQuery();) {
+
+				if (resultSet.next()) {
+					id = resultSet.getInt("id");
+					partNumberStr = resultSet.getString("pn");
+					description = resultSet.getString("description");
+				}
 			}
-
 			if(id>0){
 				query = "(SELECT `c`.`id`AS`componentId`," +
 									"0 AS`alt_comp_id`," +
@@ -172,7 +172,7 @@ public class CostDAO extends DataAccessObject {
 								"LEFT JOIN`irt`.`companies`AS`cm`ON`cm`.`id`=`co`.`id_companies`" +
 								"WHERE`bom`.`id_top_comp`="+id+")" +
 							"ORDER BY`pn`,`mfrPN`,`for`";
-				resultSet = statement.executeQuery(query);
+				try(ResultSet resultSet = statement.executeQuery(query);){
 
 				if(resultSet.next()){
 					cost = new Cost(id,partNumberStr,description);
@@ -193,20 +193,16 @@ public class CostDAO extends DataAccessObject {
 					cost.reset();
 				}
 			}
+			}
 		} catch (SQLException e) {
 			new ErrorDAO().saveError(e, "CostDAO.getCost");
 			throw new RuntimeException(e);
-		} finally {
-				close(resultSet, statement, conecsion);
 		}
 		
 		return cost;
 	}
 
 	public Cost getCost(int componentId) {
-		Connection conecsion = null;
-		Statement statement = null;
-		ResultSet resultSet = null;
 		Cost cost = null;
 
 		String query = "(SELECT`irt`.part_number(`part_number`)AS`pn`," +
@@ -224,7 +220,7 @@ public class CostDAO extends DataAccessObject {
 						"LEFT JOIN`irt`.`manufacture`AS`m`ON`m`.`id`=`c`.`manuf_id`" +
 						"LEFT JOIN`irt`.`cost`AS`co`ON`co`.`id_components`=`c`.`id`AND`co`.`id_components_alternative`=0 " +
 						"LEFT JOIN`irt`.`companies`AS`cm`ON`cm`.`id`=`co`.`id_companies`" +
-						"WHERE`c`.`id`="+componentId+")" +
+						"WHERE`c`.`id`=?)" +
 
 						"UNION" +
 
@@ -245,12 +241,15 @@ public class CostDAO extends DataAccessObject {
 						"LEFT JOIN`irt`.`manufacture`AS`m`ON`m`.`id`=`ca`.`manuf_id`" +
 						"LEFT JOIN`irt`.`cost`AS`co`ON`co`.`id_components`=`ca`.`id_components`AND`co`.`id_components_alternative`=`ca`.`id`OR((`co`.`id_components_alternative`=0 AND`c`.`id`!=`alt`.`id`AND`co`.`id_components`=`alt`.`id`))" +
 						"LEFT JOIN`irt`.`companies`AS`cm`ON`cm`.`id`=`co`.`id_companies`" +
-						"WHERE`ca`.`id_components`="+componentId+")" +
+						"WHERE`ca`.`id_components`=?)" +
 						"ORDER BY`pn`,`mfrPN`,`for`";
-		try {
-			conecsion = getDataSource().getConnection();
-			statement = conecsion.createStatement();
-			resultSet = statement.executeQuery(query);
+
+		try(	Connection connection = getDataSource().getConnection();
+				PreparedStatement statement = connection.prepareStatement(query);) {
+
+			statement.setInt(1, componentId);
+			statement.setInt(2, componentId);
+			try(ResultSet resultSet = statement.executeQuery();){
 
 			if(resultSet.next()){
 				cost = new Cost(componentId, resultSet.getString("pn"), resultSet.getString("description"));
@@ -271,12 +270,11 @@ public class CostDAO extends DataAccessObject {
 							resultSet.getInt("qty")));
 				}while(resultSet.next());
 			}
+			}
 
 		} catch (SQLException e) {
-			new ErrorDAO().saveError(e, "CostDAO.getCost 2");
+			new ErrorDAO().saveError(e, "CostDAO.getCost(int componentId)");
 			throw new RuntimeException(e);
-		} finally {
-			close(resultSet, statement, conecsion);
 		}
 
 		return cost;

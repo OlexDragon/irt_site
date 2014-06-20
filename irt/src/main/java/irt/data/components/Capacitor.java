@@ -4,28 +4,30 @@ import irt.data.Menu;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
+import irt.data.dao.MenuDAO.OrderBy;
 import irt.work.InputTitles;
-import irt.work.TextWork;
+import irt.work.TextWorker;
 
 import java.text.DecimalFormat;
 
 public class Capacitor extends Component {
 
-	private static final int CAPACITOR = TextWork.CAPACITOR;
+	private static final int CAPACITOR = TextWorker.CAPACITOR;
 
 	public final static int VALUE 	= 0;
 	public final int TYPE 			= 1;
 	public final int PACKAGE 		= 2;
 	public final static int VOLTAGE = 3;
 	public final int SIZE 			= 4;
-	public final int DESCRIPTION	= 5;
-	public final int MANUFACTURE 	= 6;
-	public final int MAN_PART_NUM 	= 7;
-	public final int QUANTITY 		= 8;
-	public final int LOCATION 		= 9;
-	public final int LINK 			= 10;
-	public final int PART_NUMBER 	=11;
-	public final int NUMBER_OF_FIELDS	= 12;
+	private static final int SHIFT 	= 5;
+	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
+	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
+	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
+	public static final int QUANTITY 		= Data.QUANTITY			+SHIFT;
+	public static final int LOCATION 		= Data.LOCATION			+SHIFT;
+	public static final int LINK 			= Data.LINK				+SHIFT;
+	public static final int PART_NUMBER 	= Data.PART_NUMBER		+SHIFT;
+	public static final int NUMBER_OF_FIELDS= Data.NUMBER_OF_FIELDS	+SHIFT;
 
 	@Override
 	public int getFieldsNumber() {
@@ -55,13 +57,13 @@ public class Capacitor extends Component {
 	public void setMenu() {
 		MenuDAO menuDAO = new MenuDAO();
 		if(titlesMenu==null)
-			titlesMenu = menuDAO.getMenu("cap_titles", "sequence");
+			titlesMenu = menuDAO.getMenu("cap_titles", OrderBy.SEQUENCE);
 		if(sizeMenu==null)
-			sizeMenu = menuDAO.getMenu("size","description");
+			sizeMenu = menuDAO.getMenu("size", OrderBy.DESCRIPTION);
 		if(typeMenu==null)
-			typeMenu = menuDAO.getMenu("cap_type","description");
+			typeMenu = menuDAO.getMenu("cap_type", OrderBy.DESCRIPTION);
 		if(mountingMenu==null)
-			mountingMenu = menuDAO.getMenu("cap_mounting","description");
+			mountingMenu = menuDAO.getMenu("cap_mounting", OrderBy.DESCRIPTION);
 	}
 
 	@Override
@@ -104,7 +106,7 @@ public class Capacitor extends Component {
 		
 		switch(index){
 		case VALUE:
-			returnStr = getValue().isEmpty() ? "" : new  Value(getValue(), TextWork.CAPACITOR).toValueString();
+			returnStr = getValue().isEmpty() ? "" : new  Value(getValue(), TextWorker.CAPACITOR).toValueString();
 			break;
 		case TYPE:
 			returnStr = getType();
@@ -113,33 +115,13 @@ public class Capacitor extends Component {
 			returnStr = getPackage();
 			break;
 		case VOLTAGE:
-			returnStr = getVoltage().isEmpty() ? "" : new Value(getVoltage(), TextWork.VOLTAGE).toValueString();
+			returnStr = getVoltage().isEmpty() ? "" : new Value(getVoltage(), TextWorker.VOLTAGE).toValueString();
 			break;
 		case SIZE:
 			returnStr = getSize();
 			break;
-		case PART_NUMBER:
-			returnStr = getPartNumber();
-			break;
-		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
-			break;
-		case MANUFACTURE:
-			returnStr = getManufId();
-			break;
-		case DESCRIPTION:
-			returnStr = getDescription();
-			break;
-		case QUANTITY:
-			returnStr = getQuantityStr();
-			break;
-		case LOCATION:
-			returnStr = getLocation();
-			break;
-		case LINK:
-			returnStr = (getLink()!=null)
-							? getLink().getHTML()
-									:"";
+		default:
+			returnStr = super.getValue(index-SHIFT);
 		}
 		
 		return returnStr;
@@ -165,33 +147,8 @@ public class Capacitor extends Component {
 		case SIZE:
 			isSet = setSize(valueStr);
 			break;
-		case PART_NUMBER:
-			if(valueStr!=null
-				&& valueStr.length()==PART_NUMB_SIZE){
-				isSet = true;
-				setPartNumber(valueStr);
-			}
-			break;
-		case MAN_PART_NUM:
-			super.setValue(super.MAN_PART_NUM, valueStr);
-			break;
-		case MANUFACTURE:
-			super.setValue(super.MANUFACTURE, valueStr);
-			break;
-		case DESCRIPTION:
-			super.setValue(super.DESCRIPTION, valueStr);
-			break;
-		case QUANTITY:
-			isSet = super.setValue(super.QUANTITY, valueStr);
-			break;
-		case LOCATION:
-			isSet = super.setValue(super.LOCATION, valueStr);
-			break;
-		case LINK:
-			isSet = super.setValue(super.LINK, valueStr);
-			break;
 		default:
-			isSet = false;	
+			isSet = super.setValue(index-SHIFT, valueStr);
 		}
 		
 		return isSet;
@@ -212,7 +169,7 @@ public class Capacitor extends Component {
 		boolean isSetted = false;
 
 		if(valueStr!=null && !valueStr.isEmpty()){
-			Value value = new Value(valueStr, TextWork.CAPACITOR);
+			Value value = new Value(valueStr, TextWorker.CAPACITOR);
 			valueStr = value.toString();
 			setDbValue(value.toValueString());
 			isSetted = true;
@@ -274,7 +231,7 @@ public class Capacitor extends Component {
 
 	private boolean setVoltage(String valueStr) {
 		boolean isSetted = false;
-		Value value = new Value(valueStr, TextWork.VOLTAGE);
+		Value value = new Value(valueStr, TextWorker.VOLTAGE);
 		if (value.getIntValue()>0) {
 			valueStr = value.toString();
 			isSetted = true;
@@ -374,7 +331,7 @@ public class Capacitor extends Component {
 		String str = null;
 		if(partNumber!=null && partNumber.length()>12){
 			str = new SecondAndThirdDigitsDAO().getClassDescription(CAPACITOR);
-			str += "\\\\"+new MenuDAO().getDescription(TextWork.CAP_TYPE,partNumber.substring(7,8));
+			str += "\\\\"+new MenuDAO().getDescription(TextWorker.CAP_TYPE,partNumber.substring(7,8));
 			str += "\\\\"+getDbValue().replaceAll("[\\d. ]", "").replace("n", "N");
 		}
 		return str;
