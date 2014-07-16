@@ -9,20 +9,35 @@
 
 	<Loggers>
 		<logger name="irt.web.ComponentsMovementServlet" 	level="WARN" />
-		<logger name="irt.web.PartNumberServlet" 			level="all" />
+		<logger name="irt.web.CostServlet" 					level="WARN" />
+		<logger name="irt.web.PartNumberServlet" 			level="WARN" />
 		<logger name="irt.web.WorkOrderServlet" 			level="WARN" />
 
-		<logger name="irt.data.partnumber.PartNumber"		level="all" />
-		<logger name="irt.data.partnumber.PartNumberDetails" level="all" />
+		<logger name="irt.data.Jackson" 					level="WARN" />
+
+		<logger name="irt.data.partnumber.PartNumber"		level="WARN" />
+		<logger name="irt.data.partnumber.PartNumberDetails" level="WARN" />
 
 		<logger name="irt.data.components.Component" 		level="WARN" />
+		<logger name="irt.data.components.Isolator" 		level="WARN" />
+		<logger name="irt.data.components.Resistor"			level="WARN" />
+		<logger name="irt.data.components.Unknown" 			level="WARN" />
+
+		<logger name="irt.data.purchase.ForPriceBean" 		level="WARN" />
+		<logger name="irt.data.purchase.CostService"		level="WARN" />
+		<logger name="irt.data.purchase.CostMfrPNService" 	level="WARN" />
+		<logger name="irt.data.purchase.CostUnitService" 	level="WARN" />
 
 		<logger name="irt.data.dao.MenuDAO" 				level="WARN" />
+		<logger name="irt.data.dao.CostDAO" 				level="all" />
 		<logger name="irt.data.dao.SecondAndThirdDigitsDAO" level="WARN" />
+		<logger name="irt.data.dao.DataAccessObject" 		level="WARN" />
 
 		<logger name="irt.data.workorder.WorkOrder"			level="WARN" />
 
-		<logger name="static.Component.logger"				level="all" />
+		<logger name="irt.table.OrderBy"					level="WARN" />
+
+		<logger name="static.Component.logger"				level="WARN" />
 
 		<Root level="WARN">
 			<AppenderRef ref="STDOUT" />

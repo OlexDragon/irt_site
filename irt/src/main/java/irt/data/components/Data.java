@@ -159,6 +159,7 @@ public abstract class Data {
 	}
 
 	public String getValue(int index){
+		logger.entry(index);
 		String returnStr = "";
 
 		switch(index){
@@ -187,10 +188,11 @@ public abstract class Data {
 									:"";
 		}
 		
-		return returnStr;
+		return logger.exit(returnStr);
 	}
 
 	public boolean setValue(int index, String valueStr){
+		logger.entry(index, valueStr);
 		boolean hasSet = valueStr!=null && !valueStr.trim().isEmpty();
 
 		if(hasSet)
@@ -217,7 +219,7 @@ public abstract class Data {
 			hasSet = false;
 		}
 		
-		return hasSet;
+		return logger.exit(hasSet);
 	}
 
 	public void setValue(ResultSet resultSet) throws SQLException, CloneNotSupportedException{
@@ -267,7 +269,7 @@ public abstract class Data {
 
 	public String getManufactureOptionHTML() {
 		String valueStr = "";
-		Manufacture[] all = new ManufactureDAO().getAll(getOrderBy());
+		Manufacture[] all = new ManufactureDAO().getAll(null);//getOrderBy());
 
 		int size = (all!=null) ? all.length : 0;
 		String[] tmp = new String[size];
@@ -377,14 +379,14 @@ public abstract class Data {
 	}
 	public void setDescription(String description) { this.description = description!=null && !(description =description.trim()).isEmpty() ? description.toUpperCase() : null;	}
 	public void setOrderBy		(String orderBy) 	{ if(this.orderBy==null) this.orderBy = new OrderBy(orderBy); else this.orderBy.setOrderBy(orderBy);						}
-	private void setOrderBy		(OrderBy orderBy) 	{ this.orderBy = orderBy; }
+	public void setOrderBy		(OrderBy orderBy) 	{ this.orderBy = orderBy; }
 	public void setId			(int id) 			{ this.id = id;									}
 	public void setFootprint	(String footprint) 	{ this.footprint = footprint;					}
 	public void setDbValue		(String value) 		{ this.dbValue = value;							}
 	public void setPartType		(String partType) 	{	this.partType = partType;					}
 	public void setSchematicPart(String schematicPart) {	this.schematicPart = schematicPart;		}
 	public void setSchematicLetter(String schematicLetter) { this.schematicLetter = schematicLetter;}
-	public void setClassId		(String classId) 	{ logger.entry(classId); this.classId = classId;}
+	public void setClassId		(String classId) 	{ logger.entry(this.classId = classId);}
 	public void setLink			(Link link) 		{ this.link = link;	}
 	public void setLink			(String linkId) 	{
 		if(linkId!=null && !linkId.isEmpty())

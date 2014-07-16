@@ -5,6 +5,7 @@ import irt.table.Row;
 import irt.table.Table;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -13,11 +14,11 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class DataAccessObject {
 
-    protected final Logger logger = (Logger) LogManager.getLogger(getClass().getName());
+    protected final Logger logger = LogManager.getLogger(getClass().getName());
 
 	private static DataSource dataSource;
 	private Error error = new Error();
@@ -74,7 +75,7 @@ public class DataAccessObject {
 	}
 
 	protected Table getTable(ResultSet resultSet, String href) throws SQLException {
-		logger.entry(resultSet, href);
+		logger.entry(href);
 		Table table = null;
 
 			ResultSetMetaData metaData = resultSet.getMetaData();
@@ -196,6 +197,20 @@ public class DataAccessObject {
 		}
 
 		return logger.exit(object);
+	}
+
+	public boolean isResult(PreparedStatement preparedStatement) {
+		logger.entry(preparedStatement);
+
+		boolean isExists = false;
+		try(ResultSet resultSet = preparedStatement.executeQuery()) {
+			isExists = resultSet.next();
+		} catch (SQLException e) {
+			new ErrorDAO().saveError(e, "DataAccessObject.isResult");
+			throw new RuntimeException(e);
+		}
+
+		return logger.exit(isExists);
 	}
 
 	public boolean isResult(String query) {

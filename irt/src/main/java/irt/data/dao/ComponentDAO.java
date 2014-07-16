@@ -653,10 +653,8 @@ public class ComponentDAO extends DataAccessObject {
 				case TextWorker.AMPLIFIER:
 				case TextWorker.OTHER:
 				case TextWorker.GASKET:
-					sn.add(Integer.parseInt(pn.substring(5,9)));
-					break;
 				case TextWorker.PLASTIC_PLARTS:
-					sn.add(Integer.parseInt(pn.substring(5)));
+					sn.add(Integer.parseInt(pn.substring(5,9)));
 					break;
 				case TextWorker.WIRE_HARNESS:
 				case TextWorker.CONNECTOR:
@@ -1212,8 +1210,6 @@ public class ComponentDAO extends DataAccessObject {
 
 			query = "SELECT*FROM("+query+"UNION "+query2+")AS`t`";
 			query += (component.getOrderBy()!=null) ? component.getOrderBy() : "ORDER BY`PartNumber`";
-
- //irt.work.Error.setErrorMessage(query);
 
 		return getTable(query, "part-numbers");
 	}

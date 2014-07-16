@@ -1,6 +1,6 @@
 <%@ page import="irt.table.Table"%>
 <%@ page import="irt.data.companies.Company"%>
-<%@ page import="irt.data.purchase.Cost"%>
+<%@ page import="irt.data.purchase.CostService"%>
 <%@ page import="irt.data.dao.BomDAO"%>
 <%@ page import="irt.data.dao.MenuDAO"%>
 <%@ page import="irt.data.dao.MenuDAO.OrderBy"%>
@@ -8,9 +8,8 @@
 <%@ page import="irt.data.dao.CompanyDAO"%>
 <%@ page import="irt.data.HTMLWork" %>
 
-<jsp:useBean id="classId" scope="request" type="java.lang.String" />
-<jsp:useBean id="cost" scope="request" type="irt.data.purchase.Cost" />
-<jsp:useBean id="componentId" scope="request" type="java.lang.String" />
+<jsp:useBean id="cost" scope="request" type="irt.data.purchase.CostService" />
+<jsp:useBean id="position" scope="request" type="java.lang.String" />
 <jsp:useBean id="error" scope="request" type="irt.data.Error" />
 
 <%@ include file="inc/top.tag" %>
@@ -23,14 +22,16 @@
 
 <div id="content">
 	<hr /><h3>IRT Cost</h3><hr />
-<%
+<%	String classId = cost.getClassId();
+	String componentId = cost.getComponentId();
+	boolean isCostEdit = cost.isEdit();
 	boolean isEditCost = ub.isEditCost();
 %>
 <form method="post" action="/irt/cost" onsubmit="storeScrollPosition()">
 	<p>
 		<input type="hidden" id="scrollx" name="scrollx" value="<%=request.getParameter("scrollx")%>" />
 		<input type="hidden" id="scrolly" name="scrolly" value="<%=request.getParameter("scrolly")%>" />
-		<input type="hidden" id="position" name="position" value="<%=cost.getPosition()%>" />
+		<input type="hidden" id="position" name="position" value="<%=position%>" />
 		<input type="hidden" id="what" name="what" />
 		<%=HTMLWork.getHtmlSelect(new MenuDAO().getComboBoxFields("cost_class", OrderBy.DESCRIPTION), classId, "class_id", "onchange=\"oneClick('submit')\"", "Select")%>
 <%	if(!classId.isEmpty() && !classId.equals("Select")){
@@ -47,20 +48,21 @@
 %>		<input type="submit" id="submit_set" name="submit_set" value="Set" />
 <%	}
 %>
-<%	if(ub.isEditCost() && cost.isEdit()){
+<%	if(ub.isEditCost() && isCostEdit){
 %>		<input type="submit" id="submit_save_set" name="submit_save_set" value="Save Set" />
 <%	}
 %>	</p>
 <%	if(ub.isEditCost()){
 		if(cost.isSet()){
 %>			<p>
-			<input type="checkbox" id="is_edit" name="is_edit" <%=cost.isEdit() ? "checked=\"checked\"" : ""%> onclick="oneClick('submit')" /><label for="is_edit">Edit</label>
-<%	if(cost.isChanged()){
+			<input type="checkbox" id="is_edit" name="is_edit" <%=isCostEdit ? "checked=\"checked\"" : ""%> onclick="oneClick('submit')" /><label for="is_edit">Edit</label>
+<%	if(isCostEdit && cost.isChanged()){
 %>				<input type="submit" id="submit_save" name="submit_save" value="Save" />
+				<input type="submit" id="submit_cansel" name="submit_cansel" value="Cancel" />
 <%	}
 %>			</p>
 <%	}
-		if(cost.isEdit()){
+		if(isCostEdit){
 %>		<div id="drag" onmouseover="style.cursor='hand'" >
 			<%=HTMLWork.getHtmlSelect(new CompanyDAO().getComboBoxFields(Company.ALL), null, "companies", null, "Select")%>
 			<label>MOQ:</label><input class="c3em" type="text" id="addFor" name="addFor" />

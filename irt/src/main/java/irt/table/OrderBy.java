@@ -1,11 +1,13 @@
 package irt.table;
 
-import irt.data.CookiesWorker;
-
-import javax.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 
 public class OrderBy {
-	private static final String DESC = "DESC";
+
+    protected final static Logger logger = (Logger) LogManager.getLogger();
+
+    private static final String DESC = "`DESC";
 	private static final String ORDER_BY = "ORDER BY`";
 	private String orderBy;
 	private boolean desc;
@@ -34,10 +36,10 @@ public class OrderBy {
 	@Override
 	public String toString() {
 		return (!orderBy.isEmpty()) 
-				? ORDER_BY+orderBy +"`"
-						+ ((isDesc()) 
+				? ORDER_BY+orderBy
+						+ (desc 
 								? DESC
-								: "") 
+								: "`") 
 				: "";
 	}
 
@@ -48,25 +50,29 @@ public class OrderBy {
 
 	@Override
 	public int hashCode() {
-		return orderBy!=null ? orderBy.hashCode() : super.hashCode();
+		return orderBy!=null ? orderBy.hashCode()+(desc ? 1231 : 1237) : super.hashCode();
 	}
 
 	public static OrderBy parseOrderBy(String orderByStr) {
+		logger.entry(orderByStr);
 		OrderBy orderBy = null;
 
+		boolean desc = false;
+
 		if(orderByStr!=null && orderByStr.startsWith(ORDER_BY)){
-			boolean desc = orderByStr.contains(DESC);
-			orderByStr = orderByStr.substring(ORDER_BY.length(), orderByStr.indexOf('`'));
-			orderBy = new OrderBy(orderByStr);
-			orderBy.setDesc(desc);
-		}
+			int indexOf = orderByStr.indexOf('`');
+			int lastIndexOf = orderByStr.lastIndexOf('`');
+			desc = orderByStr.contains(DESC);
+			if(indexOf>=0 && lastIndexOf>indexOf)
+				orderByStr = orderByStr.substring(++indexOf, lastIndexOf);
+			else
+				orderByStr = "";
+		}else
+			orderByStr = "";
 
-		return orderBy;
-	}
+		orderBy = new OrderBy(orderByStr);
+		orderBy.setDesc(desc);
 
-	public static OrderBy getOrderBy(HttpServletRequest request) {
-
-		String orderByStr = CookiesWorker.getCookieValue(request, OrderBy.class.getSimpleName());
-		return OrderBy.parseOrderBy(orderByStr);
+		return logger.exit(orderBy);
 	}
 }

@@ -14,9 +14,11 @@ import irt.web.Init;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -118,7 +120,8 @@ public class PurchaseOrder {
 
 	public Table getTable(){
 		Table table = new Table(new String[]{"Part Number","Description","Mfr PN","Mfr","Price","Qty","Total"}, null);
-		Price totalSum = null;
+		DecimalFormat decimalFormat = new DecimalFormat("#.00");
+		BigDecimal totalSum = null;
 		for(PurchaseOrderUnit pou:purchaseOrderUnits){
 			String mfrPN;
 			if(pou.size()>1 && isEdit){
@@ -129,12 +132,12 @@ public class PurchaseOrder {
 			}else
 				mfrPN = pou.getMfrPN().getMfrPN();
 
-			Price total = pou.getPrice()!=null ? new Price(pou.getPrice(), pou.getOrderQuantity()) : null;
+			BigDecimal total = pou.getPrice()!=null ? new BigDecimal(pou.getPrice()).multiply(new BigDecimal(pou.getOrderQuantity())) : null;
 			if(total!=null)
 				if(totalSum==null)
-					totalSum = new Price(total.getValueLong());
+					totalSum = total;
 				else
-					totalSum.addValue(total.getValueLong());
+					totalSum = totalSum.add(total);
 
 			table.add(new Row(new String[]{pou.getPartNumberLink(),
 											pou.getDescription(),
@@ -145,26 +148,26 @@ public class PurchaseOrder {
 														pou.getPrice()!=null ? pou.getPrice() : "",
 											isEdit ? "<input class=\"c3em\" type=\"text\" id=\"qty"+pou.getComponentId()+"\" name=\"qty"+pou.getComponentId()+"\" value=\""+pou.getOrderQuantity()+"\" "+(PartNumber.getBrowserId()==Init.CHROME ? "onclick" : "onfocus")+"=\"this.select();\" onkeypress=\"return oneKeyPress(event,'submit');\" />" :
 														""+pou.getOrderQuantity(),
-											total!=null ? total.getValue(2,2): ""}));
+											total!=null ? decimalFormat.format(total): ""}));
 		}
 		if(totalSum!=null){
-			Row row = new Row(new String[]{"","","",isGST || isQST ? "Subtotal":"Total","","",totalSum.getValue(2,2)});
+			Row row = new Row(new String[]{"","","",isGST || isQST ? "Subtotal":"Total","","",decimalFormat.format(totalSum)});
 			table.add(row);
 			row.setClassName("cBgYellow");
 
-			Price gst = null;
+			BigDecimal gst = null;
 			if(isGST)
 				gst = tableAddTax(table, "GST", totalSum);
-			Price qst = null;
+			BigDecimal qst = null;
 			if(isQST)
 				qst = tableAddTax(table, "QST", totalSum);
 
 			if(gst!=null)
-				totalSum.addValue(gst.getValueLong());
+				totalSum = totalSum.add(gst);
 			if(qst!=null)
-				totalSum.addValue(qst.getValueLong());
+				totalSum = totalSum.add(qst);
 			if(isGST || isQST){
-				row = new Row(new String[]{"","","","Total","","",totalSum.getValue(2,2)});
+				row = new Row(new String[]{"","","","Total","","",decimalFormat.format(totalSum)});
 				table.add(row);
 				row.setClassName("cBgYellow");
 			}
@@ -173,29 +176,30 @@ public class PurchaseOrder {
 		return table;
 	}
 
-	protected Price tableAddTax(Table table, String taxName, Price totalSum) {
-		Price xst;
-		String gstStr;
+	protected BigDecimal tableAddTax(Table table, String taxName, BigDecimal totalSum) {
+		DecimalFormat decimalFormat = new DecimalFormat("0.00####");
+		BigDecimal xst;
 		Tax tax = new Tax(taxName, null);
 		if (taxes.contains(tax)) {
 			xst = taxes.get(taxes.indexOf(tax)).getPursent();
-			gstStr = xst.getValue(1, 6);
 		} else {
-			gstStr = new MenuDAO().getDescription("tax", taxName);
-			addTax(taxName, new Price(gstStr));
+			String gstStr = new MenuDAO().getDescription("tax", taxName);
+			xst = new BigDecimal(gstStr);
+			addTax(taxName, xst);
 		}
-		xst = new Price(totalSum.getValueLong(), gstStr);
-		Row row = new Row(new String[] { "", "", "", "", taxName, gstStr + "%",	xst.getValue(2, 2) });
+
+		Row row = new Row(new String[] { "", "", "", "", taxName, xst + "%",	decimalFormat.format(xst = totalSum.multiply(xst)) });
 		table.add(row);
 		row.setClassName("cBgYellow");
 		return xst;
 	}
 
-	private void addTax(String name, Price gst) {
-		Tax tax = new Tax(name, gst);
+	private void addTax(String name, BigDecimal bigDecimal) {
+		Tax tax = new Tax(name, bigDecimal);
 		if(!taxes.contains(tax))
 			addTax(tax);
 	}
+
 	public String getPONumber() {
 		return poNumber;
 	}
@@ -293,24 +297,26 @@ public class PurchaseOrder {
 	}
 
 	public String getTaxes() {
+		DecimalFormat decimalFormat = new DecimalFormat("#.00####");
 		String taxesStr = null;
 		if(!taxes.isEmpty())
 			for(Tax t:taxes)
 				if(taxesStr==null)
-					taxesStr = t.getName()+":"+t.getPursent().getValue(1, 6);
+					taxesStr = t.getName()+":"+decimalFormat.format(t.getPursent());
 				else
-					taxesStr += ","+t.getName()+":"+t.getPursent().getValue(1, 6);
+					taxesStr += ","+t.getName()+":"+decimalFormat.format(t.getPursent());
 		return taxesStr;
 	}
 
 	public String getExtra() {
+		DecimalFormat decimalFormat = new DecimalFormat("#.00####");
 		String extraStr = null;
 		if(!extra.isEmpty())
 			for(Tax t:extra)
 				if(extraStr==null)
-					extraStr = t.getName()+":"+t.getPursent().getValue(1, 6);
+					extraStr = t.getName()+":"+decimalFormat.format(t.getPursent());
 				else
-					extraStr += ","+t.getName()+":"+t.getPursent().getValue(1, 6);
+					extraStr += ","+t.getName()+":"+decimalFormat.format(t.getPursent());
 		return extraStr;
 	}
 
@@ -319,7 +325,7 @@ public class PurchaseOrder {
 			String[] taxStrs = taxesStr.split(",");
 			for (String s : taxStrs) {
 				String[] tax = s.split(":");
-				addTax(new Tax(tax[0], new Price(tax[1])));
+				addTax(new Tax(tax[0], new BigDecimal(tax[1])));
 				if (tax[0].equals("GST"))
 					isGST = true;
 				else if (tax[0].equals("QST"))
@@ -338,7 +344,7 @@ public class PurchaseOrder {
 			String[] extraStrs = extraStr.split(",");
 			for (String s : extraStrs) {
 				String[] extras = s.split(":");
-				addExtra(new Tax(extras[0], new Price(extras[1])));
+				addExtra(new Tax(extras[0], new BigDecimal(extras[1])));
 			}
 		}
 	}
@@ -404,6 +410,7 @@ public class PurchaseOrder {
 	}
 
 	private PdfPTable getPdfTable(Image logo) throws DocumentException {
+		DecimalFormat decimalFormat = new DecimalFormat("#.00####");
 		int numColumns = 8;
 		PdfPTable pdfPTable = new PdfPTable(numColumns);
 		pdfPTable.setWidthPercentage(100);
@@ -624,10 +631,10 @@ public class PurchaseOrder {
 		Price tax1Price = null;
 		if(taxes.size()>0){
 			tax1 = taxes.get(0);
-			tax1Price = new Price(totalPrice.getValueLong(),  tax1.getPursent().getValue(1, 6));
+			tax1Price = new Price(totalPrice.getValueLong(), decimalFormat.format(tax1.getPursent()));
 			totalPrice.addValue(tax1Price.getValueLong());
 		}
-		cell = new PdfPCell(new Phrase(tax1!=null ? tax1.getName()+" "+tax1.getPursent().getValue(1, 6)+"%" : "", font));
+		cell = new PdfPCell(new Phrase(tax1!=null ? tax1.getName()+" "+decimalFormat.format(tax1.getPursent())+"%" : "", font));
 		cell.setColspan(2);
 		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		cell.setBorder(Rectangle.NO_BORDER);
@@ -655,10 +662,10 @@ public class PurchaseOrder {
 		Tax tax2 = null;
 		if(taxes.size()>1){
 			tax2 = taxes.get(1);
-			tax2Price = new Price(totalPrice.getValueLong(),  tax2.getPursent().getValue(1, 6));
+			tax2Price = new Price(totalPrice.getValueLong(), decimalFormat.format(tax2.getPursent()));
 			totalPrice.addValue(tax2Price.getValueLong());
 		}
-		cell = new PdfPCell(new Phrase(tax2!=null ? tax2.getName() + " " + tax2.getPursent().getValue(1, 6) + "%" : "", font));
+		cell = new PdfPCell(new Phrase(tax2!=null ? tax2.getName() + " " + decimalFormat.format(tax2.getPursent()) + "%" : "", font));
 		cell.setColspan(2);
 		cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		cell.setBorder(Rectangle.NO_BORDER);

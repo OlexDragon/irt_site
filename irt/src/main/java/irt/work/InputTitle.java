@@ -50,4 +50,9 @@ public class InputTitle {
 		}
 		return columnName;
 	}
+
+	@Override
+	public String toString() {
+		return "InputTitle [name=" + name + ", inputType=" + inputType + "]";
+	}
 }

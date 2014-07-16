@@ -124,7 +124,7 @@ public class SecondAndThirdDigitsDAO extends DataAccessObject {
 
 		Object sqlObject = null;
 		if (classId != null && classId.length() == 3){
-				String query = "SELECT`class_id`FROM`irt`.`second_and_third_digit`WHERE `id_first`='"+ classId.charAt(0)+"'AND`id`='"+classId.substring(1)+"'";
+				String query = "SELECT`class_id`FROM`irt`.`second_and_third_digit`WHERE `id_first_digits`='"+ classId.charAt(0)+"'AND`id`='"+classId.substring(1)+"'";
 				sqlObject = getSQLObject(query);
 		}
 //		irt.work.Error.setErrorMessage("getClassID: "+sqlObject);
@@ -133,7 +133,7 @@ public class SecondAndThirdDigitsDAO extends DataAccessObject {
 
 	public String[] getClassIDs(int countID) {
 
-		String query = "SELECT concat(`s`.`id_first`,`s`.`id`)" +
+		String query = "SELECT concat(`s`.`id_first_digits`,`s`.`id`)" +
 						"FROM`irt`.`counts`AS`c`" +
 						"JOIN`irt`.`second_and_third_digit`AS`s`ON`s`.`class_id`=`c`.`class_id`" +
 						"WHERE`c`.`id`="+ countID;
@@ -150,7 +150,7 @@ public class SecondAndThirdDigitsDAO extends DataAccessObject {
 				ResultSet resultSet = statement.executeQuery();) {
 
 			while(resultSet.next())
-				menu.add(resultSet.getInt("class_id"), resultSet.getString("id_first")+resultSet.getString("id"));
+				menu.add(resultSet.getInt("class_id"), resultSet.getString("id_first_digits")+resultSet.getString("id"));
 
 		} catch (SQLException e) {
 			new ErrorDAO().saveError(e, "SecondAndThirdDigitsDAO.getClassIDsMenue");

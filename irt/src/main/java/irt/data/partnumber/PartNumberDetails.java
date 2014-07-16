@@ -49,8 +49,8 @@ import irt.data.pcb.PopulatedBoard;
 import irt.data.pcb.Project;
 import irt.data.pcb.Schematic;
 import irt.data.pcb.SoftwareLoadedPopulatedBoard;
+import irt.data.row.RMWire;
 import irt.data.row.RawMaterial;
-import irt.data.row.Wire;
 import irt.data.screws.Nut;
 import irt.data.screws.ScrOther;
 import irt.data.screws.Screw;
@@ -82,9 +82,9 @@ public class PartNumberDetails {
 	}
 
 	public Component getComponent(String componentId) {
-		logger.entry(componentId);
+		logger.entry(componentId, component);
 
-		if (componentId!=null && (component==null || !componentId.equalsIgnoreCase(component.getClassId()))) {
+		if (componentId!=null) {
 
 			componentId = componentId.toUpperCase();
 			if(componentId.length()==1){
@@ -97,34 +97,41 @@ public class PartNumberDetails {
 				} else
 					firstChar = PartNumberFirstChar.valueOf(charAt);
 
+				
+
 				logger.trace("firstChar = {}", firstChar);
-				if(firstChar!=null)
-				switch (firstChar) {
-				case TOP:
-					component = new TopLevel();
-					break;			
-				case ASSEMBLIES:
-					component = new Assemblies();
-					break;			
-				case BOARD:
-					component = new Board();
-					break;
-				case METAL_PARTS:
-					component = new MetalParts();
-					break;
-				case COMPONENT:
-					component = new Component();
-					break;
-				case SCREWS:
-					component = new Screws();
-					break;
-				case RAW_MATERIAL:
-					component = new RawMaterial();
-					break;
-				default:
-					component = new Unknown();
-				}
-			}else {
+				if (firstChar != null
+						&& (component==null
+								|| firstChar.getFirstDigit().getFirstChar() != component.getClassId().charAt(0)
+								|| component.getClassId().length()!=1)
+				)
+
+					switch (firstChar) {
+					case TOP:
+						component = new TopLevel();
+						break;
+					case ASSEMBLIES:
+						component = new Assemblies();
+						break;
+					case BOARD:
+						component = new Board();
+						break;
+					case METAL_PARTS:
+						component = new MetalParts();
+						break;
+					case COMPONENT:
+						component = new Component();
+						break;
+					case SCREWS:
+						component = new Screws();
+						break;
+					case RAW_MATERIAL:
+						component = new RawMaterial();
+						break;
+					default:
+						component = new Unknown();
+					}
+			}else if(component==null || !componentId.equalsIgnoreCase(component.getClassId())){
 				Integer id = Component.CLASS_NAME_ID.get(componentId);
 				logger.trace("\n\tclass ID:\t{}\n\tcomponentId:\t{}", id, componentId);
 				if(id!=null)
@@ -296,7 +303,7 @@ public class PartNumberDetails {
 					break;
 //Raw Materials
 				case TextWorker.WIRE:
-					component = new Wire();
+					component = new RMWire();
 					break;
 				default:
 					component = new Unknown();
@@ -329,6 +336,12 @@ public class PartNumberDetails {
 
 				html += " "+it.getName()+":";
 				
+				logger.debug("\n\t"
+						+ "component:\t{}\n\t"
+						+ "Input Type:\t{}",
+						component,
+						it);
+
 				switch (it.getInputType().toLowerCase()) {
 				case "text":
 					html += "<input type=\"text\" id=\"arg" + i
