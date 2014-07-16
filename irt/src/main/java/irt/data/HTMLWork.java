@@ -3,7 +3,8 @@ package irt.data;
 import irt.data.components.movement.ComponentQty;
 import irt.data.components.movement.ComponentToMove;
 import irt.data.components.movement.ComponentsQuantity;
-import irt.data.purchase.ForPrice;
+import irt.data.purchase.ForPriceBean;
+import irt.data.purchase.ForPriceService;
 import irt.data.user.UserBean;
 import irt.work.ComboBoxField;
 
@@ -69,13 +70,16 @@ public class HTMLWork {
 	}
 
 
-	public static String getHtmlSelect(List<ForPrice> forPrices, int selectedFor, String name, String script) {
+	public static String getHtmlSelect(List<ForPriceBean> forPrices, int selectedFor, String name, String script) {
 
 		String returnStr = "<select "+(name!=null ? "id=\"" +name+"\" name=\""+name+"\" " : "")+(script!=null ? script : "")+" >";
 
 		if(forPrices!=null && !forPrices.isEmpty()){
-			ComboBoxField[] fields = new ForPrice[forPrices.size()];
-			returnStr += getConboBoxOption(forPrices.toArray(fields), ""+selectedFor);
+			int size = forPrices.size();
+			ComboBoxField[] fields = new ForPriceService[size];
+			for(int i=0; i<size; i++)
+				fields[i] = new ForPriceService().setForPriceBean(forPrices.get(i));
+			returnStr += getConboBoxOption(fields, ""+selectedFor);
 		}else
 			returnStr += "<option>Select</option>";
 		returnStr += "<option>Add</option>";

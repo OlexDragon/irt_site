@@ -48,6 +48,7 @@ public class MenuDAO extends DataAccessObject {
 	}
 
 	public Menu getMenu(String menuName, OrderBy orderBy) {
+		logger.entry(menuName, orderBy);
 		String query = null;
 
 		if(menuName!=null && !menuName.isEmpty())
@@ -55,7 +56,9 @@ public class MenuDAO extends DataAccessObject {
 		if(orderBy!=null)
 			query += "ORDER BY"+orderBy;
 
-		return getMenu(query);
+		logger.trace("\n\tQuery:\t{}", query);
+
+		return logger.exit(getMenu(query));
 	}
 
 	private Menu getMenu(String query) {

@@ -13,23 +13,13 @@ public class Unknown extends Component {
 	}
 
 	@Override
-	public String getPartNumberF() {
+	public String getValue() {
 		return "";
 	}
 
 	@Override
-	public String getValue() {
-		return null;
-	}
-
-	@Override
-	protected String getPartType(String partNumber) {
-		return null;
-	}
-
-	@Override
 	public void setClassId() {
-		setClassId("Unknown");
+		setClassId("___");
 	}
 
 	@Override

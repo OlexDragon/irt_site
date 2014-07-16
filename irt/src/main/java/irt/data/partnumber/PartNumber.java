@@ -13,7 +13,7 @@ import irt.data.dao.CostDAO;
 import irt.data.dao.FirstDigitDAO;
 import irt.data.dao.MenuDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.data.purchase.Cost;
+import irt.data.purchase.CostService;
 import irt.data.purchase.Purchase;
 import irt.data.user.UserBean;
 import irt.product.ProductStructure;
@@ -56,7 +56,7 @@ public class PartNumber {
 	private static int browserId;
 	private ProductStructure productStructure;
 	private boolean hasUpdate;
-	private Cost cost;
+	private CostService cost;
 
 	private static Error error = new Error();
 
@@ -361,21 +361,18 @@ public class PartNumber {
 		
 	}
 
-	public Cost getCost() {
-		return cost!=null ? cost : (cost=new Cost(0, null, null));
-	}
-
-	public void setCost(Cost cost) {
+	public void setCost(CostService cost) {
 		this.cost = cost;
 	}
 
-	public Table getPrices() {
-		if(component!=null){
-			cost = COST_DAO.getCost(component.getId());
+	public Table getPrices(int id) {
+		logger.entry(id);
+
+		cost = COST_DAO.getCost(id);
 			if(cost!=null)
 				table = cost.getComponentTable();
-		}
-		return table;
+
+			return logger.exit(table);
 	}
 
 	public User 	getUser()	{ return getUser(selectedUser); }

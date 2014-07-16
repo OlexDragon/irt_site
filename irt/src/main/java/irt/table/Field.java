@@ -70,6 +70,17 @@ public class Field {
 	}
 
 	public int getIntValue() {
-		return value!=null ? Integer.parseInt(value) : 0;
+
+		int result;
+		if(value!=null){
+			String replaceAll = this.value.replaceAll("\\D", "");
+			if(!replaceAll.isEmpty())
+				result = Integer.parseInt(replaceAll);
+			else
+				result = 0;
+		}else
+			result = 0;
+
+		return result;
 	}
 }

@@ -1,10 +1,12 @@
 package irt.data.purchase;
 
+import java.math.BigDecimal;
+
 public class Tax implements Comparable<Object>{
 	private String name;
-	private Price pursent;
+	private BigDecimal pursent;
 
-	public Tax(String name, Price pursent) {
+	public Tax(String name, BigDecimal pursent) {
 		super();
 		this.name = name;
 		this.pursent = pursent;
@@ -14,7 +16,7 @@ public class Tax implements Comparable<Object>{
 		return name;
 	}
 
-	public Price getPursent() {
+	public BigDecimal getPursent() {
 		return pursent;
 	}
 

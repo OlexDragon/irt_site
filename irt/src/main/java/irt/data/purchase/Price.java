@@ -51,12 +51,12 @@ public class Price {
 		this.value = (long) (value * perc);
 	}
 
-	public String getValue(int min, int max) {
+	public String getValue(int minLength, int maxLength) {
 		String str = "#.";
-		max -= min;
-		for(;min>0;min--)
+		maxLength -= minLength;
+		for(;minLength>0;minLength--)
 			str += '0';
-		for(;max>0;max--)
+		for(;maxLength>0;maxLength--)
 			str += '#';
 		DecimalFormat nf = new DecimalFormat(str);
 
@@ -81,8 +81,8 @@ public class Price {
 		return Long.valueOf(value).hashCode();
 	}
 
-	@Override
-	public String toString() {
-		return "Price [value=" + getValue(1, 6) + ", error="+error+"]";
-	}
+//	@Override
+//	public String toString() {
+//		return "Price [value=" + getValue(1, 6) + ", error="+error+"]";
+//	}
 }

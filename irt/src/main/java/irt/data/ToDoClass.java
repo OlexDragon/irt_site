@@ -36,6 +36,10 @@ public class ToDoClass {
 		return value;
 	}
 
+	public void setValue(String value) {
+		this.value = value;
+	}
+
 	public static ToDoClass parseToDoClass(String toDoClassStr){
 		logger.entry(toDoClassStr);
 

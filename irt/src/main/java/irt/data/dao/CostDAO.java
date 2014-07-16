@@ -1,12 +1,17 @@
 package irt.data.dao;
 
-import irt.data.purchase.Cost;
-import irt.data.purchase.CostCompany;
-import irt.data.purchase.CostMfrPN;
+import irt.data.purchase.CostBean;
+import irt.data.purchase.CostCompanyBean;
+import irt.data.purchase.CostCompanyService;
+import irt.data.purchase.CostMfrPNBean;
+import irt.data.purchase.CostMfrPNService;
+import irt.data.purchase.CostService;
 import irt.data.purchase.CostSetUnit;
-import irt.data.purchase.CostUnit;
-import irt.data.purchase.ForPrice;
-import irt.data.purchase.Price;
+import irt.data.purchase.CostUnitBean;
+import irt.data.purchase.CostUnitService;
+import irt.data.purchase.ForPriceBean;
+import irt.data.purchase.ForPriceService;
+import irt.data.purchase.ForPriceService.Status;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,59 +19,120 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class CostDAO extends DataAccessObject {
 
-	public void save(List<CostUnit> costUnits) {
-		Connection conecsion = null;
-		Statement statement = null;
-		String query;
+	private static final String UPDATE = "UPDATE`irt`.`cost` SET `cost`=? "
+										+ "WHERE `id_components`=? and" +
+												"`id_components_alternative`=? and" +
+												"`id_companies`=? and" +
+												"`for`=?";
+	private static final String INSERT_INTO = "INSERT INTO`irt`.`cost`("+
+																"`cost`," +
+																"`id_components`," +
+																"`id_components_alternative`," +
+																"`id_companies`," +
+																"`for`)" +
+															"VALUES(?,?,?,?,?)";
+	private static final String EXISTS = "SELECT*FROM`irt`.`cost`" +
+															"WHERE `id_components`=? and" +
+															"`id_components_alternative`=? and" +
+															"`id_companies`=? and" +
+															"`for`=?";
 
-		try {
-			conecsion = getDataSource().getConnection();
-			statement = conecsion.createStatement();
+	public int save(List<CostUnitBean> costUnits) {
+		logger.entry(costUnits);
+
+		int executedUpdate = 0;
+		try(Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statementInsert = conecsion.prepareStatement(INSERT_INTO);
+				PreparedStatement statementUpdate = conecsion.prepareStatement(UPDATE);) {
 	
-			for(CostUnit cu:costUnits){
-				for(CostMfrPN cmpn:cu.getMfrPartNumbers())
-					if(cmpn.getForPrices()!=null)
-						for(ForPrice fp:cmpn.getForPrices()){
-							int status = fp.getStatus();
-							if(status == ForPrice.INSERT)
-								query = "INSERT INTO`irt`.`cost`(" +
-											"`id_components`," +
-														"`id_components_alternative`," +
-																	"`id_companies`," +
-																				"`for`," +
-																							"`cost`)" +
-										"VALUES("+
-											cu.getComponentId(cmpn)+","+
-														(cmpn.getAlternativeUnit()==null ? cmpn.getId() : 0)+","+
-																	cmpn.getCompanyId()+","+
-																				fp.getForUnits()+","+
-																							fp.getPrice().getValueLong()+")";
-							else if(status== ForPrice.UPDATE)
-								query = "UPDATE `irt`.`cost` SET `cost`="+fp.getPrice().getValueLong()+
-										" WHERE `id_components`="+cu.getComponentId(cmpn)+" and" +
-												"`id_components_alternative`="+(cmpn.getAlternativeUnit()==null ? cmpn.getId() : 0)+" and" +
-												"`id_companies`="+cmpn.getCompanyId()+" and" +
-												"`for`="+fp.getForUnits();
+			PreparedStatement statement;
+
+			for(CostUnitBean cu:costUnits){
+				logger.trace("\n\tfor(CostUnitBean {}:costUnits)", cu);
+				for(CostMfrPNBean cmpn:cu.getMfrPartNumbers())
+					if(CostMfrPNService.getForPrices(cmpn)!=null)
+						for(ForPriceBean fp:CostMfrPNService.getForPrices(cmpn)){
+							Status status = ForPriceService.getStatus(fp);
+							logger.trace("\n\t"
+									+ "for(ForPriceBean\t{}:CostMfrPNService.getForPrices(cmpn))\n\t"
+									+ "status:\t{}",
+									fp,
+									status);
+							if(status == Status.HAVE_TO_INSERT)
+								statement = statementInsert;
+							else if(status== Status.HAVE_TO_UPDATE)
+								statement = statementUpdate;
 							else continue;
 
-							statement.executeUpdate(query);
-							fp.setPrice();
+							statement.setBigDecimal(1, fp.getPrice());
+							statement.setInt(2, cu.getComponentId());
+							statement.setInt(3, cmpn.getAlternativeUnit()==null ? cmpn.getId() : 0);
+							statement.setInt(4, CostMfrPNService.getCompanyId(cmpn));
+							statement.setInt(5, fp.getForUnits());
+							executedUpdate = statement.executeUpdate();
+							ForPriceService.setPrice(fp);
 						}
+					else
+						logger.warn("\n\tCostMfrPNService.getForPrices(cmpn)==null");
 			}
 
 		} catch (SQLException e) {
-			new ErrorDAO().saveError(e, "CostDAO.save");
+			new ErrorDAO().saveError(e, "CostDAO.save(List<CostUnitBean> costUnits)");
 			throw new RuntimeException(e);
-		} finally {
-			close(null, statement, conecsion);
 		}
+		return executedUpdate;
 	}
 
-	public void saveSet(int setId, int topComponentId, List<CostUnit> costUnits){
+	public int save(Map<Integer, CostCompanyBean> costCompanyBeans) {
+		logger.entry(costCompanyBeans);
+		Set<Integer> componentIds = costCompanyBeans.keySet();
+		int executedUpdate = 0;
+		if(!componentIds.isEmpty()){
+			try(Connection conecsion = getDataSource().getConnection();
+					PreparedStatement statementExists = conecsion.prepareStatement(EXISTS);
+					PreparedStatement statementInsert = conecsion.prepareStatement(INSERT_INTO);
+					PreparedStatement statementUpdate = conecsion.prepareStatement(UPDATE);) {
+
+				PreparedStatement statement;
+
+				for(Integer componentId:componentIds){
+					CostCompanyBean costCompanyBean = costCompanyBeans.get(componentId);
+					for(ForPriceBean forPriceBean:costCompanyBean.getForPriceBeans()){
+
+						statementExists.setInt(1, componentId);
+						statementExists.setInt(2, 0);
+						statementExists.setInt(3, costCompanyBean.getId());
+						statementExists.setInt(4, forPriceBean.getForUnits());
+
+						if(isResult(statementExists))
+							statement = statementUpdate;
+						else
+							statement = statementInsert;
+
+						logger.trace("\n\t{}\n\t{}", statement, forPriceBean);
+						statement.setBigDecimal(1, forPriceBean.getPrice());
+						statement.setInt(2, componentId);
+						statement.setInt(3, 0);
+						statement.setInt(4, costCompanyBean.getId());
+						statement.setInt(5, forPriceBean.getForUnits());
+						executedUpdate = statement.executeUpdate();
+					}
+				}
+			} catch (SQLException e) {
+				new ErrorDAO().saveError(e, "CostDAO.save(Map<Integer, CostCompanyBean> costCompanyBeans)");
+				throw new RuntimeException(e);
+			}
+		}
+		return executedUpdate;
+	}
+
+	public void saveSet(int setId, int topComponentId, List<CostUnitBean> costUnits){
 		Connection conecsion = null;
 		Statement statement = null;
 
@@ -78,13 +144,13 @@ public class CostDAO extends DataAccessObject {
 			statement = conecsion.createStatement();
 			statement.executeUpdate(query);
 
-			for(CostUnit cu:costUnits){
-				int selectedForPrice = cu.getSelectedForPrice();
+			for(CostUnitBean cu:costUnits){
+				int selectedForPrice = CostUnitService.getSelectedForPrice(cu);
 				if(selectedForPrice<0)
 					selectedForPrice = 0;
-				if(cu.getSelectedMfrPN()>0 || cu.getSelectedCompany()>0 || selectedForPrice>0){
+				if(CostUnitService.getSelectedMfrPN(cu)>0 || CostUnitService.getSelectedCompany(cu)>0 || selectedForPrice>0){
 					query = "INSERT INTO`irt`.`cost_sets`(`set_id`,`id_top_component`,`id_components`,`mfr_part_number`,`vendor`,`moq`)"+
-						"VALUES ("+setId+","+topComponentId+","+cu.getComponentId()+","+cu.getSelectedMfrPN()+","+cu.getSelectedCompany()+","+selectedForPrice+")";
+						"VALUES ("+setId+","+topComponentId+","+cu.getComponentId()+","+CostUnitService.getSelectedMfrPN(cu)+","+CostUnitService.getSelectedCompany(cu)+","+selectedForPrice+")";
 
 //					irt.work.Error.setErrorMessage(query);
 					statement.executeUpdate(query);
@@ -99,8 +165,12 @@ public class CostDAO extends DataAccessObject {
 			}
 	}
 
-	public Cost getCost(String topComponentIdStr){
-		Cost cost = null;
+	/**
+	 * @param topComponentIdStr
+	 * @return Top Level CostService
+	 */
+	public CostService getCostService(String topComponentIdStr){
+		CostService cost = null;
 
 
 		String query = "SELECT`id`," +
@@ -172,24 +242,40 @@ public class CostDAO extends DataAccessObject {
 								"LEFT JOIN`irt`.`companies`AS`cm`ON`cm`.`id`=`co`.`id_companies`" +
 								"WHERE`bom`.`id_top_comp`="+id+")" +
 							"ORDER BY`pn`,`mfrPN`,`for`";
+
+				logger.trace("\n\tQuery:\t{}", query);
+
 				try(ResultSet resultSet = statement.executeQuery(query);){
 
 				if(resultSet.next()){
-					cost = new Cost(id,partNumberStr,description);
-					do
-						cost.add(new CostUnit(resultSet.getInt("componentId"),
-												resultSet.getInt("alt_comp_id"),
-												resultSet.getString("pn"),
-												resultSet.getString("description"),
-												new CostMfrPN(resultSet.getInt("mfrPNId"),
-																resultSet.getString("mfr"),
-																resultSet.getString("mfrPN"),
-																new CostCompany(resultSet.getInt("CompanyId"),
-																				resultSet.getString("companyName"),
-																				new ForPrice(new Price(resultSet.getLong("price")),
-																						resultSet.getInt("for")))),
-												resultSet.getInt("qty")));
-					while(resultSet.next());
+
+					CostBean costBean = new CostBean().setId(id).setPartnamber(partNumberStr).setDescription(description);
+					cost = new CostService(costBean).setComponentId(topComponentIdStr);
+
+					do{
+						ForPriceBean forPriceBean = new ForPriceBean().setPrice(resultSet.getBigDecimal("price")).setForUnits(resultSet.getInt("for"));
+
+						CostCompanyBean costCompanyBean = new CostCompanyBean()
+																.setId(resultSet.getInt("CompanyId"))
+																.setName(resultSet.getString("companyName"));
+						CostCompanyService.addForPriceBean(costCompanyBean, forPriceBean); 
+
+						CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
+															.setId(resultSet.getInt("mfrPNId"))
+															.setMfr(resultSet.getString("mfr"))
+															.setMfrPN(resultSet.getString("mfrPN"));
+						costMfrPNBean.getCostCompanyBeans().add(costCompanyBean);
+
+						CostUnitBean costUnitBean = new CostUnitBean()
+											.setComponentId(resultSet.getInt("componentId"))
+											.setAlternativeComponentId(resultSet.getInt("alt_comp_id"))
+											.setPartNumberStr(resultSet.getString("pn"))
+											.setDescription(resultSet.getString("description"))
+											.setQty(resultSet.getInt("qty"));
+						costUnitBean.getMfrPartNumbers().add(costMfrPNBean);
+						
+						cost.add(costUnitBean);
+					}while(resultSet.next());
 					cost.reset();
 				}
 			}
@@ -202,8 +288,14 @@ public class CostDAO extends DataAccessObject {
 		return cost;
 	}
 
-	public Cost getCost(int componentId) {
-		Cost cost = null;
+	/**
+	 * 
+	 * @param componentId
+	 * @return Component's CostService
+	 */
+	public CostService getCost(int componentId) {
+		logger.entry(componentId);
+		CostService cost = null;
 
 		String query = "(SELECT`irt`.part_number(`part_number`)AS`pn`," +
 								"0 AS`alt_comp_id`," +
@@ -244,6 +336,8 @@ public class CostDAO extends DataAccessObject {
 						"WHERE`ca`.`id_components`=?)" +
 						"ORDER BY`pn`,`mfrPN`,`for`";
 
+		logger.debug("\n\tQoery:\t{}\n\t? =\t{}", query, componentId);
+
 		try(	Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(query);) {
 
@@ -252,22 +346,33 @@ public class CostDAO extends DataAccessObject {
 			try(ResultSet resultSet = statement.executeQuery();){
 
 			if(resultSet.next()){
-				cost = new Cost(componentId, resultSet.getString("pn"), resultSet.getString("description"));
+				CostBean costBean = new CostBean()
+											.setId(componentId)
+											.setPartnamber(resultSet.getString("pn"))
+											.setDescription(resultSet.getString("description"));
+				cost = new CostService(costBean);
 				do{
 					String mfr = resultSet.getString("mfr");
 					int companyId = resultSet.getInt("CompanyId");
-					cost.add(new CostUnit(componentId,
-							resultSet.getInt("alt_comp_id"),
-							resultSet.getString("pn"),
-							resultSet.getString("description"),
-							new CostMfrPN(resultSet.getInt("mfrPNId"),
-											mfr,
-											resultSet.getString("mfrPN"),
-											new CostCompany(companyId,
-													companyId!=0 ? resultSet.getString("companyName") : mfr,
-															new ForPrice(new Price(resultSet.getLong("cost")),
-																	resultSet.getInt("for")))),
-							resultSet.getInt("qty")));
+
+					CostUnitBean costUnitBean = new CostUnitBean()
+								.setComponentId(componentId)
+								.setAlternativeComponentId(resultSet.getInt("alt_comp_id"))
+								.setPartNumberStr(resultSet.getString("pn"))
+								.setDescription(resultSet.getString("description"));
+					CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
+													.setId(resultSet.getInt("mfrPNId"))
+													.setMfrPN(resultSet.getString("mfrPN"));
+					CostCompanyBean costCompanyBean = new CostCompanyBean()
+																	.setId(companyId)
+																	.setName(companyId!=0 ? resultSet.getString("companyName") : mfr);
+					CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()
+																				.setPrice(resultSet.getBigDecimal("cost"))
+																				.setForUnits(resultSet.getInt("for")));
+					costMfrPNBean.getCostCompanyBeans().add(costCompanyBean);
+					costUnitBean.getMfrPartNumbers().add(costMfrPNBean);
+
+					cost.add(costUnitBean);
 				}while(resultSet.next());
 			}
 			}
@@ -277,7 +382,7 @@ public class CostDAO extends DataAccessObject {
 			throw new RuntimeException(e);
 		}
 
-		return cost;
+		return logger.exit(cost);
 	}
 
 	public boolean hasCost(int componentId) {

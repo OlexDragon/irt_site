@@ -6,6 +6,7 @@ import irt.data.HTMLWork;
 import irt.data.ToDoClass;
 import irt.data.ToDoClass.ToDo;
 import irt.data.components.Component;
+import irt.data.components.Data;
 import irt.data.components.Unknown;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.ErrorDAO;
@@ -34,6 +35,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 public class PartNumberServlet extends HttpServlet {
+
+	public static final String TABLE = "table";
+
 	private static final long serialVersionUID = 1L;
 
 	private final Logger logger = (Logger) LogManager.getLogger();
@@ -68,28 +72,50 @@ public class PartNumberServlet extends HttpServlet {
 			if(tmpStr!=null)
 				try { component = (Component) Component.parseData(tmpStr); } catch (CloneNotSupportedException e) { new ErrorDAO().saveError(e, "PartNumberServlet.doGet"); throw new RuntimeException(e); }
 			else
-				component =  new Component();
+				component =  new Unknown();
 		}
-
-		ToDoClass toDoClass = getToDoClass(request, "TODO");
-
-		OrderBy orderBy = getOrderBy(request, response);
-		if(orderBy == null)
-			orderBy = new OrderBy("`part_number`");
-		logger.trace("{}, {}", tmpStr, orderBy);
+		if(component==null)
+			component = new Unknown();
 
 		PartNumber partNumber = PartNumber.getPartNumber(request.getRemoteHost());
 		partNumber.setComponent(component);
 
-		logger.trace("exit with:\n\tcomponent:\t{},\n\tbrowser:\t{},\n\ttoDoClass:\t{},\n\tpartNumber:\t{}", component, browser, toDoClass, partNumber);
+		logger.trace("exit with:\n\t"
+				+ "component:\t{},\n\t"
+				+ "browser:\t{},\n\t"
+				+ "partNumber:\t{}",
+				component,
+				browser,
+				partNumber);
+
+		ToDoClass search = getToDoClass(request, TABLE);
+		OrderBy orderBy = getOrderBy(request, response);
+		if (search != null) {
+			if (search.getCommand() == ToDo.SEARCH) {
+				String value = search.getValue();
+				if (value != null) {
+					try {
+						Data parseData = Component.parseData(value);
+						if (parseData != null) {
+							if (orderBy != null && !orderBy.equals(parseData.getOrderBy())) {
+								parseData.setOrderBy(orderBy);
+								search.setValue(parseData.toString());
+								CookiesWorker.addCookie(request, response, TABLE, search, 7 * 24 * 60 * 60);
+							}
+						}
+					} catch (CloneNotSupportedException e) {
+						e.printStackTrace();
+					}
+				}
+			}else if(search.getCommand() == ToDo.PROJECT_SERARCH)
+				component.setOrderBy(orderBy);
+		}
 
 		request.setAttribute("back_page", HTTP_ADDRESS );
-		request.setAttribute("component", component!=null ? component : new Unknown());
-		request.setAttribute("orderBy", orderBy);
+		request.setAttribute("component", component);
 		request.setAttribute("browser", browser);
-		request.setAttribute("todo", toDoClass);
 		request.setAttribute("partNumber", partNumber);
-		request.setAttribute("search", getToDoClass(request, "SEARCH"));
+		request.setAttribute("search", search);
 		jsp.forward(request, response);
 	}
 
@@ -118,8 +144,7 @@ public class PartNumberServlet extends HttpServlet {
 	
 		String pressedButton = HTMLWork.getSubmitButton(request);
 
-		ToDoClass toDoClass = getToDoClass(request, "TODO");
-		ToDoClass search = getToDoClass(request, "SEARCH");
+		ToDoClass search = getToDoClass(request, TABLE);
 
 		PartNumber partNumber = PartNumber.getPartNumber(request.getRemoteHost());
 
@@ -131,7 +156,6 @@ public class PartNumberServlet extends HttpServlet {
 				+ "component:\t{},\n\t"
 				+ "pnt:\t{},\n\t"
 				+ "pressedButton:\t{},\n\t"
-				+ "toDoClass:\t{},\n\t"
 				+ "partNumber:\t{}",
 				browser,
 				userBean,
@@ -140,7 +164,6 @@ public class PartNumberServlet extends HttpServlet {
 				component,
 				pnt,
 				pressedButton,
-				toDoClass,
 				partNumber);
 
 		if(pressedButton!=null)
@@ -161,15 +184,15 @@ public class PartNumberServlet extends HttpServlet {
 			component = getComponent(request,  component, userBean.isAdmin() && userBean.isEditing());
 			component.resetSequentialNunber();
 			search = new ToDoClass(ToDo.SEARCH, component);
-			CookiesWorker.addCookie(request, response, "SEARCH", search, 7*24*60*60);
+			CookiesWorker.addCookie(request, response, TABLE, search, 7*24*60*60);
 			break;
 		case "submit-price":
 			search = new ToDoClass(ToDo.PRICE, component.getId());
-			CookiesWorker.addCookie(request, response, "SEARCH", search, 7*24*60*60);
+			CookiesWorker.addCookie(request, response, TABLE, search, 7*24*60*60);
 			break;
 		case "submit_show":
 			search = new ToDoClass(ToDo.PROJECT_SERARCH, "___"+component.getPartNumber().substring(3,9)+"%");
-			CookiesWorker.addCookie(request, response, "SEARCH", search, 7*24*60*60);
+			CookiesWorker.addCookie(request, response, TABLE, search, 7*24*60*60);
 			break;
 		case "submit-cancel":
 			component = new PartNumberDetails(null).getComponent(component.getClassId());
@@ -303,20 +326,16 @@ public class PartNumberServlet extends HttpServlet {
 				+ "HTTP_ADDRESS:\t{}\n\t"
 				+ "component:\t{}\n\tb"
 				+ "rowser:\t{}\n\t"
-				+ "toDoClass:\t{}\n\t"
 				+ "partNumber:\t{}\n\t"
 				+ "search:\t\t{}",
 				HTTP_ADDRESS,
 				component,
 				browser,
-				toDoClass,
 				partNumber,
 				search);
 		request.setAttribute("back_page", HTTP_ADDRESS );
 		request.setAttribute("component", component);
-		request.setAttribute("orderBy", getOrderBy(request, response));
 		request.setAttribute("browser", browser);
-		request.setAttribute("todo", toDoClass);
 		request.setAttribute("partNumber", partNumber);
 		request.setAttribute("search", search);
 		jsp.forward(request, response);
@@ -373,7 +392,11 @@ public class PartNumberServlet extends HttpServlet {
 		String selectedFirst = req.getParameter("first");
 		String selectedSecond = req.getParameter("second");
 
-		logger.trace("\n\tselectedFirst:\t'{}'\n\tselectedSecond:\t'{}'", selectedFirst, selectedSecond);
+		logger.trace("\n\t"
+				+ "selectedFirst:\t'{}'\n\t"
+				+ "selectedSecond:\t'{}'",
+				selectedFirst,
+				selectedSecond);
 
 		boolean isSet = true;
 
@@ -383,27 +406,24 @@ public class PartNumberServlet extends HttpServlet {
 			char firstChar = PartNumberFirstChar.valueOf(Integer.parseInt(selectedFirst)).getFirstDigit().getFirstChar();
 
 			if (	component == null ||
-					component.getClassId().charAt(0) != firstChar ||
-					selectedSecond == null ||
-					selectedSecond.equals("-"))
+						component.getClassId().charAt(0) != firstChar ||
+						selectedSecond == null ||
+						selectedSecond.equals("-"))
 
-				c = new PartNumberDetails(component).getComponent(selectedFirst);
-			else
-				c = new PartNumberDetails(component).getComponent(firstChar + selectedSecond);
+					c = new PartNumberDetails(component).getComponent(selectedFirst);
+				else
+					c = new PartNumberDetails(component).getComponent(firstChar + selectedSecond);
 
-			if (c != null) {
+			if (c != null && (component==null || c==component)) {
 
-				if (component != null)
-					for (int i = 0; i < c.getTitleSize(); i++)
-						isSet = component.setValue(i,
-								req.getParameter("arg" + i))
-								&& isSet;
+				for (int i = 0; i < c.getTitleSize(); i++)
+					isSet = c.setValue(i, req.getParameter("arg" + i)) && isSet;
 
 			} else
 				isSet = false;
 
 			if (!isSet)
-				component.getError().setErrorMessage("All fields must be filled. <small>(E034)</small>");
+				c.getError().setErrorMessage("All fields must be filled. <small>(E034)</small>");
 			else if (c == null)
 				component.getError().setErrorMessage("Coming soon");
 		}else
@@ -414,15 +434,16 @@ public class PartNumberServlet extends HttpServlet {
 
 	private OrderBy getOrderBy(HttpServletRequest request, HttpServletResponse response) {
 
-		OrderBy orderBy = OrderBy.getOrderBy(request);
-
 		String orderByStr = request.getParameter("ob");//order by
+		OrderBy orderBy = OrderBy.parseOrderBy(CookiesWorker.getCookieValue(request, "ob"));
+
+		logger.trace("ob={}; orderBy={}", orderByStr, orderBy);
+
 		if(orderByStr!=null){
 			orderBy.setOrderBy(orderByStr);
 			CookiesWorker.addCookie(request, response, "ob", orderBy, 7*24*60*60);
-		}else
-			orderBy = OrderBy.parseOrderBy(CookiesWorker.getCookieValue(request, "ob"));
+		}
 
-		return orderBy!=null ? orderBy : new OrderBy("part_number");
+		return logger.exit(orderBy);
 	}
 }

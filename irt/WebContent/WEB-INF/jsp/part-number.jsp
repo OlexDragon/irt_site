@@ -14,8 +14,6 @@
 <%@page import="irt.data.dao.FirstDigitDAO"%>
 <%@page import="irt.data.FirstDigit"%>
 <jsp:useBean id="component" scope="request" type="irt.data.components.Component" />
-<jsp:useBean id="orderBy" scope="request" type="irt.table.OrderBy" />
-<jsp:useBean id="todo" scope="request" type="irt.data.ToDoClass" />
 <jsp:useBean id="search" scope="request" type="irt.data.ToDoClass" />
 <jsp:useBean id="browser" scope="request" type="irt.data.Browser" />
 <jsp:useBean id="partNumber" scope="request" type="irt.data.partnumber.PartNumber" />
@@ -34,6 +32,7 @@ boolean hasLink = component.getLink().getId()>0;
 boolean isEditing = ub.isEditing();
 String partNumberStr = component.getPartNumberF();
 %>
+<c:set var="ub" value="<%=ub %>"/>
 <c:set var="isExist" value="<%=component.isExist()%>" />
 <c:set var="isEditing" value="<%=ub.isEditing()%>" />
 <c:set var="hasLink" value="<%=component.getLink().getId()>0%>" />
@@ -104,10 +103,10 @@ String partNumberStr = component.getPartNumberF();
 </script>
 	<input type="submit" name="submit-parse" id="submit-parse" value="Parse" />
 <% if(ub!=null && isExist){ 
-		if(ub.isSchematicPart() && (component.getSchematicPart()!=null || ub.isAdmin())){ %>
+		if(ub.isSchematicPart() || ub.isAdmin()){ %>
 		<input type="submit" name="submit-part" id="submit-part" value="Schematic Part" onclick="return confirm('Do you want to save Schematic Part?');" />
 <%		}
-		if(ub.isSchematicLetter() && component.getSchematicLetter()!=null){%>
+		if(ub.isSchematicLetter()){%>
 			<input type="submit" name="submit-letter" id="submit-letter" value="Schematic Letter" onclick="return confirm('Do you want to resave Schematic Letter?');" />
 <% }	}
 	if(isExist){
@@ -166,10 +165,14 @@ String partNumberStr = component.getPartNumberF();
 <%	Table table;
 	switch(search.getCommand()){
 	case PRICE:
-		table = partNumber.getPrices();
+		String idStr = search.getValue();
+		if(idStr!=null){
+			table = partNumber.getPrices(Integer.parseInt(idStr));
+		}else
+			table = null;
 		break;
 	case PROJECT_SERARCH:
-		table =  new Search().componentBy(search.getValue(), orderBy);
+		table =  new Search().componentBy(search.getValue(), component.getOrderBy());
 		break;
 	default:
 		table = new Search().componentBy((Component)Component.parseData(search.getValue()));

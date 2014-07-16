@@ -64,7 +64,7 @@ public class Isolator extends Component {
 	}
 
 	protected Menu getTitlesMenu() {
-		return new MenuDAO().getMenu("isol_titles", OrderBy.DESCRIPTION);
+		return new MenuDAO().getMenu("isol_titles", OrderBy.SEQUENCE);
 	}
 
 	public Menu getPackages() {
@@ -78,6 +78,7 @@ public class Isolator extends Component {
 
 	@Override
 	public String getSelectOptionHTML(int index) {
+		logger.entry(index);
 		
 		String[] tmp = null;
 		String[] toShow = null;

@@ -353,26 +353,26 @@ public class UserBean {
 	public void seteMail(String eMail)			{ this.eMail = eMail;			} 
 	public void setPermission(int permission)	{ this.permission = permission;	}
 
-	public boolean isValid()		{ return id!=0 && permission!=0;			}
-	public boolean isSchematicPart(){ return (permission & SCHEMATIC_PART)!=0;	}
-	public boolean isSchematicLetter(){ return (permission & SCHEMATIC_LETTER)!=0;	}
-	public boolean isUserEdit()		{ return (permission & USER_EDIT)!=0;		}
-	public boolean isUser()			{ return (permission & USER)!=0;			}
-	public boolean isAdmin()		{ return (permission & ADMIN)!=0;			}
-	public boolean isEditing()		{ return (permission & EDITING)!=0;			}
-	public boolean isAlt()			{ return (permission & ALT_PART_NUMBER)!=0;	}
+	public boolean isAdmin()		{ return (permission & ADMIN)!=0;}
+	public boolean isValid()		{ return id!=0 && permission!=0 			|| (permission & ADMIN)!=0;	}
+	public boolean isSchematicPart(){ return (permission & SCHEMATIC_PART)!=0 	|| (permission & ADMIN)!=0;	}
+	public boolean isSchematicLetter(){ return (permission & SCHEMATIC_LETTER)!=0 || (permission & ADMIN)!=0;}
+	public boolean isUserEdit()		{ return (permission & USER_EDIT)!=0 		|| (permission & ADMIN)!=0;	}
+	public boolean isUser()			{ return (permission & USER)!=0 			|| (permission & ADMIN)!=0;	}
+	public boolean isEditing()		{ return (permission & EDITING)!=0 			|| (permission & ADMIN)!=0;	}
+	public boolean isAlt()			{ return (permission & ALT_PART_NUMBER)!=0 	|| (permission & ADMIN)!=0;	}
 
-	public boolean isEditCost()		{ return (permission & EDIT_COST)!=0;		}
-	public boolean isSellers()		{ return (permission & SELLERS)!=0;			}
-	public boolean isStock()		{ return (permission & STOCK)!=0;			}
-	public boolean isEditCompanies(){ return (permission & EDIT_COMPANIES)!=0;	}
+	public boolean isEditCost()		{ return (permission & EDIT_COST)!=0 		|| (permission & ADMIN)!=0;}
+	public boolean isSellers()		{ return (permission & SELLERS)!=0 			|| (permission & ADMIN)!=0;	}
+	public boolean isStock()		{ return (permission & STOCK)!=0 			|| (permission & ADMIN)!=0;	}
+	public boolean isEditCompanies(){ return (permission & EDIT_COMPANIES)!=0 	|| (permission & ADMIN)!=0;	}
 
-	public boolean isDatabase() 	{ return (permission & DATABASE)!=0;		}
+	public boolean isDatabase() 	{ return (permission & DATABASE)!=0 		|| (permission & ADMIN)!=0;	}
 
-	public boolean isDeviceType()	{ return (permission & DEVICE_TYPE)!=0;		}
-	public boolean isDeviceTypeUpdate(){return(permission& DEVICE_TYPE_UPDATE)!=0;}
+	public boolean isDeviceType()	{ return (permission & DEVICE_TYPE)!=0 		|| (permission & ADMIN)!=0;	}
+	public boolean isDeviceTypeUpdate(){return(permission& DEVICE_TYPE_UPDATE)!=0 || (permission & ADMIN)!=0;}
 
-	public boolean isWorkOrder()	{return(permission& WORK_ORDER)!=0;}
+	public boolean isWorkOrder()	{return(permission & WORK_ORDER)!=0 		|| (permission & ADMIN)!=0;	}
 
 	// Encryption and description ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

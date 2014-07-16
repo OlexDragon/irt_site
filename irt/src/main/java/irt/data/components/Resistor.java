@@ -2,9 +2,8 @@ package irt.data.components;
 
 import irt.data.Menu;
 import irt.data.dao.MenuDAO;
-import irt.data.dao.SecondAndThirdDigitsDAO;
 import irt.data.dao.MenuDAO.OrderBy;
-import irt.work.InputTitles;
+import irt.data.dao.SecondAndThirdDigitsDAO;
 import irt.work.TextWorker;
 
 import java.text.DecimalFormat;
@@ -15,7 +14,7 @@ public class Resistor extends Component {
 	public static final int VALUE 		= 0;
 	public static final int PRECISION 	= 1;
 	public static final int SIZE 		= 2;
-	private static final int SHIFT 		= 5;
+	private static final int SHIFT 		= 3;
 	public static final int DESCRIPTION		= Data.DESCRIPTION		+SHIFT;
 	public static final int MANUFACTURE 	= Data.MANUFACTURE		+SHIFT;
 	public static final int MAN_PART_NUM 	= Data.MAN_PART_NUM		+SHIFT;
@@ -43,17 +42,15 @@ public class Resistor extends Component {
 		return 13;
 	}
 
+
 	@Override
-	public void setTitles() {
-		setTitles(new InputTitles(
-				new String[] 
-						{ "Value(Ohm)","Precision(%)",	"Size",	"<br />Description",	"Mfr",	"Mfr P/N" },
-					new String[]
-						{ "text",	"select",		"select",	"text",				"select",		"text"}));
+	protected String getDatabaseNameForTitles() {
+		return "resistor_titles";
 	}
 
 	@Override
 	public void setMenu() {
+		super.setMenu();
 		if(precisionMenu==null){
 			precisionMenu = new MenuDAO().getMenu("prec_res", OrderBy.DESCRIPTION);
 		}
@@ -91,6 +88,7 @@ public class Resistor extends Component {
 
 	@Override
 	public String getValue(int index){
+		logger.entry(index);
 		String returnStr = "";
 
 		switch(index){
@@ -107,7 +105,7 @@ public class Resistor extends Component {
 			returnStr = super.getValue(index-SHIFT);
 		}
 		
-		return returnStr;
+		return logger.exit(returnStr);
 	}
 
 	@Override
