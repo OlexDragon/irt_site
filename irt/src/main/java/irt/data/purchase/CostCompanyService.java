@@ -1,5 +1,7 @@
 package irt.data.purchase;
 
+import irt.data.companies.Company;
+import irt.data.dao.CompanyDAO;
 import irt.work.ComboBoxField;
 
 import java.math.BigDecimal;
@@ -8,14 +10,14 @@ import java.util.List;
 
 public class CostCompanyService implements ComboBoxField{
 
+	private final CompanyDAO companyDAO = new CompanyDAO();
 	private CostCompanyBean costCompanyBean;
 	private final ForPriceService forPriceService = new ForPriceService();
 
-	public CostCompanyService(int id, String name, ForPriceBean forPriceBean) {
+	public CostCompanyService(int id, ForPriceBean forPriceBean) {
 
 		costCompanyBean = new CostCompanyBean();
 		costCompanyBean.setId(id);
-		costCompanyBean.setName(name);
 
 		forPriceService.setForPriceBean(forPriceBean);
 		List<ForPriceBean> forPriceBeans = new ArrayList<>();
@@ -33,7 +35,24 @@ public class CostCompanyService implements ComboBoxField{
 	}
 
 	public String getName() {
-		return costCompanyBean.getName();
+		String companyName = null;
+
+		if(costCompanyBean!=null){
+			Company company = companyDAO.getCompany(costCompanyBean.getId());
+			if(company!=null)
+				companyName = company.getName();
+		}
+		return companyName;
+	}
+
+	public static String getName(int companyId) {
+		String companyName = null;
+
+		Company company = new CompanyDAO().getCompany(companyId);
+		if(company!=null)
+			companyName = company.getName();
+
+		return companyName;
 	}
 
 	@Override
@@ -43,7 +62,7 @@ public class CostCompanyService implements ComboBoxField{
 
 	@Override
 	public String getText() {
-		return costCompanyBean.getName();
+		return getName();
 	}
 
 	public int getSelectedForPriceIndex() {
@@ -56,7 +75,7 @@ public class CostCompanyService implements ComboBoxField{
 	}
 
 	public static boolean isSet(CostCompanyBean costCompanyBean) {
-		return costCompanyBean.getId()>=0 && costCompanyBean.getName()!=null;
+		return costCompanyBean.getId()>=0;
 	}
 
 	public boolean isSet() {

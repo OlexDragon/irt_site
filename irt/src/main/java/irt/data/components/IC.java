@@ -114,6 +114,7 @@ public class IC extends Component {
 
 	@Override
 	public boolean setValue(int index, String valueStr) {
+		logger.entry(index, valueStr, isExist);
 		boolean isSetted = isExist;
 
 		if(index==MAN_PART_NUM || !isExist)
@@ -135,19 +136,20 @@ public class IC extends Component {
 			}
 			break;
 		case MAN_PART_NUM:
-			if(valueStr!=null && !valueStr.isEmpty() && !valueStr.equals(getManufPartNumber())){
-				setPartNumber(getClassId()+getManufactureIdQ()+"????"+getPackageQ()+getLeadsNumberQ());
+			if(!(valueStr==null || valueStr.isEmpty())){
 				Data tmpComp;
 				if(isExist = (tmpComp = new ComponentDAO().getByMPN(valueStr))!=null)
 					setValues(tmpComp);
 				else{
-					super.setValue(Data.MAN_PART_NUM, valueStr);
+					super.setValue(Component.MAN_PART_NUM, valueStr);
+					setPartNumber(getClassId()+getManufactureIdQ()+"????"+getPackageQ()+getLeadsNumberQ());
 					isExist = false;
 				}
+				logger.trace("\n\tComponent is exists = {}\n\t{}", isExist, tmpComp);
 
 				isSetted = true;
 			}else{
-				super.setValue(Data.MAN_PART_NUM, null);
+				super.setValue(Component.MAN_PART_NUM, null);
 				isExist = false;
 			}
 			break;
@@ -158,16 +160,16 @@ public class IC extends Component {
 		case DESCRIPTION:
 			setPartNumber(getClassId()+getManufactureIdQ()+"????"+getPackageQ()+getLeadsNumberQ());
 			isSetted = valueStr!=null && !valueStr.isEmpty();
-			super.setValue(Data.DESCRIPTION, valueStr);
+			super.setValue(Component.DESCRIPTION, valueStr);
 			break;
 		case QUANTITY:
-			isSetted = super.setValue(Data.QUANTITY, valueStr);
+			isSetted = super.setValue(Component.QUANTITY, valueStr);
 			break;
 		case LOCATION:
-			isSetted = super.setValue(Data.LOCATION, valueStr);
+			isSetted = super.setValue(Component.LOCATION, valueStr);
 			break;
 		case LINK:
-			isSetted = super.setValue(Data.LINK, valueStr);
+			isSetted = super.setValue(Component.LINK, valueStr);
 		}
 		
 		return isSetted;

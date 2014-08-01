@@ -9,9 +9,10 @@
 
 	<Loggers>
 		<logger name="irt.web.ComponentsMovementServlet" 	level="WARN" />
-		<logger name="irt.web.CostServlet" 					level="WARN" />
-		<logger name="irt.web.PartNumberServlet" 			level="WARN" />
+		<logger name="irt.web.CostServlet" 					level="all" />
+		<logger name="irt.web.PartNumberServlet" 			level="all" />
 		<logger name="irt.web.WorkOrderServlet" 			level="WARN" />
+		<logger name="irt.web.ProductServlet" 				level="WARN" />
 
 		<logger name="irt.data.Jackson" 					level="WARN" />
 
@@ -21,6 +22,7 @@
 		<logger name="irt.data.components.Component" 		level="WARN" />
 		<logger name="irt.data.components.Isolator" 		level="WARN" />
 		<logger name="irt.data.components.Resistor"			level="WARN" />
+		<logger name="irt.data.components.Other" 			level="WARN" />
 		<logger name="irt.data.components.Unknown" 			level="WARN" />
 
 		<logger name="irt.data.purchase.ForPriceBean" 		level="WARN" />
@@ -29,7 +31,8 @@
 		<logger name="irt.data.purchase.CostUnitService" 	level="WARN" />
 
 		<logger name="irt.data.dao.MenuDAO" 				level="WARN" />
-		<logger name="irt.data.dao.CostDAO" 				level="all" />
+		<logger name="irt.data.dao.ComponentDAO" 			level="WARN" />
+		<logger name="irt.data.dao.CostDAO" 				level="WARN" />
 		<logger name="irt.data.dao.SecondAndThirdDigitsDAO" level="WARN" />
 		<logger name="irt.data.dao.DataAccessObject" 		level="WARN" />
 

@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -48,7 +48,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 
 public class BomDAO extends DataAccessObject {
 
-   private Logger logger = (Logger) LogManager.getLogger();
+   private Logger logger = LogManager.getLogger();
 
 	private static final String SQL_COLUMN_PART_REFERENCE_AS = "`irt`.ref(IF(`cosl`.`schematic_letter`IS NOT NULL,`cosl`.`schematic_letter`,`c`.`schematic_letter`),`ref`)AS";
 	private static final String FOOTPRINT = "Footprint";

@@ -435,7 +435,8 @@ public class ComponentsMovementDAO extends DataAccessObject {
 							"JOIN`irt`.`arrays`AS`to`ON`to`.`id`=`m`.`to`" +
 							"LEFT JOIN`irt`.`companies`AS`to_d`ON`to_d`.`id`=`m`.`to_detail`" +
 							"LEFT JOIN`irt`.`components`AS`to_c`ON`to_c`.`id`=`m`.`to_detail`" +
-							"WHERE`from`.`name`='from_to'AND`to`.`name`='from_to'AND`m`.`status`!=1";//status=1 - CLOSE
+							"WHERE`from`.`name`='from_to'AND`to`.`name`='from_to'AND`m`.`status`!=1"//status=1 - CLOSE
+							+ " ORDER BY `Date`DESC LIMIT 500";
 
 			Table table;
 			if((table = getTable(query, null))!=null)
@@ -498,7 +499,7 @@ public class ComponentsMovementDAO extends DataAccessObject {
 							"RIGHT JOIN`irt`.`movement_details`as`md`ON`md`.`id_components`=`bom`.`id_top_comp`" +
 							"JOIN`irt`.`movement`AS`m`ON`m`.`id`=`md`.`id_movement`WHERE`m`.`to`=3)" +
 							
-							"ORDER BY 1,2 DESC,7,6";
+							"ORDER BY 1 DESC,2 DESC,7,6 LIMIT 500";
 
 			Table table;
 			if((table = getTable(query, null))!=null){

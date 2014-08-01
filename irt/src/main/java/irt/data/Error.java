@@ -5,10 +5,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class Error {
-	private static final Logger LOGGER = (Logger) LogManager.getLogger();
+
+	private static Logger logger = LogManager.getLogger();
 
 	private String errorMessage;
 
@@ -16,11 +17,11 @@ public class Error {
 		String tmpErr = errorMessage;
 		errorMessage = null;
 
-		return LOGGER.exit(tmpErr);
+		return logger.exit(tmpErr);
 	}
 
 	public void setErrorMessage(String errorMessage) {
-		LOGGER.entry(errorMessage);
+		logger.entry(errorMessage);
 
 		if (errorMessage != null && !errorMessage.trim().isEmpty())
 			if (this.errorMessage == null)
@@ -30,11 +31,11 @@ public class Error {
 	}
 
 	public boolean isError() {
-		return LOGGER.exit(errorMessage != null);
+		return logger.exit(errorMessage != null);
 	}
 
 	public void setErrorMessage(String errorMessage, String htmlClassName) {
-		LOGGER.entry(errorMessage, htmlClassName);
+		logger.entry(errorMessage, htmlClassName);
 
 		setErrorMessage("<span class=\"" + htmlClassName + "\" >"
 				+ errorMessage + "</span>");

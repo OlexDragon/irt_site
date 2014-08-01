@@ -28,13 +28,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class PartNumber {
 
 	private static final CostDAO COST_DAO = new CostDAO();
 
-	private static final Logger logger = (Logger) LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 
 	private char selectedFirstChar;
 	private static List<FirstDigit> firstDigitList = new FirstDigitDAO().getAll();
@@ -366,13 +366,12 @@ public class PartNumber {
 	}
 
 	public Table getPrices(int id) {
-		logger.entry(id);
 
 		cost = COST_DAO.getCost(id);
-			if(cost!=null)
-				table = cost.getComponentTable();
+		if(cost!=null)
+			table = cost.getComponentTable();
 
-			return logger.exit(table);
+		return table;
 	}
 
 	public User 	getUser()	{ return getUser(selectedUser); }

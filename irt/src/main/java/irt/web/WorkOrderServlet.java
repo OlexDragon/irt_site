@@ -21,14 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class WorkOrderServlet extends HttpServlet {
 	public static final String COOKIE_NAME_MENU = "workOrderMenu";
 
 	private static final long serialVersionUID = 1L;
 
-	private final Logger logger = (Logger) LogManager.getLogger();
+	private final Logger logger = LogManager.getLogger();
 
 	public static final String HTTP_ADDRESS = "work-orders";
 

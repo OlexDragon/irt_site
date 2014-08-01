@@ -8,7 +8,7 @@ package irt.data.dao;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 /**
@@ -17,7 +17,7 @@ import org.junit.Test;
  */
 public class ErrorDAOTest {
 
-    private Logger logger = (Logger) LogManager.getLogger();
+    private Logger logger = LogManager.getLogger();
 
     public ErrorDAOTest() {
     	logger.trace("setUp");

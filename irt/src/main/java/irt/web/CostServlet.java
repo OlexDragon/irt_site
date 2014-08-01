@@ -34,20 +34,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
 @SuppressWarnings("serial")
 public class CostServlet extends HttpServlet {
 
-    private static final String COST_COMPANY_BEAN_WRAPPERS = "costCompanyBeanWrappers";
+    private static final String TOP_COMP_ID = "top_comp_id";
 
-	protected final Logger logger = (Logger) LogManager.getLogger();
+	private static final String COST_COMPANY_BEAN_WRAPPERS = "costCompanyBeanWrappers";
+
+	protected final Logger logger =LogManager.getLogger();
 
     private final String httpAddress = "cost";
 	private RequestDispatcher jsp;
 	private Error error = new Error();
+
+	private RequestParameters parameters = new RequestParameters();
 
     private static final CostCompanyBeanWrapper BEAN_WRAPPER = new CostCompanyBeanWrapper();
 
@@ -60,10 +65,11 @@ public class CostServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 
-		UserBean userBean = getUserBean(request, response);
+		parameters.getParameters(request, response);
 
 		CostService costService = getCostServic(request, response);
 
+		UserBean userBean = getUserBean(request, response);
 		if (userBean.isEditCost()) {
 			String cookieValue = CookiesWorker.getCookieValue(request, "isEdit");
 			if(cookieValue!=null && cookieValue.equals("true"))
@@ -86,17 +92,19 @@ public class CostServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
 
-		String position = request.getParameter("position");
-		CookiesWorker.addCookie(request, response, "position", position, 24*60*60);
+		parameters.getParameters(request, response);;
+
+		CookiesWorker.addCookie(request, response, "position", parameters.getPosition(), 24*60*60);
 
 		CostService costService = getCostServic(request, response);
 
 		String fieldName = request.getParameter("what");
-		boolean isSetFor = false;
-		boolean isStartWithFor = false;
+		boolean isStartWithFor = fieldName.startsWith("for");
+
 		int componentId = 0;
+		boolean isSetFor = false;
 		if (fieldName != null)
-			if (isStartWithFor = fieldName.startsWith("for")) {
+			if (isStartWithFor) {
 				String[] split = fieldName.split(":");
 				componentId = Integer.parseInt(split[0].replaceAll("\\D", ""));
 				isSetFor = costService.setForPriceIndex(componentId, Integer.parseInt(split[1]));
@@ -106,9 +114,7 @@ public class CostServlet extends HttpServlet {
 				costService.setSelectedMfrPNIndex(fieldName);
 
 		int setIndex = Integer.parseInt(request.getParameter("set"));
-		boolean isSet = request.getParameter("submit_set")!=null;
 		costService.setSetIndex(setIndex);
-		costService.setSet(isSet);
 
 		UserBean userBean = getUserBean(request, response);
 
@@ -116,96 +122,115 @@ public class CostServlet extends HttpServlet {
 			boolean isEdit = request.getParameter("is_edit") != null;
 			CookiesWorker.addCookie(request, response, "isEdit", isEdit, 24*60*60);
 			costService.setEdit(isEdit);
-			if (costService.isEdit()) {
+			if (isEdit) {
 				if (!fieldName.isEmpty()) {
-					if (isStartWithFor && !isSetFor){
-						String addVandor = request.getParameter("companies");
-						String addPrice = request.getParameter("price" + componentId);
-						String addFor = request.getParameter("addFor");
-						logger.debug("\n\t"
-								+ "id:\t{}\n\t"
-								+ "fieldName:\t{}\n\t"
-								+ "addVandor:\t{}\n\t"
-								+ "addPrice:\t{}\n\t"
-								+ "addFor:\t{}\n\t",
-								componentId,
-								fieldName,
-								addVandor,
-								addPrice,
-								addFor);
-						if (!addFor.isEmpty() && !(addFor = addFor.replaceAll("\\D", "")).isEmpty() && !addPrice.isEmpty()) {
-							CostCompanyBean costCompany = costService.getCostCompany(componentId);
-							CostMfrPNBean costMfrPN = costService.getCostMfrPN(componentId);
-							logger.debug("\n\tid:\t{}\n\t{}\n\t{}", componentId, costMfrPN, costCompany);
-							String companyName;
-							int companyId;
-							if (addVandor.equals("Select")) {
-								if(costCompany!=null && costCompany.getName()!=null){
-									companyId = costCompany.getId();
-									companyName = costCompany.getName();
-								}else{
-									companyId = 0;
-									companyName = costMfrPN.getMfr();
-								}
-							}else {
-								Company company = new CompanyDAO().getCompany(Integer.parseInt(addVandor));
-								companyId = company.getId();
-								companyName = company.getCompanyName();
-							}
+					if (isStartWithFor && !isSetFor)
+						setNewPrice(request, response, costService, fieldName, componentId);
+				} else 
+					setPrices(request, costService);
 
-							error.setErrorMessage("CompanyName: "+companyName);
-							if(companyName!=null) {
-								CostCompanyBean costCompanyBean = new CostCompanyBean()
-												.setId(companyId)
-												.setName(companyName);
-								CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()
-																			.setNewPrice(new BigDecimal(addPrice))
-																			.setForUnits(Integer.parseInt(addFor)));
-								costService.add(componentId, costCompanyBean);
-								CookiesWorker.addCookie(request, response, COST_COMPANY_BEAN_WRAPPERS, Jackson.objectToJsonString(BEAN_WRAPPER.set(componentId, costService.getCostCompany(companyId))), 24*60*60);
-							}
-						} else
-							error.setErrorMessage("Company, Price and For fields should be filled");
-					}
-				} else {
-					List<String> names = Init.getFieldsNames(request, "price");
-					for (String s : names)
-						costService.setPrices(	Integer.parseInt(s.replaceAll("\\D", "")), request.getParameter(s));
-				}
-
-				String pressedButton = HTMLWork.getSubmitButton(request);
-				List<CostUnitBean> costUnitBeans = costService.getCostUnitBeans();
-
-				logger.trace("{}", costUnitBeans);
-
-				Map<Integer, CostCompanyBean> costCompanyBeans = BEAN_WRAPPER.getCostCompanyBeans();
-				switch(pressedButton){
-				case "submit_save_set":
-					new CostDAO().saveSet(costService.getSetIndex(), costService.getId(), costUnitBeans);
-				case "submit_save":
-					if(new CostDAO().save(costCompanyBeans)!=0){
-						CookiesWorker.removeCookiesStartWith(request, response, COST_COMPANY_BEAN_WRAPPERS);
-						costCompanyBeans.clear();
-					}else
-						error.setErrorMessage("Can not be saved.");
-					break;
-				case "submit_cansel":
-					if(!costCompanyBeans.isEmpty()) {
-						logger.debug("\n\tcomponentId:\t{}\n\t{}", componentId, BEAN_WRAPPER);
-						for(Integer compId:costCompanyBeans.keySet())
-							costService.remove(compId, costCompanyBeans.get(compId));
-						CookiesWorker.removeCookiesStartWith(request, response, COST_COMPANY_BEAN_WRAPPERS);
-						costCompanyBeans.clear();
-					}
-				}
+				buttonAction(request, response, costService, componentId);
 			}
 		}
 
 		request.setAttribute("back_page", httpAddress);
 		request.setAttribute("cost", costService);
-		request.setAttribute("position", position);
+		request.setAttribute("position", parameters.getPosition());
 		request.setAttribute("error", error);
 	    jsp.forward(request, response);
+	}
+
+	private void setPrices(HttpServletRequest request, CostService costService) {
+		List<String> names = Init.getFieldsNames(request, "price");
+		for (String s : names)
+			costService.setPrices(	Integer.parseInt(s.replaceAll("\\D", "")), request.getParameter(s));
+	}
+
+	private void setNewPrice(HttpServletRequest request,
+			HttpServletResponse response, CostService costService,
+			String fieldName, int componentId) throws JsonGenerationException,
+			JsonMappingException, IOException {
+		String addVandor = request.getParameter("companies");
+		String addPrice = request.getParameter("price" + componentId);
+		String addFor = request.getParameter("addFor");
+
+		logger.debug("\n\t"
+				+ "id:\t{}\n\t"
+				+ "fieldName:\t{}\n\t"
+				+ "addVandor:\t{}\n\t"
+				+ "addPrice:\t{}\n\t"
+				+ "addFor:\t{}\n\t",
+				componentId,
+				fieldName,
+				addVandor,
+				addPrice,
+				addFor);
+
+		if (!addFor.isEmpty() && !(addFor = addFor.replaceAll("\\D", "")).isEmpty() && !addPrice.isEmpty()) {
+			CostCompanyBean costCompanyBean = costService.getCostCompany(componentId);
+			CostMfrPNBean costMfrPN = costService.getCostMfrPN(componentId);
+			logger.debug("\n\tid:\t{}\n\t{}\n\t{}", componentId, costMfrPN, costCompanyBean);
+			String companyName;
+			int companyId;
+			if (addVandor.equals("Select")) {
+				if(costCompanyBean!=null){
+					companyId = costCompanyBean.getId();
+					companyName = CostCompanyService.getName(companyId);
+				}else{
+					companyId = 0;
+					companyName = costMfrPN.getMfr();
+				}
+			}else {
+				Company company = new CompanyDAO().getCompany(Integer.parseInt(addVandor));
+				companyId = company.getId();
+				companyName = company.getCompanyName();
+			}
+
+			error.setErrorMessage("CompanyName: "+companyName);
+			if(companyName!=null) {
+				costCompanyBean = new CostCompanyBean()
+								.setId(companyId);
+				CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()
+															.setNewPrice(new BigDecimal(addPrice))
+															.setForUnits(Integer.parseInt(addFor)));
+				costService.add(componentId, costCompanyBean);
+				CookiesWorker.addCookie(request, response, COST_COMPANY_BEAN_WRAPPERS, Jackson.objectToJsonString(BEAN_WRAPPER.set(componentId, costService.getCostCompany(companyId))), 24*60*60);
+			}
+		} else
+			error.setErrorMessage("Company, Price and For fields should be filled");
+	}
+
+	private void buttonAction(HttpServletRequest request,
+			HttpServletResponse response, CostService costService,
+			int componentId) {
+		String pressedButton = HTMLWork.getSubmitButton(request);
+		List<CostUnitBean> costUnitBeans = costService.getCostUnitBeans();
+
+		logger.debug("\n\t{}", costUnitBeans);
+
+		Map<Integer, CostCompanyBean> costCompanyBeans = BEAN_WRAPPER.getCostCompanyBeans();
+		switch(pressedButton){
+		case "submit_save_set":
+			new CostDAO().saveSet(costService.getSetIndex(), costService.getId(), costUnitBeans);
+		case "submit_save":
+			if(new CostDAO().save(costCompanyBeans)!=0){
+				CookiesWorker.removeCookiesStartWith(request, response, COST_COMPANY_BEAN_WRAPPERS);
+				costCompanyBeans.clear();
+			}else
+				error.setErrorMessage("Can not be saved.");
+			break;
+		case "submit_cansel":
+			if(!costCompanyBeans.isEmpty()) {
+				logger.debug("\n\tcomponentId:\t{}\n\t{}", componentId, BEAN_WRAPPER);
+				for(Integer compId:costCompanyBeans.keySet())
+					costService.remove(compId, costCompanyBeans.get(compId));
+				CookiesWorker.removeCookiesStartWith(request, response, COST_COMPANY_BEAN_WRAPPERS);
+				costCompanyBeans.clear();
+			}
+			break;
+		case "submit_set":
+			costService.setSet(true);
+		}
 	}
 
 	private UserBean getUserBean(HttpServletRequest request,
@@ -221,34 +246,12 @@ public class CostServlet extends HttpServlet {
 
 	private CostService getCostServic(HttpServletRequest request, HttpServletResponse response) throws NumberFormatException, JsonParseException, JsonMappingException, IOException {
 
-		String componentId;
-
-		String classId = request.getParameter("class_id");
-		if(classId==null)
-			classId = CookiesWorker.getCookieValue(request, "class_id");
-
-		if(classId==null || classId.equals("Select")){
-			componentId = null;
-		}else{
-			CookiesWorker.addCookie(request, response, "class_id", classId, 24*60*60);
-			componentId = request.getParameter("component_id");
-			if(componentId==null)
-				componentId = CookiesWorker.getCookieValue(request, "component_id");
-			else
-				CookiesWorker.addCookie(request, response, "component_id", componentId, 24*60*60);
-		}
-
-		String cookieValue = CookiesWorker.getCookieValue(request, PartNumberServlet.TABLE);
-
-		ToDoClass toDoClass;
-		if(cookieValue!=null)
-			toDoClass = ToDoClass.parseToDoClass(cookieValue);
-		else
-			toDoClass = null;
-
-		CostService costService;
+		String 		componentId = parameters.getTopComponentId();
+		ToDoClass 	toDoClass 	= parameters.getToDoClass();
 
 		logger.trace("\n\tcomponentId:\t{}\n\ttoDoClass:\t{}", componentId, toDoClass);
+
+		CostService costService;
 		if(componentId == null){
 			if(toDoClass == null || toDoClass.getCommand()!=ToDo.PRICE)
 				costService = new CostService(null);
@@ -259,7 +262,14 @@ public class CostServlet extends HttpServlet {
 		}else
 			costService = getBOMCostService(componentId);
 
-		cookieValue = CookiesWorker.getCookieValue(request, COST_COMPANY_BEAN_WRAPPERS);
+		costService.setClassId(parameters.getClassId());
+		setCostServicValues(costService, request);
+
+		return logger.exit(costService);
+	}
+
+	private void setCostServicValues(CostService costService, HttpServletRequest request) throws JsonParseException, JsonMappingException, IOException {
+		String cookieValue = CookiesWorker.getCookieValue(request, COST_COMPANY_BEAN_WRAPPERS);
 		if(cookieValue!=null) {
 			logger.debug("\n\t{}", cookieValue);
 			CostCompanyBeanWrapper ccbw = Jackson.jsonStringToObject(CostCompanyBeanWrapper.class, cookieValue);
@@ -270,14 +280,9 @@ public class CostServlet extends HttpServlet {
 					costService.add(compId, costCompanyBeans.get(compId));
 			}
 		}
-
-		costService.setClassId(classId);
-
-		return logger.exit(costService);
 	}
 
 	private CostService getBOMCostService(String componentId) {
-		logger.entry(componentId);
 		CostService costService;
 
 		if(componentId==null || componentId.isEmpty() || componentId.equals("Select"))
@@ -292,11 +297,71 @@ public class CostServlet extends HttpServlet {
 		logger.entry(componentId);
 		CostService costService;
 
-		if(componentId==null || componentId.isEmpty())
+		if(componentId==null || componentId.isEmpty()){
 			costService = new CostService(null);
-		else
+		}else
 			costService=new CostDAO().getCost(Integer.parseInt(componentId));
 
 		return logger.exit(costService);
+	}
+
+	private class RequestParameters{
+
+		private String position;
+		private String topComponentId;
+		private String classId;
+		private ToDoClass toDoClass;
+
+		public void getParameters(HttpServletRequest request, HttpServletResponse response) {
+			position = request.getParameter("position");
+			setClassId(request);
+			setTopComponentId(request, response);
+			setToDoClass(request);
+		}
+
+		public String getPosition() {
+			return position;
+		}
+
+		public String getTopComponentId() {
+			return topComponentId;
+		}
+
+		private void setTopComponentId(HttpServletRequest request, HttpServletResponse response) {
+			topComponentId = request.getParameter(TOP_COMP_ID);
+			if(classId==null || classId.equals("Select")){
+				topComponentId = null;
+			}else{
+				CookiesWorker.addCookie(request, response, "class_id", classId, 24*60*60);
+				if(topComponentId==null)
+					topComponentId = CookiesWorker.getCookieValue(request, TOP_COMP_ID);
+				else
+					CookiesWorker.addCookie(request, response, TOP_COMP_ID, topComponentId, 24*60*60);
+			}
+		}
+
+		public String getClassId() {
+			return classId;
+		}
+
+		private void setClassId(HttpServletRequest request) {
+			classId = request.getParameter("class_id");
+			if(classId==null)
+				classId = CookiesWorker.getCookieValue(request, "class_id");
+		}	
+
+		public ToDoClass getToDoClass(){
+			return toDoClass;
+		}
+
+		private void setToDoClass(HttpServletRequest request){
+			String cookieValue = CookiesWorker.getCookieValue(request, PartNumberServlet.TABLE);
+
+			if(cookieValue!=null)
+				toDoClass = ToDoClass.parseToDoClass(cookieValue);
+			else
+				toDoClass = null;
+
+		}
 	}
 }

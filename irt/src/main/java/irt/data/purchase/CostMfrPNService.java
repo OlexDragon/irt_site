@@ -68,7 +68,7 @@ public class CostMfrPNService implements ComboBoxField{
 	}
 
 	public static void add(CostMfrPNBean costMfrPNBean, CostCompanyBean costCompanyBean){
-		if(costCompanyBean!=null && costCompanyBean.getName()!=null) {
+		if(costCompanyBean!=null) {
 			List<CostCompanyBean> costCompanies = costMfrPNBean.getCostCompanyBeans();
 
 			costCompanies.remove(new CostCompanyBean());
@@ -85,7 +85,7 @@ public class CostMfrPNService implements ComboBoxField{
 	}
 
 	public static void remove(CostMfrPNBean costMfrPNBean, CostCompanyBean costCompanyBean) {
-		if(costCompanyBean!=null && costCompanyBean.getName()!=null) {
+		if(costCompanyBean!=null) {
 			List<CostCompanyBean> costCompanies = costMfrPNBean.getCostCompanyBeans();
 
 			costCompanies.remove(costCompanyBean);
@@ -109,7 +109,7 @@ public class CostMfrPNService implements ComboBoxField{
 
 	public static String getCompanyName(CostMfrPNBean costMfrPNBean) {
 		List<CostCompanyBean> costCompanies = costMfrPNBean.getCostCompanyBeans();
-		return costCompanies.isEmpty() ? null : costCompanies.get(costMfrPNBean.getSelectedIndex()).getName();
+		return costCompanies.isEmpty() ? null : CostCompanyService.getName(costCompanies.get(costMfrPNBean.getSelectedIndex()).getId());
 	}
 
 	public String getCompanyName() {
