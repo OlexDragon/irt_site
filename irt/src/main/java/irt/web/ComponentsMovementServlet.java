@@ -22,11 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class ComponentsMovementServlet extends HttpServlet {
 
-	private static final Logger logger = (Logger) LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 
 	public static final String MOVE_FROM		= "move_from";
 	public static final String MOVE_FROM_DETAIL	= "move_from_company";

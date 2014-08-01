@@ -25,7 +25,7 @@ public class CookiesWorker {
 		removeCookiesStartWith(request, response, name);
 
 		Cookie c = new Cookie(name+System.currentTimeMillis(), value.toString());
-		c.setMaxAge(cookieMaxAge);
+		c.setMaxAge(cookieMaxAge);//in seconds
 		response.addCookie(c);
 	}
 

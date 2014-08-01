@@ -109,6 +109,7 @@ public class KitDAO extends DataAccessObject {
 				query = "SELECT`qty`FROM`irt`.`components`WHERE`id`="+componentId;
 				resultSet = statement.executeQuery(query);
 				if(resultSet.next() && (stockQty = resultSet.getInt(1))>0){	//is in Stock
+					resultSet.close();
 					query = "SELECT`qty`FROM`irt`.`kit_details`WHERE`id_components`="+componentId+" AND`id_kit`="+kitId;
 					resultSet = statement.executeQuery(query);
 					boolean doUpdate = true;
@@ -356,6 +357,7 @@ public class KitDAO extends DataAccessObject {
 				query = "SELECT`qty`FROM`irt`.`components`WHERE`id`="+componentId;
 					resultSet = statement.executeQuery(query);
 					if(resultSet.next() && (stockQty = resultSet.getInt(1))>0){	//is in Stock
+						resultSet.close();
 						if(stockQty<toMove)
 							toMove =stockQty;
 						query = "SELECT`qty`FROM`irt`.`kit_details`WHERE`id_components`="+componentId;

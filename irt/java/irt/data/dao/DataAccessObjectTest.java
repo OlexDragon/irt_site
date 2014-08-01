@@ -11,7 +11,7 @@ import javax.naming.NamingException;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 /**
@@ -20,7 +20,7 @@ import org.junit.Test;
  */
 public class DataAccessObjectTest {
 
-    private Logger logger = (Logger) LogManager.getLogger();
+    private Logger logger = LogManager.getLogger();
 
     public DataAccessObjectTest() throws NamingException {
     	logger.trace("setUp");

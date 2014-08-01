@@ -68,14 +68,14 @@ import irt.work.TextWorker;
 import irt.work.TextWorker.PartNumberFirstChar;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 
 public class PartNumberDetails {
 
 	Component component;
 
-	private Logger logger = (Logger) LogManager.getLogger();
+	private Logger logger = LogManager.getLogger();
 
 	public PartNumberDetails(Component component) {
 		this.component = component;

@@ -9,12 +9,12 @@ import irt.data.workorder.WorkOrder;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 public class ComponentDAOTest {
 
-    private Logger logger = (Logger) LogManager.getLogger();
+    private Logger logger = LogManager.getLogger();
 	private ComponentDAO componentDAO;
 
 	public ComponentDAOTest() {

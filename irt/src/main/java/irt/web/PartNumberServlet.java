@@ -9,7 +9,6 @@ import irt.data.components.Component;
 import irt.data.components.Data;
 import irt.data.components.Unknown;
 import irt.data.dao.ComponentDAO;
-import irt.data.dao.ErrorDAO;
 import irt.data.partnumber.PartNumber;
 import irt.data.partnumber.PartNumberDetails;
 import irt.data.purchase.Purchase;
@@ -32,19 +31,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class PartNumberServlet extends HttpServlet {
-
-	public static final String TABLE = "table";
-
 	private static final long serialVersionUID = 1L;
 
-	private final Logger logger = (Logger) LogManager.getLogger();
+	private final Logger logger = LogManager.getLogger();
 
+	private static final String COMPONENT_ID = "component";
+	public static final String TABLE = "table";
 	public static final String HTTP_ADDRESS = "part-numbers";
 
 	private RequestDispatcher jsp;
+
+	private final ComponentDAO componentDAO = new ComponentDAO();
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -61,19 +61,13 @@ public class PartNumberServlet extends HttpServlet {
 
 		String tmpStr = request.getParameter("pn");//Get PartNumber from address bar
 
-		logger.entry(request, response, browser, tmpStr);
-
 		Component component;
 		if(tmpStr!=null && !tmpStr.isEmpty()){
 			component = PartNumber.parsePartNumber(tmpStr);
-			CookiesWorker.addCookie(request, response, "component", component.toString(), 7*24*60*60);
-		}else{
-			tmpStr = CookiesWorker.getCookieValue(request,  "component");
-			if(tmpStr!=null)
-				try { component = (Component) Component.parseData(tmpStr); } catch (CloneNotSupportedException e) { new ErrorDAO().saveError(e, "PartNumberServlet.doGet"); throw new RuntimeException(e); }
-			else
-				component =  new Unknown();
-		}
+			CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
+		}else
+			component = cookieToComponent(request);
+
 		if(component==null)
 			component = new Unknown();
 
@@ -83,10 +77,12 @@ public class PartNumberServlet extends HttpServlet {
 		logger.trace("exit with:\n\t"
 				+ "component:\t{},\n\t"
 				+ "browser:\t{},\n\t"
-				+ "partNumber:\t{}",
+				+ "partNumber:\t{}\n\t"
+				+ "tmpStr:\t{}",
 				component,
 				browser,
-				partNumber);
+				partNumber,
+				tmpStr);
 
 		ToDoClass search = getToDoClass(request, TABLE);
 		OrderBy orderBy = getOrderBy(request, response);
@@ -122,7 +118,7 @@ public class PartNumberServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
-		logger.entry(request, response);
+		logger.entry();
 
 		LogIn logIn;
 		try { logIn = UsersLogsIn.getLogIn(request); } catch (GeneralSecurityException e) { throw new RuntimeException(e); }
@@ -130,15 +126,7 @@ public class PartNumberServlet extends HttpServlet {
 
 		Browser browser = Browser.getBrowser(request);
 
-		Component component = null;
-		String tmpStr = CookiesWorker.getCookieValue(request,  "component");
-
-		if(tmpStr!=null)
-			try {
-				component = (Component) Component.parseData(tmpStr);
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
-			}
+		Component component = cookieToComponent(request);
 
 		String pnt = request.getParameter("pnText");
 	
@@ -152,7 +140,6 @@ public class PartNumberServlet extends HttpServlet {
 				+ "browser:\t{}\n\t"
 				+ "userBean:\t{}\n\t"
 				+ "logIn:\t{}\n\t"
-				+ "tmpStr:\t{}\n\t"
 				+ "component:\t{},\n\t"
 				+ "pnt:\t{},\n\t"
 				+ "pressedButton:\t{},\n\t"
@@ -160,17 +147,17 @@ public class PartNumberServlet extends HttpServlet {
 				browser,
 				userBean,
 				logIn,
-				tmpStr,
 				component,
 				pnt,
 				pressedButton,
 				partNumber);
 
+		String tmpStr;
 		if(pressedButton!=null)
 		switch(pressedButton){
 		case "submit_to_text":
 			component = getComponent(request,  component, userBean.isAdmin() && userBean.isEditing());
-			CookiesWorker.addCookie(request, response, "component", component, 7*24*60*60);
+			CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
 			break;
 		case "submit-add":
 			if(userBean!=null && userBean.isEditing())
@@ -196,7 +183,7 @@ public class PartNumberServlet extends HttpServlet {
 			break;
 		case "submit-cancel":
 			component = new PartNumberDetails(null).getComponent(component.getClassId());
-			CookiesWorker.addCookie(request, response, "component", component, 7*24*60*60);
+			CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
 			break;
 		case "submit_add_link":
 			if(userBean.getID()>0){
@@ -219,7 +206,7 @@ public class PartNumberServlet extends HttpServlet {
 			response.sendRedirect("product_structure?pn="+component.getPartNumber()+"&excel=true&bom=true");
 			return;
 		case "submit-where":
-			response.sendRedirect("product_structure?pn="+component.getPartNumber());
+			response.sendRedirect("product_structure?pn="+component.getPartNumber()+"&bom=false");
 			return;
 		case "submit-alt":
 			response.sendRedirect("alt-mfr-pns");
@@ -310,7 +297,7 @@ public class PartNumberServlet extends HttpServlet {
 		case "submit-parse":
 			if (pnt != null){
 				component = PartNumber.parsePartNumber(pnt);
-				CookiesWorker.addCookie(request, response, "component", component, 7*24*60*60);
+				CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
 				break;
 			}
 		default:
@@ -339,6 +326,17 @@ public class PartNumberServlet extends HttpServlet {
 		request.setAttribute("partNumber", partNumber);
 		request.setAttribute("search", search);
 		jsp.forward(request, response);
+	}
+
+	private Component cookieToComponent(HttpServletRequest request) {
+
+		Component component;
+		String tmpStr = CookiesWorker.getCookieValue(request,  COMPONENT_ID);
+		if(tmpStr!=null && !(tmpStr = tmpStr.replaceAll("\\D", "")).isEmpty())
+			component = componentDAO.getComponent(Integer.parseInt(tmpStr));
+		else
+			component =  new Unknown();
+		return component;
 	}
 
 	private ToDoClass getToDoClass(HttpServletRequest request, String cookiesName) {
@@ -406,18 +404,22 @@ public class PartNumberServlet extends HttpServlet {
 			char firstChar = PartNumberFirstChar.valueOf(Integer.parseInt(selectedFirst)).getFirstDigit().getFirstChar();
 
 			if (	component == null ||
-						component.getClassId().charAt(0) != firstChar ||
-						selectedSecond == null ||
-						selectedSecond.equals("-"))
+					component.getClassId().charAt(0) != firstChar ||
+					selectedSecond == null ||
+					selectedSecond.equals("-"))
 
-					c = new PartNumberDetails(component).getComponent(selectedFirst);
-				else
-					c = new PartNumberDetails(component).getComponent(firstChar + selectedSecond);
+				c = new PartNumberDetails(component).getComponent(selectedFirst);
+			else
+				c = new PartNumberDetails(component).getComponent(firstChar + selectedSecond);
+
+			logger.trace("\n\tcomponent 1\t{}", c);
 
 			if (c != null && (component==null || c==component)) {
 
 				for (int i = 0; i < c.getTitleSize(); i++)
 					isSet = c.setValue(i, req.getParameter("arg" + i)) && isSet;
+
+				logger.trace("\n\tcomponent 2\t{}", c);
 
 			} else
 				isSet = false;

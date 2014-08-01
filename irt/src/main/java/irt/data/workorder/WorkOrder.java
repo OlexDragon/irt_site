@@ -9,12 +9,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 
 public class WorkOrder {
 
-	private final static Logger logger = (Logger) LogManager.getLogger();
+	private final static Logger logger = LogManager.getLogger();
 
 	private String name;
 	private String description;

@@ -138,10 +138,6 @@ public class ProductStructure {
 			ProductStructure.errorMessage += (errorMessage!=null) ? errorMessage+"<br />" : "";
 	}
 
-	public void toDatabase() {
-			new BomDAO().insert(billOfMaterials);
-	}
-
 	public PdfPTable getPdfTable(Image logo) {
 		return isTop() ? new BomDAO().getTopPdfTable(getPartNumber(),logo) : new BomDAO().getPdfTable(getPartNumber(),logo, orderBy);
 	}

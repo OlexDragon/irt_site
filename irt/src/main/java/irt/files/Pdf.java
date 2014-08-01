@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
@@ -30,7 +30,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class Pdf {
 
-	private static final Logger logger = (Logger) LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 
 	public static ByteArrayOutputStream getPdf(String partNumberStr, String pathLogo, OrderBy orderBy) throws DocumentException, BadElementException, MalformedURLException, IOException, BadPdfFormatException {
 		logger.entry(partNumberStr, pathLogo, orderBy);

@@ -722,29 +722,26 @@ public class ComponentDAO extends DataAccessObject {
 	}
 
 	public Data getByMPN(String manPartNum) {
-		Connection conecsion = null;
-		PreparedStatement statement = null;
-		ResultSet resultSet = null;
 
 		Data data = null;
 
 		String query = "select*from`irt`.`components`" +
-						"where `manuf_part_number`='"+manPartNum+"'";
-		try {
-			conecsion = getDataSource().getConnection();
-			statement = conecsion.prepareStatement(query);
-			resultSet = statement.executeQuery();
+						"where `manuf_part_number`=?";
 
-			if (resultSet.next()){
-				data = new PartNumberDetails(null).getComponent(resultSet.getString("part_number").substring(0, 3));
-				data.setValue(resultSet);
+		try(	Connection connecsion = getDataSource().getConnection();
+				PreparedStatement statement = connecsion.prepareStatement(query);) {
+
+			statement.setString(1, manPartNum);
+
+			try(ResultSet resultSet = statement.executeQuery();){
+				if (resultSet.next()){
+					data = new PartNumberDetails(null).getComponent(resultSet.getString("part_number").substring(0, 3));
+					data.setValue(resultSet);
+				}
 			}
-
 		} catch (SQLException | CloneNotSupportedException e) {
 			new ErrorDAO().saveError(e, "ComponentDAO.getByMPN");
 			throw new RuntimeException(e);
-		} finally {
-			close(resultSet, statement, conecsion);
 		}
 		
 	return data;
@@ -795,10 +792,11 @@ public class ComponentDAO extends DataAccessObject {
 	}
 
 	public boolean hasBom(String partNumber) {
+		logger.entry(partNumber);
 		partNumber = PartNumber.validation(partNumber);
 
 		String query = "select`manuf_part_number`from`irt`.`components`where`part_number`='"+partNumber+"'and`manuf_part_number`like'irt bom%'";
-		return isResult(query);
+		return logger.exit(isResult(query));
 	}
 
 	public void setFootprint(Component component) {

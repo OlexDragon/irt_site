@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class JacksonTest {
 
-    protected final Logger logger = (Logger) LogManager.getLogger();
+    protected final Logger logger = LogManager.getLogger();
 
     @Test
 	public void test(){

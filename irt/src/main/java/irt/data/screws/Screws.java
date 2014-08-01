@@ -83,7 +83,7 @@ public class Screws extends Component {
 			returnStr = getManufPartNumber();
 			break;
 		case MANUFACTURE:
-			returnStr = super.getValue(super.MANUFACTURE);
+			returnStr = super.getValue(Component.MANUFACTURE);
 			break;
 		case DESCRIPTION:
 			returnStr = getDescription();
@@ -133,13 +133,13 @@ public class Screws extends Component {
 			setDescription(valueStr);
 			break;
 		case QUANTITY:
-			isSet = super.setValue(super.QUANTITY, valueStr);
+			isSet = super.setValue(Component.QUANTITY, valueStr);
 			break;
 		case LOCATION:
-			isSet = super.setValue(super.LOCATION, valueStr);
+			isSet = super.setValue(Component.LOCATION, valueStr);
 			break;
 		case LINK:
-			isSet = super.setValue(super.LINK, valueStr);
+			isSet = super.setValue(Component.LINK, valueStr);
 			break;
 		default:
 			isSet = false;

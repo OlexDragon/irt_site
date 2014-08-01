@@ -103,26 +103,28 @@ public class CostDAO extends DataAccessObject {
 
 				for(Integer componentId:componentIds){
 					CostCompanyBean costCompanyBean = costCompanyBeans.get(componentId);
-					for(ForPriceBean forPriceBean:costCompanyBean.getForPriceBeans()){
+					if(costCompanyBean!=null)
+						for (ForPriceBean forPriceBean : costCompanyBean.getForPriceBeans()) {
 
-						statementExists.setInt(1, componentId);
-						statementExists.setInt(2, 0);
-						statementExists.setInt(3, costCompanyBean.getId());
-						statementExists.setInt(4, forPriceBean.getForUnits());
+							statementExists.setInt(1, componentId);
+							statementExists.setInt(2, 0);
+							statementExists.setInt(3, costCompanyBean.getId());
+							statementExists.setInt(4, forPriceBean.getForUnits());
 
-						if(isResult(statementExists))
-							statement = statementUpdate;
-						else
-							statement = statementInsert;
+							if (isResult(statementExists))
+								statement = statementUpdate;
+							else
+								statement = statementInsert;
 
-						logger.trace("\n\t{}\n\t{}", statement, forPriceBean);
-						statement.setBigDecimal(1, forPriceBean.getPrice());
-						statement.setInt(2, componentId);
-						statement.setInt(3, 0);
-						statement.setInt(4, costCompanyBean.getId());
-						statement.setInt(5, forPriceBean.getForUnits());
-						executedUpdate = statement.executeUpdate();
-					}
+							logger.trace("\n\t{}\n\t{}", statement, forPriceBean);
+
+							statement.setBigDecimal(1, forPriceBean.getPrice());
+							statement.setInt(2, componentId);
+							statement.setInt(3, 0);
+							statement.setInt(4, costCompanyBean.getId());
+							statement.setInt(5, forPriceBean.getForUnits());
+							executedUpdate = statement.executeUpdate();
+						}
 				}
 			} catch (SQLException e) {
 				new ErrorDAO().saveError(e, "CostDAO.save(Map<Integer, CostCompanyBean> costCompanyBeans)");
@@ -256,8 +258,7 @@ public class CostDAO extends DataAccessObject {
 						ForPriceBean forPriceBean = new ForPriceBean().setPrice(resultSet.getBigDecimal("price")).setForUnits(resultSet.getInt("for"));
 
 						CostCompanyBean costCompanyBean = new CostCompanyBean()
-																.setId(resultSet.getInt("CompanyId"))
-																.setName(resultSet.getString("companyName"));
+																.setId(resultSet.getInt("CompanyId"));
 						CostCompanyService.addForPriceBean(costCompanyBean, forPriceBean); 
 
 						CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
@@ -352,20 +353,19 @@ public class CostDAO extends DataAccessObject {
 											.setDescription(resultSet.getString("description"));
 				cost = new CostService(costBean);
 				do{
-					String mfr = resultSet.getString("mfr");
 					int companyId = resultSet.getInt("CompanyId");
 
 					CostUnitBean costUnitBean = new CostUnitBean()
 								.setComponentId(componentId)
 								.setAlternativeComponentId(resultSet.getInt("alt_comp_id"))
 								.setPartNumberStr(resultSet.getString("pn"))
-								.setDescription(resultSet.getString("description"));
+								.setDescription(resultSet.getString("description"))
+								.setQty(resultSet.getInt("qty"));
 					CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
 													.setId(resultSet.getInt("mfrPNId"))
 													.setMfrPN(resultSet.getString("mfrPN"));
 					CostCompanyBean costCompanyBean = new CostCompanyBean()
-																	.setId(companyId)
-																	.setName(companyId!=0 ? resultSet.getString("companyName") : mfr);
+																	.setId(companyId);
 					CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()
 																				.setPrice(resultSet.getBigDecimal("cost"))
 																				.setForUnits(resultSet.getInt("for")));

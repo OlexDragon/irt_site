@@ -24,13 +24,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 
 public abstract class Data {
 
-    protected final Logger logger = (Logger) LogManager.getLogger(getClass().getName());
-    protected static final Logger loggerComponent = (Logger) LogManager.getLogger("static.Component.logger");
+    protected final Logger logger = LogManager.getLogger(getClass().getName());
+    protected static final Logger loggerComponent = LogManager.getLogger("static.Component.logger");
 
 	public static final Map<Integer, String> CLASS_ID_NAME = new SecondAndThirdDigitsDAO().getMapIdClass();
 	public static final Map<String, Integer> CLASS_NAME_ID = new SecondAndThirdDigitsDAO().getMapClassId();
@@ -154,7 +154,6 @@ public abstract class Data {
 			setDbVoltage(data.getDbVoltage());
 			setSchematicPart(data.getSchematicPart());
 			setSchematicLetter(data.getSchematicLetter());
-
 		}
 	}
 

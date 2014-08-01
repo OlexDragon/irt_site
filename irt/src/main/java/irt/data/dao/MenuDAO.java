@@ -86,6 +86,7 @@ public class MenuDAO extends DataAccessObject {
 	}
 
 	public boolean isBomValid(String partNumber) {
+		logger.entry(partNumber);
 		boolean isValid = false;
 
 		if (partNumber != null && partNumber.length()>3){
@@ -93,7 +94,7 @@ public class MenuDAO extends DataAccessObject {
 						+ partNumber.substring(0,3) + "'";
 		isValid = isResult(query);
 		}
-		return isValid;
+		return logger.exit(isValid);
 	}
 
 	public List<Place> getPlaces() {

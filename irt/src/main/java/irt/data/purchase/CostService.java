@@ -76,7 +76,7 @@ public class CostService {
 						row[TL] = null;
 					}else{
 						for(CostCompanyBean cc:cmpn.getCostCompanyBeans()){
-							row[VD] = cc.getName();
+							row[VD] = CostCompanyService.getName(cc.getId());
 							if(CostMfrPNService.getForPrices(cmpn).isEmpty()){
 								table.add( new Row(Arrays.copyOf(row, row.length)));
 								row[PR] =
@@ -257,18 +257,25 @@ public class CostService {
 		return this;
 	}
 
-	public void setSelectedCompanyIndex(String id_index) {
+	public boolean setSelectedCompanyIndex(String id_index) {
+
+		boolean set = false;
+
 		if(id_index!=null){
 			String[] split = id_index.split(":");
 			if(split.length==2) {
 				List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
 				CostUnitBean costUnit = costUnitBeans.get(costUnitBeans.indexOf(new CostUnitService(Integer.parseInt(split[0].replaceAll("\\D", "")), 0, null, null, null, 0)));
-				CostUnitService.setSelectedCompanyIndex(costUnit, Integer.parseInt(split[1]));
+				if(set = costUnit!=null)
+					CostUnitService.setSelectedCompanyIndex(costUnit, Integer.parseInt(split[1]));
 			}
 		}
+
+		return set;
 	}
 
-	public void setSelectedMfrPNIndex(String id_index) {
+	public boolean setSelectedMfrPNIndex(String id_index) {
+		boolean set = false;
 		if(id_index!=null){
 			String[] split = id_index.split(":");
 			if(split.length==2) {
@@ -277,10 +284,12 @@ public class CostService {
 				int indexOf = costUnitBeans.indexOf(cu);
 				if(indexOf>=0){
 					CostUnitBean costUnit = costUnitBeans.get(indexOf);
-					CostUnitService.setSelectedMfrPN(costUnit, Integer.parseInt(split[1]));
+					if(set = costUnit!=null)
+						CostUnitService.setSelectedMfrPN(costUnit, Integer.parseInt(split[1]));
 				}
 			}
 		}
+		return set;
 	}
 
 	public boolean setForPriceIndex(int id, int index) {
@@ -354,7 +363,12 @@ public class CostService {
 
 	public CostCompanyBean getCostCompany(int id) {
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-		CostMfrPNBean costMfrPN = CostUnitService.getMfrPartNumberBean(costUnitBeans.get(costUnitBeans.indexOf(new CostUnitService(id, 0, null, null, null, 0)))) ;
+		int indexOf = costUnitBeans.indexOf(new CostUnitService(id, 0, null, null, null, 0));
+		CostMfrPNBean costMfrPN = null;
+
+		if(indexOf>=0)
+			costMfrPN = CostUnitService.getMfrPartNumberBean(costUnitBeans.get(indexOf)) ;
+
 		logger.debug("\n\t{}", costMfrPN);
 		return costMfrPN!=null ? CostMfrPNService.getCostCompanyBean(costMfrPN) : null;
 	}

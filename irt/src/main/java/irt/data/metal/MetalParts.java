@@ -156,16 +156,16 @@ public class MetalParts extends Component {
 			break;
 		case DESCRIPTION:
 			isSetted = valueStr!=null && !valueStr.isEmpty();
-			super.setValue(super.DESCRIPTION, valueStr);
+			super.setValue(Component.DESCRIPTION, valueStr);
 			break;
 		case QUANTITY:
-			isSetted = super.setValue(super.QUANTITY, valueStr);
+			isSetted = super.setValue(Component.QUANTITY, valueStr);
 			break;
 		case LOCATION:
-			isSetted = super.setValue(super.LOCATION, valueStr);
+			isSetted = super.setValue(Component.LOCATION, valueStr);
 			break;
 		case LINK:
-			isSetted = super.setValue(super.LINK, valueStr);
+			isSetted = super.setValue(Component.LINK, valueStr);
 		}
 		
 		return isSetted;

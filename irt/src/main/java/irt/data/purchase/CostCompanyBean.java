@@ -6,7 +6,6 @@ import java.util.List;
 public class CostCompanyBean {
 
 	private int id;//Company Id
-	private String name;//Company Name
 	private int selectedIndex;
 	private List<ForPriceBean> forPriceBeans = new ArrayList<>();
 
@@ -15,13 +14,6 @@ public class CostCompanyBean {
 	}
 	public CostCompanyBean setId(int id) {
 		this.id = id;
-		return this;
-	}
-	public String getName() {
-		return name;
-	}
-	public CostCompanyBean setName(String name) {
-		this.name = name;
 		return this;
 	}
 	public int getSelectedIndex() {
@@ -50,7 +42,7 @@ public class CostCompanyBean {
 	}
 	@Override
 	public String toString() {
-		return "CostCompanyBean [id=" + id + ", name=" + name
+		return "CostCompanyBean [id=" + id
 				+ ", selectedIndex=" + selectedIndex + ", forPrices="
 				+ forPriceBeans + "]";
 	}
