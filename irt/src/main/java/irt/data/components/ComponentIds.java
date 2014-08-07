@@ -39,11 +39,6 @@ public class ComponentIds {
 		return id;
 	}
 
-	@Override
-	public String toString() {
-		return  partNumber;
-	}
-
 	public void setQuantity(String quantityStr) {
 		if(quantityStr!=null){
 			quantityStr = quantityStr.replaceAll("\\D", "");
@@ -54,5 +49,15 @@ public class ComponentIds {
 		}else
 			qty = 0;
 
+	}
+//
+//	@Override
+//	public String toString() {
+//		return  partNumber;
+//	}
+
+	@Override
+	public String toString() {
+		return "ComponentIds [id=" + id + ", partNumber=" + partNumber + ", mfrPartNumber=" + mfrPartNumber + ", qty=" + qty + "]";
 	}
 }

@@ -9,15 +9,16 @@
 
 	<Loggers>
 		<logger name="irt.web.ComponentsMovementServlet" 	level="WARN" />
-		<logger name="irt.web.CostServlet" 					level="all" />
+		<logger name="irt.web.CostServlet" 					level="WARN" />
 		<logger name="irt.web.PartNumberServlet" 			level="all" />
 		<logger name="irt.web.WorkOrderServlet" 			level="WARN" />
 		<logger name="irt.web.ProductServlet" 				level="WARN" />
 
 		<logger name="irt.data.Jackson" 					level="WARN" />
+		<logger name="irt.data.CookiesWorker" 				level="all" />
 
 		<logger name="irt.data.partnumber.PartNumber"		level="WARN" />
-		<logger name="irt.data.partnumber.PartNumberDetails" level="WARN" />
+		<logger name="irt.data.partnumber.PartNumberDetails" level="all" />
 
 		<logger name="irt.data.components.Component" 		level="WARN" />
 		<logger name="irt.data.components.Isolator" 		level="WARN" />
@@ -37,6 +38,9 @@
 		<logger name="irt.data.dao.DataAccessObject" 		level="WARN" />
 
 		<logger name="irt.data.workorder.WorkOrder"			level="WARN" />
+
+		<logger name="irt.product.ProductStructure"			level="WARN" />
+		<logger name="irt.product.BillOfMaterials"			level="WARN" />
 
 		<logger name="irt.table.OrderBy"					level="WARN" />
 

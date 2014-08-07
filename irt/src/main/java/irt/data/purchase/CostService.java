@@ -55,18 +55,19 @@ public class CostService {
 				row[TL] = null;
 			}else
 				for(CostMfrPNBean cmpn:cu.getMfrPartNumbers()){
-					if(cmpn.getAlternativeUnit()!=null){
-						CostUnitBean alt = cmpn.getAlternativeUnit();
-						row[ID]	= ""+alt.getComponentId();
-						row[PN] = alt.getPartNumberStr();
-						row[QT] = ""+alt.getQty();
-					}else{
-						row[ID]	= ""+cu.getComponentId();
-						row[PN] = cu.getPartNumberStr();
-						row[QT] = ""+cu.getQty();
-					}
-					row[MPN] = cmpn.getMfrPN();
-					row[MFR] = cmpn.getMfr();
+//TODO
+//					if(cmpn.getAlternativeUnit()!=null){
+//						CostUnitBean alt = cmpn.getAlternativeUnit();
+//						row[ID]	= ""+alt.getComponentId();
+//						row[PN] = alt.getPartNumberStr();
+//						row[QT] = ""+alt.getQty();
+//					}else{
+//						row[ID]	= ""+cu.getComponentId();
+//						row[PN] = cu.getPartNumberStr();
+//						row[QT] = ""+cu.getQty();
+//					}
+//					row[MPN] = cmpn.getMfrPN();
+//					row[MFR] = cmpn.getMfr();
 					if(cmpn.getCostCompanyBeans().isEmpty()){
 						table.add( new Row(Arrays.copyOf(row, row.length)));
 						row[VD] =

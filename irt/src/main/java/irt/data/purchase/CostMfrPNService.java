@@ -1,5 +1,7 @@
 package irt.data.purchase;
 
+import irt.data.components.AlternativeComponent;
+import irt.data.dao.ComponentDAO;
 import irt.work.ComboBoxField;
 
 import java.math.BigDecimal;
@@ -13,13 +15,13 @@ public class CostMfrPNService implements ComboBoxField{
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
+	private final ComponentDAO componentDAO = new ComponentDAO();
+
 	private CostMfrPNBean costMfrPNBean = new CostMfrPNBean();
 	private CostCompanyService costCompanyService;
 
 	public CostMfrPNService(int id, String mfr, String mfrPN, CostCompanyBean costCompanyBean) {
-		costMfrPNBean.setId(id);
-		costMfrPNBean.setMfr(mfrPN);
-		costMfrPNBean.setMfrPN(mfrPN);
+		costMfrPNBean.setAlternativeComponentId(id);
 
 		costCompanyService = new CostCompanyService(costCompanyBean);
 		ArrayList<CostCompanyBean> costCompanyBeans = new ArrayList<>();
@@ -31,15 +33,17 @@ public class CostMfrPNService implements ComboBoxField{
 	public CostMfrPNService() {}
 
 	public int getId() {
-		return costMfrPNBean.getId();
+		return costMfrPNBean.getAlternativeComponentId();
 	}
 
 	public String getMfrPN() {
-		return costMfrPNBean.getMfrPN();
+		AlternativeComponent alternativeComponent = componentDAO.getAlternativeComponent(costMfrPNBean.getAlternativeComponentId());
+		return alternativeComponent!=null ? alternativeComponent.getMfrPN() : null;
 	}
 
 	public String getMfr() {
-		return costMfrPNBean.getMfr();
+		AlternativeComponent alternativeComponent = componentDAO.getAlternativeComponent(costMfrPNBean.getAlternativeComponentId());
+		return alternativeComponent!=null ? alternativeComponent.getMfrId() : null;
 	}
 
 	public int getSelectedCompany() {
@@ -52,11 +56,11 @@ public class CostMfrPNService implements ComboBoxField{
 	}
 
 	public boolean isSet(){
-		return costMfrPNBean.getId()>=0;
+		return costMfrPNBean.getAlternativeComponentId()>=0;
 	}
 
 	public static boolean isSet(CostMfrPNBean costMfrPNBean){
-		return costMfrPNBean.getId()>=0;
+		return costMfrPNBean.getAlternativeComponentId()>=0;
 	}
 
 	public List<CostCompanyBean> getCostCompanies() {
@@ -199,12 +203,13 @@ public class CostMfrPNService implements ComboBoxField{
 	}
 
 	public void add(CostUnitBean alternativeUnit) {
-		if(CostUnitService.isSet(alternativeUnit))
-			costMfrPNBean.setAlternativeUnit(alternativeUnit);
+//		if(CostUnitService.isSet(alternativeUnit))
+//			costMfrPNBean.setAlternativeUnit(alternativeUnit);
+		//TODO
 	}
 
 	public CostUnitBean getAlternativeUnit() {
-		return costMfrPNBean.getAlternativeUnit();
+		return null;//TODO costMfrPNBean.getAlternativeUnit();
 	}
 
 	@Override
@@ -214,17 +219,17 @@ public class CostMfrPNService implements ComboBoxField{
 
 	@Override
 	public int hashCode() {
-		return costMfrPNBean.getId();
+		return costMfrPNBean.getAlternativeComponentId();
 	}
 
 	@Override
 	public String getValue() {
-		return ""+costMfrPNBean.getId();
+		return ""+costMfrPNBean.getAlternativeComponentId();
 	}
 
 	@Override
 	public String getText() {
-		return costMfrPNBean.getMfrPN();
+		return getMfrPN();
 	}
 
 	public static CostCompanyBean getCostCompanyBean(CostMfrPNBean costMfrPNBean) {

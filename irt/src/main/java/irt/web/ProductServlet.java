@@ -47,6 +47,8 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
 public class ProductServlet extends HttpServlet {
+	private static final BomDAO BOM_DAO = new BomDAO();
+
 	private static final long serialVersionUID = 1L;
 
 	private final static Logger logger = LogManager.getLogger();
@@ -78,13 +80,11 @@ public class ProductServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		logger.entry();
 
 		ProductStructureFields productStructureFields = new ProductStructureFields(request, response);
-		productStructureFields.setPartNumber(request.getParameter("pn"));
-		productStructureFields.setOrderBy(getOrderBy(request.getParameter("ob")));
+		productStructureFields.setFields();
 		productStructureFields.setOrderByReference(null);
-		productStructureFields.setBOM(request.getParameter("bom"));
-
 
 		if (request.getParameter("pdf") != null)
 			try {
@@ -102,6 +102,8 @@ public class ProductServlet extends HttpServlet {
 				throw new RuntimeException(e);
 			}
 		}
+
+		logger.trace("\n\t{}\n\t{}", productStructureFields, error);
 
 		request.setAttribute("psf", productStructureFields);
 		request.setAttribute("error", error);
@@ -149,19 +151,26 @@ public class ProductServlet extends HttpServlet {
 //		case SYMBOL:
 //		}
 		if(productStructureFields!=null && productStructureFields.getCommand()!=null){
-				switch (productStructureFields.getCommand()) {
-				case EXSEL:
-					Excel.uploadExcel(response,
+			ProductStructureFields.Command command = productStructureFields.getCommand();
+			logger.trace("\n\tcommand:\t{}", command);
+			switch (command) {
+			case EXSEL:
+				Excel.uploadExcel(response,
 							productStructureFields.getPartNumber(), pathLogo,
 							productStructureFields.isWithQty,
 							productStructureFields.getOrderBy());
-					break;
-				case PDF:
-					getPdf(	response,
+				return;
+			case PDF:
+				getPdf(	response,
 							productStructureFields.getPartNumber(),
 							productStructureFields.getOrderBy());
-				}
-			return;
+				return;
+			case GET_BOM:
+				productStructureFields.setBOM("true");
+				break;
+			case ADD_BOM:
+				addBOM(productStructureFields);
+			}
 		}
 		} catch (Exception e) {
 			throw new ServletException(e);
@@ -206,7 +215,7 @@ public class ProductServlet extends HttpServlet {
 						productStructureFields.setOrderByReference("true");
 						break;
 					case "submit-add-bom":
-						bomIsSet = showBOM(productStructureFields, name, inputStr);
+						productStructureFields.setCommand(inputStr.equals("get BOM") ? ProductStructureFields.Command.GET_BOM : ProductStructureFields.Command.ADD_BOM);
 						break;
 					case "submit-where":
 						productStructureFields.setBOM("false");
@@ -241,25 +250,10 @@ public class ProductServlet extends HttpServlet {
 
 						String sourceFile = getFileName(path, fileName);
 						if(uploadFile(inputStream, sourceFile))
-							if(isSymbol)
-								updateSymbols(sourceFile);
-							else{
-								if (!productStructureFields.isSymbol()) {
-								
-									// work with uploaded file
-									BillOfMaterials billOfMaterials = new BillOfMaterials(sourceFile, productStructureFields.isIgnoreFootprint());
-									ProductStructure productStructure = new ProductStructure();
-									productStructure.set(billOfMaterials);
-									productStructure.setPartNumber(productStructureFields.getPartNumber(), productStructureFields.isBOM());
-									if (productStructure.isErrorMessage())
-										error.setErrorMessage(productStructure.getErrorMessage());
-									else if (!productStructure.hasBom())
-										new BomDAO().insert(billOfMaterials);
-								}
-							}
+							productStructureFields.setSourceFile(sourceFile);
 
 					}else{
-						ProductStructure.setErrorMessage("Select the file.");
+						error.setErrorMessage("Select the file.");
 						productStructureFields.setSymbol("false");
 					}
 				}
@@ -273,21 +267,32 @@ public class ProductServlet extends HttpServlet {
 		return productStructureFields;
 	}
 
-	private boolean showBOM(ProductStructureFields productStructureFields, String name, String inputStr) {
-		boolean bomIsSet = false;
-		switch(inputStr){
-		case "get BOM":
-			bomIsSet = true;
-			productStructureFields.setBOM("true");
-			break;
-		default:
-			logger.warn("\n\t"
-					+ "name=\t{}\n\t"
-					+ "fname=\t{}",
-					name,
-					inputStr);
+	private void addBOM(ProductStructureFields productStructureFields) {
+		String sourceFile = productStructureFields.getSourceFile();
+		if (sourceFile != null && !sourceFile.isEmpty()){		
+//		if(isSymbol)
+//			updateSymbols(sourceFile);
+//		else{
+
+			String partNumber = productStructureFields.getPartNumber();
+
+			// work with uploaded file
+			BillOfMaterials billOfMaterials = new BillOfMaterials(partNumber, sourceFile, productStructureFields.isIgnoreFootprint());
+			ProductStructure productStructure = new ProductStructure();
+			productStructure.set(billOfMaterials);
+			productStructure.setPartNumber(partNumber, productStructureFields.isBOM());
+
+			if(billOfMaterials.isError())
+				error.setErrorMessage(billOfMaterials.getErrorMessage());
+			if (productStructure.isErrorMessage())
+				error.setErrorMessage(productStructure.getErrorMessage());
+
+			if (!(error.isError() || productStructure.hasBom()))
+				BOM_DAO.insert(billOfMaterials);
+
+			if(BOM_DAO.getError().isError())
+				error.setErrorMessage(BOM_DAO.getError().getErrorMessage());
 		}
-		return bomIsSet;
 	}
 
 //	private int takeDecision(HttpServletRequest httpServletRequest, ProductStructureFields productStructureFields) throws IOException {
@@ -481,20 +486,13 @@ public class ProductServlet extends HttpServlet {
 		logger.exit();
 	}
 
-	private OrderBy getOrderBy(String orderByStr) {
-
-		OrderBy orderBy = null;
-		if(orderByStr!=null && !orderByStr.isEmpty())
-			orderBy = new OrderBy(orderByStr);
-
-		return orderBy;
-	}
-
 	public static class ProductStructureFields{
 
 		private enum Command{
 			EXSEL,
-			PDF
+			PDF,
+			ADD_BOM,
+			GET_BOM
 		}
 
 		private String partNumber;
@@ -505,13 +503,24 @@ public class ProductServlet extends HttpServlet {
 		private boolean isSymbol;
 		private boolean isOrderByReference;
 		private Command command;
+		private String sourceFile;
 
 		private HttpServletRequest request;
 		private HttpServletResponse response;
 
-		public ProductStructureFields(HttpServletRequest request, HttpServletResponse response) {
+		public ProductStructureFields(HttpServletRequest request, HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException {
 			this.request = request;
 			this.response = response;
+		}
+
+		public void setSourceFile(String sourceFile) {
+			this.sourceFile = sourceFile;
+		}
+
+		public void setFields() throws JsonParseException, JsonMappingException, IOException {
+			setPartNumber(request.getParameter("pn"));
+			setOrderBy(getOrderBy(request.getParameter("ob")));
+			setBOM(request.getParameter("bom"));
 		}
 
 		public String getPartNumber() {
@@ -582,6 +591,7 @@ public class ProductServlet extends HttpServlet {
 		public boolean isBOM() {
 			return isBOM;
 		}
+
 		public void setBOM(String isBOM) {
 			logger.entry(isBOM);
 			if(isBOM==null)
@@ -638,6 +648,19 @@ public class ProductServlet extends HttpServlet {
 
 		public void setCommand(Command command) {
 			this.command = command;
+		}
+
+		private OrderBy getOrderBy(String orderByStr) {
+
+			OrderBy orderBy = null;
+			if(orderByStr!=null && !orderByStr.isEmpty())
+				orderBy = new OrderBy(orderByStr);
+
+			return orderBy;
+		}
+
+		public String getSourceFile() {
+			return sourceFile;
 		}
 	}
 }

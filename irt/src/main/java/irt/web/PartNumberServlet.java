@@ -36,15 +36,16 @@ import org.apache.logging.log4j.Logger;
 public class PartNumberServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private final Logger logger = LogManager.getLogger();
+	private final static Logger logger = LogManager.getLogger();
 
 	private static final String COMPONENT_ID = "component";
+	private static final String COMPONENT_CLASS_ID = "compClassId";
 	public static final String TABLE = "table";
 	public static final String HTTP_ADDRESS = "part-numbers";
 
 	private RequestDispatcher jsp;
 
-	private final ComponentDAO componentDAO = new ComponentDAO();
+	private final static ComponentDAO componentDAO = new ComponentDAO();
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -64,7 +65,7 @@ public class PartNumberServlet extends HttpServlet {
 		Component component;
 		if(tmpStr!=null && !tmpStr.isEmpty()){
 			component = PartNumber.parsePartNumber(tmpStr);
-			CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
+			componentToCookies(request, response, component);
 		}else
 			component = cookieToComponent(request);
 
@@ -157,7 +158,7 @@ public class PartNumberServlet extends HttpServlet {
 		switch(pressedButton){
 		case "submit_to_text":
 			component = getComponent(request,  component, userBean.isAdmin() && userBean.isEditing());
-			CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
+			componentToCookies(request, response, component);
 			break;
 		case "submit-add":
 			if(userBean!=null && userBean.isEditing())
@@ -183,12 +184,12 @@ public class PartNumberServlet extends HttpServlet {
 			break;
 		case "submit-cancel":
 			component = new PartNumberDetails(null).getComponent(component.getClassId());
-			CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
+			componentToCookies(request, response, component);
 			break;
 		case "submit_add_link":
 			if(userBean.getID()>0){
 				if(userBean.isEditing()){
-					response.sendRedirect("add-link");
+					response.sendRedirect("add-link?id="+component.getId());
 					return;
 				}else
 					component.getError().setErrorMessage("You do not have permission.");
@@ -297,7 +298,7 @@ public class PartNumberServlet extends HttpServlet {
 		case "submit-parse":
 			if (pnt != null){
 				component = PartNumber.parsePartNumber(pnt);
-				CookiesWorker.addCookie(request, response, COMPONENT_ID, component.getId(), 7*24*60*60);
+				componentToCookies(request, response, component);
 				break;
 			}
 		default:
@@ -328,15 +329,43 @@ public class PartNumberServlet extends HttpServlet {
 		jsp.forward(request, response);
 	}
 
-	private Component cookieToComponent(HttpServletRequest request) {
+	private void componentToCookies(HttpServletRequest request, HttpServletResponse response, Component component) {
+		logger.entry(component);
 
-		Component component;
-		String tmpStr = CookiesWorker.getCookieValue(request,  COMPONENT_ID);
-		if(tmpStr!=null && !(tmpStr = tmpStr.replaceAll("\\D", "")).isEmpty())
-			component = componentDAO.getComponent(Integer.parseInt(tmpStr));
-		else
+		int id = component.getId();
+		if(id>0){
+			logger.trace("save componentId: {}", id);
+			CookiesWorker.addCookie(request, response, COMPONENT_ID, id, 7*24*60*60);
+			CookiesWorker.removeCookiesStartWith(request, response, COMPONENT_CLASS_ID);
+		} else {
+			String classId = component.getClassId();
+			logger.trace("save classId: {}", classId);
+			CookiesWorker.addCookie(request, response, COMPONENT_CLASS_ID, classId, 7*24*60*60);
+		}
+	}
+
+	public static Component cookieToComponent(HttpServletRequest request) {
+
+		Component component = null;
+		String tmpStr = CookiesWorker.getCookieValue(request,  COMPONENT_CLASS_ID);
+
+		logger.trace("{} : {}", COMPONENT_CLASS_ID, tmpStr);
+		if(tmpStr!=null)
+			component = new PartNumberDetails(null).getComponent(tmpStr);
+
+		else{
+			tmpStr = CookiesWorker.getCookieValue(request,  COMPONENT_ID);
+			if(tmpStr!=null && !(tmpStr = tmpStr.replaceAll("\\D", "")).isEmpty() && tmpStr.length()<9) {
+				int componentId = Integer.parseInt(tmpStr);
+				if(componentId>0)
+					component = componentDAO.getComponent(componentId);
+			} 
+		}
+
+		if(component == null)
 			component =  new Unknown();
-		return component;
+
+		return logger.exit(component);
 	}
 
 	private ToDoClass getToDoClass(HttpServletRequest request, String cookiesName) {

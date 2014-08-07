@@ -344,6 +344,10 @@ public abstract class Data {
 			id = new ComponentDAO().getId(partNumber);
 	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getPartType() 		{
 		if(partType==null || partType.isEmpty())
 			partType = getPartType(getPartNumber());
@@ -379,7 +383,6 @@ public abstract class Data {
 	public void setDescription(String description) { this.description = description!=null && !(description =description.trim()).isEmpty() ? description.toUpperCase() : null;	}
 	public void setOrderBy		(String orderBy) 	{ if(this.orderBy==null) this.orderBy = new OrderBy(orderBy); else this.orderBy.setOrderBy(orderBy);						}
 	public void setOrderBy		(OrderBy orderBy) 	{ this.orderBy = orderBy; }
-	public void setId			(int id) 			{ this.id = id;									}
 	public void setFootprint	(String footprint) 	{ this.footprint = footprint;					}
 	public void setDbValue		(String value) 		{ this.dbValue = value;							}
 	public void setPartType		(String partType) 	{	this.partType = partType;					}

@@ -7,7 +7,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class CookiesWorker {
+
+	private static final Logger logger = LogManager.getLogger();
 
 	public static String getCookieValue(HttpServletRequest request, String startWith) {
 
@@ -24,12 +29,15 @@ public class CookiesWorker {
 
 		removeCookiesStartWith(request, response, name);
 
+		logger.entry(name, value);
+
 		Cookie c = new Cookie(name+System.currentTimeMillis(), value.toString());
 		c.setMaxAge(cookieMaxAge);//in seconds
 		response.addCookie(c);
 	}
 
 	public static void removeCookiesStartWith(HttpServletRequest request, HttpServletResponse response, String startWith) {
+		logger.entry(startWith);
 
 		for(Cookie c:getCookiesStartWith(request, startWith)){
 			c.setValue(null);
@@ -39,6 +47,7 @@ public class CookiesWorker {
 	}
 
 	public static TreeSet<Cookie> getCookiesStartWith(HttpServletRequest request, String startWith) {
+		logger.entry(startWith);
 
 		TreeSet<Cookie> cookiesSet = new TreeSet<Cookie>(new Comparator<Cookie>() {
 

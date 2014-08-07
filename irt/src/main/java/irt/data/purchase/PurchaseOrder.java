@@ -127,7 +127,7 @@ public class PurchaseOrder {
 			if(pou.size()>1 && isEdit){
 				mfrPN = "<select id=\"mfrPN"+pou.getComponentId()+"\" name=\"mfrPN"+pou.getComponentId()+"\" onchange=\"oneClick('submit');\">";
 				for(ManufacturePartNumber mpn:pou.getMfrPNs())
-					mfrPN += "<option value=\""+mpn.getId()+"\""+(mpn.getId()==pou.getMfrPNIndex() ? " selected=\"selected\"":"")+" >"+(mpn.getMfrPN()!=null ? mpn.getMfrPN() : "")+"</option>";
+					mfrPN += "<option value=\""+mpn.getComponentId()+"\""+(mpn.getComponentId()==pou.getMfrPNIndex() ? " selected=\"selected\"":"")+" >"+(mpn.getMfrPN()!=null ? mpn.getMfrPN() : "")+"</option>";
 				mfrPN +=	"</select>";
 			}else
 				mfrPN = pou.getMfrPN().getMfrPN();

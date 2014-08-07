@@ -39,7 +39,6 @@ public class AddLinkServlet extends HttpServlet {
 
 	private RequestDispatcher jsp;
 	private String message;
-	private String partNumberStr;
 	private String realPath;
 
 	private String purchaseOrderNumber;
@@ -67,9 +66,13 @@ public class AddLinkServlet extends HttpServlet {
 			throw new RuntimeException(e);
 		}
 
-		PartNumber partNumber = PartNumber.getPartNumber(request.getRemoteHost());
-		Component component = partNumber.getComponent();
+		Component component = null;
+		String componentId = request.getParameter("id");
+		if(componentId!=null)
+			component = new ComponentDAO().getComponent(Integer.parseInt(componentId));
+
 		String manufPN;
+		String partNumberStr = null;
 		if(component!=null){
 			partNumberStr = component.getPartNumberF();
 			manufPN = " : " + component.getManufPartNumber();
@@ -111,6 +114,8 @@ public class AddLinkServlet extends HttpServlet {
 
 		int linkId = -1;
 
+		Component component = PartNumberServlet.cookieToComponent(request);
+
 		if (ServletFileUpload.isMultipartContent(request)) {
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
@@ -130,7 +135,7 @@ public class AddLinkServlet extends HttpServlet {
 						if (fileName != null && !fileName.isEmpty()) {
 							fileName = FilenameUtils.getName(fileName);
 							if (!linkDAO.isExists(fileName)) {
-								String folderName = partNumberStr!=null ? partNumberStr.substring(0, 3) : "Invoices";
+								String folderName = component!=null  ? component.getClassId() : "Invoices";
 								String path = FilenameUtils.concat(realPath, folderName);
 								File folder = new File(path);
 								if (!folder.exists())
@@ -151,6 +156,7 @@ public class AddLinkServlet extends HttpServlet {
 								linkId = linkDAO.getId(fileName);
 								
 							if (linkId > 0){
+								String partNumberStr = component.getPartNumberF();
 								if(partNumberStr!=null && new ComponentDAO().addLink(userBean.getID(), partNumberStr, linkId)) {
 									response.sendRedirect("part-numbers?pn="+ partNumberStr);
 									return;

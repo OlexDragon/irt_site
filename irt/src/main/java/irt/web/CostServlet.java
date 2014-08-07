@@ -13,6 +13,7 @@ import irt.data.purchase.CostCompanyBean;
 import irt.data.purchase.CostCompanyBeanWrapper;
 import irt.data.purchase.CostCompanyService;
 import irt.data.purchase.CostMfrPNBean;
+import irt.data.purchase.CostMfrPNService;
 import irt.data.purchase.CostService;
 import irt.data.purchase.CostUnitBean;
 import irt.data.purchase.ForPriceBean;
@@ -178,7 +179,7 @@ public class CostServlet extends HttpServlet {
 					companyName = CostCompanyService.getName(companyId);
 				}else{
 					companyId = 0;
-					companyName = costMfrPN.getMfr();
+//TODO					companyName = CostMfrPNService.getMfr()costMfrPN.getMfr();
 				}
 			}else {
 				Company company = new CompanyDAO().getCompany(Integer.parseInt(addVandor));
@@ -186,16 +187,16 @@ public class CostServlet extends HttpServlet {
 				companyName = company.getCompanyName();
 			}
 
-			error.setErrorMessage("CompanyName: "+companyName);
-			if(companyName!=null) {
-				costCompanyBean = new CostCompanyBean()
-								.setId(companyId);
-				CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()
-															.setNewPrice(new BigDecimal(addPrice))
-															.setForUnits(Integer.parseInt(addFor)));
-				costService.add(componentId, costCompanyBean);
-				CookiesWorker.addCookie(request, response, COST_COMPANY_BEAN_WRAPPERS, Jackson.objectToJsonString(BEAN_WRAPPER.set(componentId, costService.getCostCompany(companyId))), 24*60*60);
-			}
+//TODO			error.setErrorMessage("CompanyName: "+companyName);
+//			if(companyName!=null) {
+//				costCompanyBean = new CostCompanyBean()
+//								.setId(companyId);
+//				CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()
+//															.setNewPrice(new BigDecimal(addPrice))
+//															.setForUnits(Integer.parseInt(addFor)));
+//				costService.add(componentId, costCompanyBean);
+//				CookiesWorker.addCookie(request, response, COST_COMPANY_BEAN_WRAPPERS, Jackson.objectToJsonString(BEAN_WRAPPER.set(componentId, costService.getCostCompany(companyId))), 24*60*60);
+//			}
 		} else
 			error.setErrorMessage("Company, Price and For fields should be filled");
 	}

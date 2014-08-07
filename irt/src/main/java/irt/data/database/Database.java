@@ -11,6 +11,7 @@ public class Database implements Runnable {
 
 	private boolean running = true;
 	private String databaseName;
+	private DatabaseDAO databaseDAO = new DatabaseDAO();
 
 	public Database(String databaseName) {
 		this.databaseName = databaseName;
@@ -32,8 +33,9 @@ public class Database implements Runnable {
 
 				try {
 
-					if(file.createNewFile())
-						new DatabaseDAO().writeToFile(file, databaseName);
+					if(file.createNewFile()) {
+						databaseDAO.writeToFile(file, databaseName);
+					}
 
 				} catch (IOException e1) { e1.printStackTrace(); }
 

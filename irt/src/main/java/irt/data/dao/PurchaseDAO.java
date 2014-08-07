@@ -192,6 +192,7 @@ public class PurchaseDAO extends DataAccessObject {
 								"`irt`.part_number(`part_number`)AS`Part Number`," +
 								"`c`.`description`," +
 								"`c`.`manuf_part_number`AS`Mfr P/N`," +
+								"`m`.`id`AS`mfrID`," +
 								"`m`.`name`AS`mfr`," +
 								"`pc`.`id_components_alternative`AS`mfrPNId`," +
 								"`pc`.`price`," +
@@ -207,7 +208,7 @@ public class PurchaseDAO extends DataAccessObject {
 					PurchaseOrderUnit purchaseOrderUnit = new PurchaseOrderUnit(resultSet.getInt("id"),
 																resultSet.getString("Part Number"),
 																resultSet.getString("description"),
-																new ManufacturePartNumber(0, resultSet.getString("Mfr P/N"), resultSet.getString("mfr")));
+																new ManufacturePartNumber(0, resultSet.getString("mfrID"), resultSet.getString("Mfr P/N"), resultSet.getString("mfr")));
 					purchaseOrderUnit.setPrice(new Price(resultSet.getLong("price")));
 					purchaseOrderUnit.setOrderQuantity(resultSet.getInt("SQty"));
 					purchaseOrderUnit.setMfrPNIndex(resultSet.getInt("mfrPNId"));

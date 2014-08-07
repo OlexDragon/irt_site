@@ -1,5 +1,8 @@
 package irt.product;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import irt.data.dao.BomDAO;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
@@ -10,6 +13,8 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfPTable;
 
 public class ProductStructure {
+
+	private final Logger logger = LogManager.getLogger();
 
 	public boolean isFootprint	= true;
 	public boolean isQty		= false;
@@ -31,14 +36,13 @@ public class ProductStructure {
 	 * @return 
 	 */
 	public boolean setPartNumber(String partNumber, boolean isBom) {
+		logger.entry(partNumber, isBom);
 
-		if(partNumber!=null && !partNumber.isEmpty()){
-			this.isBom=isBom;
-			partNumber = validationBom(partNumber, isBom);
-			if(partNumber==null || !partNumber.equals(this.partNumber)){
-				this.partNumber = partNumber;
-				table = null;
-			}
+		this.isBom=isBom;
+		partNumber = validationBom(partNumber, isBom);
+		if(partNumber==null || !partNumber.equals(this.partNumber)){
+			this.partNumber = partNumber;
+			table = null;
 		}
 		return table!=null;
 	}
@@ -130,8 +134,6 @@ public class ProductStructure {
 
 	public void set(BillOfMaterials billOfMaterials) {
 		this.billOfMaterials = billOfMaterials;
-		if(billOfMaterials!=null)
-			billOfMaterials.setTopComponentIds(getPartNumber());
 	}
 
 	public static void setErrorMessage(String errorMessage) {

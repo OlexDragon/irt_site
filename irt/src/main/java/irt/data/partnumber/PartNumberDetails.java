@@ -322,7 +322,7 @@ public class PartNumberDetails {
 			logger.error(errorMessage);
 		}
 
-		logger.trace("EXIT\n\tcomponent:\t{}", component);
+		logger.trace("\n\tEXIT WITH\n\tcomponent:\t{}", component);
 		return component;
 	}
 

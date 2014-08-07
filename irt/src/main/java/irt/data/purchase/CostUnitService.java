@@ -33,8 +33,8 @@ public class CostUnitService {
 	}
 
 	public int getQty() {
-		CostUnitBean alternativeUnit = costUnitBean.getMfrPartNumbers().get(costUnitBean.getSelectedIndex()).getAlternativeUnit();
-		return costUnitBean.getSelectedIndex() == 0 || alternativeUnit==null ? costUnitBean.getQty() :alternativeUnit.getQty();
+//TODO		CostUnitBean alternativeUnit = costUnitBean.getMfrPartNumbers().get(costUnitBean.getSelectedIndex()).getAlternativeUnit();
+		return 0;// costUnitBean.getSelectedIndex() == 0 || alternativeUnit==null ? costUnitBean.getQty() :alternativeUnit.getQty();
 	}
 
 	public int getComponentId() {
@@ -47,19 +47,19 @@ public class CostUnitService {
 	}
 
 	public String getPartNumberStr() {
-		CostUnitBean alternativeUnit = null;
-		int selectedIndex = costUnitBean.getSelectedIndex();
-		if(selectedIndex != 0)
-			alternativeUnit = costUnitBean.getMfrPartNumbers().get(selectedIndex).getAlternativeUnit();
-		return alternativeUnit==null ? costUnitBean.getPartNumberStr() : alternativeUnit.getPartNumberStr();
+//TODO		CostUnitBean alternativeUnit = null;
+//		int selectedIndex = costUnitBean.getSelectedIndex();
+//		if(selectedIndex != 0)
+//			alternativeUnit = costUnitBean.getMfrPartNumbers().get(selectedIndex).getAlternativeUnit();
+		return null;// alternativeUnit==null ? costUnitBean.getPartNumberStr() : alternativeUnit.getPartNumberStr();
 	}
 
 	public String getDescription() {
-		CostUnitBean alternativeUnit = null;
-		int selectedIndex = costUnitBean.getSelectedIndex();
-		if(selectedIndex != 0)
-			alternativeUnit = costUnitBean.getMfrPartNumbers().get(selectedIndex).getAlternativeUnit();
-		return alternativeUnit==null ? costUnitBean.getDescription() : alternativeUnit.getDescription();
+//TODO		CostUnitBean alternativeUnit = null;
+//		int selectedIndex = costUnitBean.getSelectedIndex();
+//		if(selectedIndex != 0)
+//			alternativeUnit = costUnitBean.getMfrPartNumbers().get(selectedIndex).getAlternativeUnit();
+		return null;// alternativeUnit==null ? costUnitBean.getDescription() : alternativeUnit.getDescription();
 	}
 
 	@Override
@@ -118,8 +118,8 @@ public class CostUnitService {
 	}
 
 	public static String getMfrPN(CostUnitBean costUnitBean) {
-		ArrayList<CostMfrPNBean> mfrPartNumbers = costUnitBean.getMfrPartNumbers();
-		return mfrPartNumbers.isEmpty() ? null : mfrPartNumbers.get(costUnitBean.getSelectedIndex()).getMfrPN();
+//TODO		ArrayList<CostMfrPNBean> mfrPartNumbers = costUnitBean.getMfrPartNumbers();
+		return null;//mfrPartNumbers.isEmpty() ? null : mfrPartNumbers.get(costUnitBean.getSelectedIndex()).getMfrPN();
 	}
 
 	public String getMfrPN() {
@@ -127,8 +127,8 @@ public class CostUnitService {
 	}
 
 	public static String getMfr(CostUnitBean costUnitBean) {
-		ArrayList<CostMfrPNBean> mfrPartNumbers = costUnitBean.getMfrPartNumbers();
-		return mfrPartNumbers.isEmpty() ? null : mfrPartNumbers.get(costUnitBean.getSelectedIndex()).getMfr();
+//		ArrayList<CostMfrPNBean> mfrPartNumbers = costUnitBean.getMfrPartNumbers();
+		return null;// mfrPartNumbers.isEmpty() ? null : mfrPartNumbers.get(costUnitBean.getSelectedIndex()).getMfr();
 	}
 
 	public String getMfr() {
@@ -281,7 +281,7 @@ public class CostUnitService {
 
 	public static int getMfrPartNumberIndex(CostUnitBean costUnitBean) {
 		ArrayList<CostMfrPNBean> mfrPartNumbers = costUnitBean.getMfrPartNumbers();
-		return mfrPartNumbers.isEmpty() ? null : mfrPartNumbers.get(costUnitBean.getSelectedIndex()).getId();
+		return mfrPartNumbers.isEmpty() ? null : mfrPartNumbers.get(costUnitBean.getSelectedIndex()).getAlternativeComponentId();
 	}
 
 	public int getMfrPartNumberIndex() {
