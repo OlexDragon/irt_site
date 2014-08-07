@@ -305,12 +305,12 @@ public class Purchase {
 			else
 				purchaseOrderUnits = purchaseOrder.getPurchaseOrderUnits();
 
-			PurchaseOrderUnit purchaseOrderUnit = new PurchaseOrderUnit(component.getId(), component.getPartNumberF(), component.getDescription(), new ManufacturePartNumber(0, component.getManufPartNumber(), new ManufactureDAO().getMfrName(component.getManufId())));
-			purchaseOrderUnit.setOrderQuantity(1);
-			if(!purchaseOrderUnits.contains(purchaseOrderUnit))
-				purchaseOrderUnits.add(purchaseOrderUnit);
-			else
-				component.setError("The component "+component.getPartNumberF()+" already exist in the PO. <small>(E042)</small>");
+//TODO			PurchaseOrderUnit purchaseOrderUnit = new PurchaseOrderUnit(component.getId(), component.getPartNumberF(), component.getDescription(), new ManufacturePartNumber(0, component.getManufPartNumber(), new ManufactureDAO().getMfrName(component.getManufId())));
+//			purchaseOrderUnit.setOrderQuantity(1);
+//			if(!purchaseOrderUnits.contains(purchaseOrderUnit))
+//				purchaseOrderUnits.add(purchaseOrderUnit);
+//			else
+//				component.setError("The component "+component.getPartNumberF()+" already exist in the PO. <small>(E042)</small>");
 		}else
 			component.setError("The component "+(component!=null ? component.getPartNumberF() : "")+" does not exist. <small>(E043)</small>");
 	}

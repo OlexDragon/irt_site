@@ -2,18 +2,20 @@ package irt.data.manufacture;
 
 public class ManufacturePartNumber {
 
-	private int id;
+	private int ComponentId;
+	private String mfrID;
 	private String mfrPN;
 	private String mfr;
 
-	public ManufacturePartNumber(int id, String mfrPN, String mfr) {
-		this.id = id;
+	public ManufacturePartNumber(int id, String mfrID, String mfrPN, String mfr) {
+		this.ComponentId = id;
+		this.mfrID = mfrID;
 		this.mfrPN = mfrPN;
 		this.mfr = mfr;
 	}
 
 	public ManufacturePartNumber(int id) {
-		this.id = id;
+		this.ComponentId = id;
 	}
 
 	public String getMfrPN() {
@@ -32,17 +34,28 @@ public class ManufacturePartNumber {
 		this.mfr = mfr;
 	}
 
-	public int getId() {
-		return id;
+	/**
+	 * @return component ID
+	 */
+	public int getComponentId() {
+		return ComponentId;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setComponentId(int ComponentId) {
+		this.ComponentId = ComponentId;
+	}
+
+	public String getMfrID() {
+		return mfrID;
+	}
+
+	public void setMfrID(String mfrID) {
+		this.mfrID = mfrID;
 	}
 
 	@Override
 	public String toString() {
-		return "ManufacturePartNumber [id=" + id + ", mfrPN=" + mfrPN
+		return "ManufacturePartNumber [id=" + ComponentId + ", mfrPN=" + mfrPN
 				+ ", mfr=" + mfr + "]";
 	}
 
@@ -53,6 +66,6 @@ public class ManufacturePartNumber {
 
 	@Override
 	public int hashCode() {
-		return id>=0 ? id : super.hashCode();
+		return ComponentId>=0 ? ComponentId : super.hashCode();
 	}
 }

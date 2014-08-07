@@ -6,31 +6,14 @@ import java.util.List;
 public class CostMfrPNBean {
 
 	private int id;
-	private String mfrPN;
-	private String mfr;
 	private int selectedIndex;//cost for ...
 	private List<CostCompanyBean> costCompanyBeans = new ArrayList<>();
-	private CostUnitBean alternativeUnit;
 
-	public int getId() {
+	public int getAlternativeComponentId() {
 		return id;
 	}
-	public CostMfrPNBean setId(int id) {
+	public CostMfrPNBean setAlternativeComponentId(int id) {
 		this.id = id;
-		return this;
-	}
-	public String getMfrPN() {
-		return mfrPN;
-	}
-	public CostMfrPNBean setMfrPN(String mfrPN) {
-		this.mfrPN = mfrPN;
-		return this;
-	}
-	public String getMfr() {
-		return mfr;
-	}
-	public CostMfrPNBean setMfr(String mfr) {
-		this.mfr = mfr;
 		return this;
 	}
 	public int getSelectedIndex() {
@@ -47,13 +30,6 @@ public class CostMfrPNBean {
 		this.costCompanyBeans = costCompanyBeans;
 		return this;
 	}
-	public CostUnitBean getAlternativeUnit() {
-		return alternativeUnit;
-	}
-	public CostMfrPNBean setAlternativeUnit(CostUnitBean alternativeUnit) {
-		this.alternativeUnit = alternativeUnit;
-		return this;
-	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -66,8 +42,8 @@ public class CostMfrPNBean {
 	}
 	@Override
 	public String toString() {
-		return "CostMfrPNBean [id=" + id + ", mfrPN=" + mfrPN + ", mfr=" + mfr
+		return "CostMfrPNBean [id=" + id
 				+ ", selectedIndex=" + selectedIndex + ", costCompanies="
-				+ costCompanyBeans + ", alternativeUnit=" + alternativeUnit + "]";
+				+ costCompanyBeans + "]";
 	}
 }

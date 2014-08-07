@@ -102,7 +102,7 @@ public class BomDAO extends DataAccessObject {
 		boolean isInserted = false;
 
 		int compId = u.getComponent().getId();
-		if (!isInBom(topCompIndex, compId)) {
+		if (topCompIndex>0 && compId>0 && !isInBom(topCompIndex, compId)) {
 
 			String query = "INSERT INTO `irt`.`bom` (`id_top_comp`,`id_components`, `id_bom_ref`) VALUES ("
 					+ topCompIndex + "," + compId +","+u.getRefId()+ ")";

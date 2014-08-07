@@ -4,6 +4,7 @@ import irt.data.Link;
 import irt.data.Menu;
 import irt.data.ValueText;
 import irt.data.companies.Company;
+import irt.data.components.AlternativeComponent;
 import irt.data.components.Component;
 import irt.data.components.ComponentIds;
 import irt.data.components.Data;
@@ -1310,7 +1311,8 @@ public class ComponentDAO extends DataAccessObject {
 			poUnits = new ArrayList<>();
 			String query = "SELECT`c`.`id`," +
 									"`irt`.part_number(`part_number`)AS`pn`," +
-									"`description`," +
+									"`description`,"
+									+ "`c`.`manuf_id`" +
 									"`manuf_part_number`," +
 									"`name`AS`mfr`" +
 								"FROM`irt`.`components`AS`c`" +
@@ -1326,7 +1328,7 @@ public class ComponentDAO extends DataAccessObject {
 					PurchaseOrderUnit purchaseOrderUnit = new PurchaseOrderUnit(resultSet.getInt("id"),
 														resultSet.getString("pn"),
 														resultSet.getString("description"),
-														new ManufacturePartNumber(0, resultSet.getString("manuf_part_number"), resultSet.getString("mfr")));
+														new ManufacturePartNumber(0, resultSet.getString("manuf_id"), resultSet.getString("manuf_part_number"), resultSet.getString("mfr")));
 					purchaseOrderUnit.setOrderQuantity(cq.getQuantityToMove());
 					poUnits.add(purchaseOrderUnit);
 					resultSet.close();
@@ -1544,5 +1546,30 @@ public class ComponentDAO extends DataAccessObject {
 			}
 		}
 		return fields;
+	}
+
+	public AlternativeComponent getAlternativeComponent(int alternativeComponentId) {
+
+		AlternativeComponent alternativeComponent;
+		final String query ="SELECT*FROM`irt`.`components_alternative`WHERE`id`=?";
+
+		try(	Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query)){
+			statement.setInt(1, alternativeComponentId);
+			try(ResultSet resultSet = statement.executeQuery()){
+				if(resultSet.next())
+					alternativeComponent = new AlternativeComponent(resultSet.getInt("id"),
+																	resultSet.getInt("id_components"),
+																	resultSet.getString("manuf_id"),
+																	resultSet.getString("alt_mfr_part_number"));
+				else
+					alternativeComponent = null;
+			}
+		} catch (SQLException e) {
+			new ErrorDAO().saveError(e, "ComponentDAO.getAlternativeComponent");
+			throw new RuntimeException(e);
+		}
+
+		return alternativeComponent;
 	}
 }

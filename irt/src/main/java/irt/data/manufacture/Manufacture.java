@@ -38,22 +38,24 @@ public class Manufacture {
 		return (id!=null) ? id : "";
 	}
 
-	public void setId(String id) {
+	public Manufacture setId(String id) {
 		if(id!=null && id.length()==2)
 			this.id = id.toUpperCase();
 		else
 			error.setErrorMessage("ID should have two letters"); 
+		return this;
 	}
 
 	public String getName() {
 		return (name!=null) ? name :"";
 	}
 
-	public void setName(String name) {
+	public Manufacture setName(String name) {
 		if(name!=null && !name.isEmpty())
 			this.name = name;
 		else
 			error.setErrorMessage("<br />Fill the \"Name\" field");
+		return this;
 	}
 
 	public String getLink() {

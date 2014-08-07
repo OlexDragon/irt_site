@@ -72,7 +72,7 @@ public class CostDAO extends DataAccessObject {
 
 							statement.setBigDecimal(1, fp.getPrice());
 							statement.setInt(2, cu.getComponentId());
-							statement.setInt(3, cmpn.getAlternativeUnit()==null ? cmpn.getId() : 0);
+							statement.setInt(3, cmpn.getAlternativeComponentId());
 							statement.setInt(4, CostMfrPNService.getCompanyId(cmpn));
 							statement.setInt(5, fp.getForUnits());
 							executedUpdate = statement.executeUpdate();
@@ -262,9 +262,7 @@ public class CostDAO extends DataAccessObject {
 						CostCompanyService.addForPriceBean(costCompanyBean, forPriceBean); 
 
 						CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
-															.setId(resultSet.getInt("mfrPNId"))
-															.setMfr(resultSet.getString("mfr"))
-															.setMfrPN(resultSet.getString("mfrPN"));
+															.setAlternativeComponentId(resultSet.getInt("mfrPNId"));
 						costMfrPNBean.getCostCompanyBeans().add(costCompanyBean);
 
 						CostUnitBean costUnitBean = new CostUnitBean()
@@ -362,8 +360,7 @@ public class CostDAO extends DataAccessObject {
 								.setDescription(resultSet.getString("description"))
 								.setQty(resultSet.getInt("qty"));
 					CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
-													.setId(resultSet.getInt("mfrPNId"))
-													.setMfrPN(resultSet.getString("mfrPN"));
+													.setAlternativeComponentId(resultSet.getInt("mfrPNId"));
 					CostCompanyBean costCompanyBean = new CostCompanyBean()
 																	.setId(companyId);
 					CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()

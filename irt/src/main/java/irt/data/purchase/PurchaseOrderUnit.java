@@ -91,7 +91,7 @@ public class PurchaseOrderUnit {
 	}
 
 	public void addMfrPM(int id, String mfrPN, String mfr){
-		mfrPNs.add(new ManufacturePartNumber(id, mfrPN, mfr));
+//TODO		mfrPNs.add(new ManufacturePartNumber(id, mfrPN, mfr));
 	}
 
 	public int getMfrPNIndex() {

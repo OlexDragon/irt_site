@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -18,14 +20,17 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 public class BillOfMaterials {
 
+	private final Logger logger = LogManager.getLogger();
+
 	private ComponentIds topComponentIds;
 	private List<BomUnitInterface> units = new ArrayList<>();
 	private static String errorMessage = "";
 	
 
-	public BillOfMaterials(String sourceFile, boolean isFootprint) {
+	public BillOfMaterials(String partNumber, String sourceFile, boolean isFootprint) {
 
-		if(sourceFile!=null && !sourceFile.isEmpty()){
+		if(partNumber!=null &&sourceFile!=null && !sourceFile.isEmpty()){
+			setTopComponentIds(partNumber);
 
 			Workbook workbook = null;
 
@@ -58,6 +63,8 @@ public class BillOfMaterials {
 	}
 
 	public BillOfMaterials(ComponentIds topComponentIds) {
+		logger.entry(topComponentIds);
+
 		if(topComponentIds != null){
 			this.topComponentIds = topComponentIds;
 			units = new BomDAO().getBomUnits(topComponentIds.getId());
@@ -114,6 +121,7 @@ public class BillOfMaterials {
 
 
 	public void setTopComponentIds(ComponentIds topComponentIds) {
+		logger.entry(topComponentIds);
 		this.topComponentIds = topComponentIds;
 	}
 
@@ -123,16 +131,17 @@ public class BillOfMaterials {
 	}
 
 	public void setTopComponentIds(String partNumber) {
+		logger.entry(partNumber);
 		setTopComponentIds(new ComponentDAO().getComponentIds(partNumber));
 	}
 
 	public boolean hasBom() {
-		return topComponentIds.hasBom();
+		return topComponentIds!=null ? topComponentIds.hasBom() : false;
 	}
 
 
 	public int getTopId() {
-		return topComponentIds.getId();
+		return topComponentIds!=null ? topComponentIds.getId() : -1;
 	}
 
 
