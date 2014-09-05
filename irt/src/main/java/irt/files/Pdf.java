@@ -3,7 +3,7 @@ package irt.files;
 import irt.data.dao.BomDAO;
 import irt.data.dao.ManufactureDAO;
 import irt.data.partnumber.PartNumber;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class Pdf {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	public static ByteArrayOutputStream getPdf(String partNumberStr, String pathLogo, OrderBy orderBy) throws DocumentException, BadElementException, MalformedURLException, IOException, BadPdfFormatException {
+	public static ByteArrayOutputStream getPdf(String partNumberStr, String pathLogo, OrderByService orderBy) throws DocumentException, BadElementException, MalformedURLException, IOException, BadPdfFormatException {
 		logger.entry(partNumberStr, pathLogo, orderBy);
 
 		partNumberStr = partNumberStr.trim().replace("-", "");

@@ -11,7 +11,7 @@ import irt.data.dao.SecondAndThirdDigitsDAO;
 import irt.data.manufacture.Manufacture;
 import irt.data.partnumber.PartNumber;
 import irt.data.partnumber.PartNumberDetails;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Table;
 import irt.work.InputTitles;
 
@@ -78,7 +78,7 @@ public abstract class Data {
 
 	private InputTitles titles;
 
-	private OrderBy orderBy;
+	private OrderByService orderBy;
 
 	public Data(){
 		logger.info("constructor: public {}()", getClass().getSimpleName());
@@ -143,8 +143,8 @@ public abstract class Data {
 		if (data != null) {
 			setId(data.getId());
 			setPartNumber(data.getPartNumber());
-			setManufPartNumber(data.getManufPartNumber());
-			setManufId(data.getManufId());
+			setManufPartNumber(data.getMfrPN());
+			setManufId(data.getMfrId());
 			setDescription(data.getDescription());
 			setQuantityStr(data.getQuantityStr());
 			setLink(data.getLink());
@@ -166,10 +166,10 @@ public abstract class Data {
 			returnStr = getPartNumber();
 			break;
 		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
+			returnStr = getMfrPN();
 			break;
 		case MANUFACTURE:
-			returnStr = getManufId();
+			returnStr = getMfrId();
 			break;
 		case DESCRIPTION:
 			returnStr = getDescription();
@@ -221,7 +221,7 @@ public abstract class Data {
 		return logger.exit(hasSet);
 	}
 
-	public void setValue(ResultSet resultSet) throws SQLException, CloneNotSupportedException{
+	public void setValues(ResultSet resultSet) throws SQLException, CloneNotSupportedException{
 
 			setId(resultSet.getInt("id"));
 			setManufPartNumber(resultSet.getString("manuf_part_number"));
@@ -278,7 +278,7 @@ public abstract class Data {
 			if(((tmp[i] = all[i].getId()) == null)
 				|| (toShow[i] = all[i].getName().replace("&","&amp;" ))==null)
 				tmp[i] = toShow[i] = "";
-			valueStr = getManufId();
+			valueStr = getMfrId();
 		}
 		
 		return getOptionHTML(tmp, toShow, valueStr);
@@ -329,7 +329,7 @@ public abstract class Data {
 		this.manufId = manufId;
 	}
 	
-	public String getManufId() {
+	public String getMfrId() {
 			return manufId!=null ? manufId : "";
 	}
 	
@@ -365,12 +365,12 @@ public abstract class Data {
 	public String getInputType(int index) { return titles.getInputTitle(index).getInputType();	}
 	public String getFootprint()		{ return footprint!=null ? footprint : "";	}
 	public InputTitles getTitles() 		{ return titles;			}
-	public OrderBy getOrderBy() 		{ return orderBy;			}
+	public OrderByService getOrderBy() 		{ return orderBy;			}
 	public String getSchematicLetter() 	{ return schematicLetter;	}
 	public String getDbValue() 			{ return dbValue;			}
 	public String getSchematicPart()	{ return schematicPart;		}
 	public String getClassId()			{ return logger.exit(classId);	}
-	public String getManufPartNumber() 	{ return manufPartNumber;	}
+	public String getMfrPN() 	{ return manufPartNumber;	}
 	public String getDbVoltage()		{ return dbVoltage;			}
 	public String getPartNumber()		{ return partNumber;	}
 	public void setPartNumber(String partNumberStr) {
@@ -381,8 +381,8 @@ public abstract class Data {
 			partNumber = "";
 	}
 	public void setDescription(String description) { this.description = description!=null && !(description =description.trim()).isEmpty() ? description.toUpperCase() : null;	}
-	public void setOrderBy		(String orderBy) 	{ if(this.orderBy==null) this.orderBy = new OrderBy(orderBy); else this.orderBy.setOrderBy(orderBy);						}
-	public void setOrderBy		(OrderBy orderBy) 	{ this.orderBy = orderBy; }
+	public void setOrderBy		(String orderBy) 	{ if(this.orderBy==null) this.orderBy = new OrderByService(orderBy); else this.orderBy.setOrderBy(orderBy);						}
+	public void setOrderBy		(OrderByService orderBy) 	{ this.orderBy = orderBy; }
 	public void setFootprint	(String footprint) 	{ this.footprint = footprint;					}
 	public void setDbValue		(String value) 		{ this.dbValue = value;							}
 	public void setPartType		(String partType) 	{	this.partType = partType;					}
@@ -501,7 +501,7 @@ public abstract class Data {
 						data.setSchematicPart(map.get(s));
 						break;
 					case "orderBy":
-						data.setOrderBy(OrderBy.parseOrderBy(map.get(s)));
+						data.setOrderBy(OrderByService.parseOrderBy(map.get(s)));
 					}
 				data.setOldData();
 			}
@@ -509,6 +509,10 @@ public abstract class Data {
 
 
 		return data;
+	}
+
+	public void resetOldData(){
+		oldData = null;
 	}
 
 	private void setOldData() throws CloneNotSupportedException {

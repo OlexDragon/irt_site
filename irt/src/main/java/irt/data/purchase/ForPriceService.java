@@ -2,9 +2,14 @@ package irt.data.purchase;
 
 import java.math.BigDecimal;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import irt.work.ComboBoxField;
 
 public class ForPriceService implements ComboBoxField{
+
+	private final static Logger logger = LogManager.getLogger();
 
 	public enum Status{
 		HAVE_TO_INSERT,
@@ -85,10 +90,11 @@ public class ForPriceService implements ComboBoxField{
 	}
 
 	public static void setPrice(ForPriceBean forPriceBean, BigDecimal newPrice) {
-		if(newPrice!=null && newPrice.compareTo(forPriceBean.getPrice())!=0)
+		logger.entry(forPriceBean, newPrice);
+		if(forPriceBean.getPrice()==null || newPrice!=null && newPrice.compareTo(forPriceBean.getPrice())!=0)
 			forPriceBean.setNewPrice(newPrice);
 		else
-			newPrice = null;
+			forPriceBean.setNewPrice(null);
 	}
 
 	public void setPrice(BigDecimal newPrice) {

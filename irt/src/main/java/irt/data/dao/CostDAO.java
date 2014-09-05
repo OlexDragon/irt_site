@@ -1,10 +1,10 @@
 package irt.data.dao;
 
+import irt.data.purchase.AlternativeComponentBean;
+import irt.data.purchase.AlternativeComponentService;
 import irt.data.purchase.CostBean;
 import irt.data.purchase.CostCompanyBean;
 import irt.data.purchase.CostCompanyService;
-import irt.data.purchase.CostMfrPNBean;
-import irt.data.purchase.CostMfrPNService;
 import irt.data.purchase.CostService;
 import irt.data.purchase.CostSetUnit;
 import irt.data.purchase.CostUnitBean;
@@ -55,9 +55,9 @@ public class CostDAO extends DataAccessObject {
 
 			for(CostUnitBean cu:costUnits){
 				logger.trace("\n\tfor(CostUnitBean {}:costUnits)", cu);
-				for(CostMfrPNBean cmpn:cu.getMfrPartNumbers())
-					if(CostMfrPNService.getForPrices(cmpn)!=null)
-						for(ForPriceBean fp:CostMfrPNService.getForPrices(cmpn)){
+				for(AlternativeComponentBean cmpn:cu.getAlternativeComponentBeans())
+					if(AlternativeComponentService.getForPrices(cmpn)!=null)
+						for(ForPriceBean fp:AlternativeComponentService.getForPrices(cmpn)){
 							Status status = ForPriceService.getStatus(fp);
 							logger.trace("\n\t"
 									+ "for(ForPriceBean\t{}:CostMfrPNService.getForPrices(cmpn))\n\t"
@@ -70,10 +70,10 @@ public class CostDAO extends DataAccessObject {
 								statement = statementUpdate;
 							else continue;
 
-							statement.setBigDecimal(1, fp.getPrice());
+							statement.setBigDecimal(1, fp.getNewPrice());
 							statement.setInt(2, cu.getComponentId());
 							statement.setInt(3, cmpn.getAlternativeComponentId());
-							statement.setInt(4, CostMfrPNService.getCompanyId(cmpn));
+							statement.setInt(4, AlternativeComponentService.getCompanyId(cmpn));
 							statement.setInt(5, fp.getForUnits());
 							executedUpdate = statement.executeUpdate();
 							ForPriceService.setPrice(fp);
@@ -181,21 +181,16 @@ public class CostDAO extends DataAccessObject {
 							"FROM`irt`.`components`" +
 						"WHERE`id`=?";
 		int id = -1;
-		String partNumberStr = null;
-		String description = null;
 		try(	Connection conecsion = getDataSource().getConnection();
 				PreparedStatement statement = conecsion.prepareStatement(query);) {
 
 			statement.setString(1, topComponentIdStr);
 			
-			try (ResultSet resultSet = statement.executeQuery();) {
-
-				if (resultSet.next()) {
+			try (ResultSet resultSet = statement.executeQuery();){
+				if (resultSet.next())
 					id = resultSet.getInt("id");
-					partNumberStr = resultSet.getString("pn");
-					description = resultSet.getString("description");
-				}
 			}
+
 			if(id>0){
 				query = "(SELECT `c`.`id`AS`componentId`," +
 									"0 AS`alt_comp_id`," +
@@ -251,31 +246,27 @@ public class CostDAO extends DataAccessObject {
 
 				if(resultSet.next()){
 
-					CostBean costBean = new CostBean().setId(id).setPartnamber(partNumberStr).setDescription(description);
-					cost = new CostService(costBean).setComponentId(topComponentIdStr);
+					cost = new CostService(new CostBean().setTopComponentId(id));
 
 					do{
 						ForPriceBean forPriceBean = new ForPriceBean().setPrice(resultSet.getBigDecimal("price")).setForUnits(resultSet.getInt("for"));
 
 						CostCompanyBean costCompanyBean = new CostCompanyBean()
-																.setId(resultSet.getInt("CompanyId"));
+																	.setId(resultSet.getInt("CompanyId"));
 						CostCompanyService.addForPriceBean(costCompanyBean, forPriceBean); 
 
-						CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
-															.setAlternativeComponentId(resultSet.getInt("mfrPNId"));
-						costMfrPNBean.getCostCompanyBeans().add(costCompanyBean);
+						AlternativeComponentBean alternativeComponentBean = new AlternativeComponentBean()
+																	.setAlternativeComponentId(resultSet.getInt("mfrPNId"));
+						alternativeComponentBean.getCostCompanyBeans().add(costCompanyBean);
 
 						CostUnitBean costUnitBean = new CostUnitBean()
-											.setComponentId(resultSet.getInt("componentId"))
-											.setAlternativeComponentId(resultSet.getInt("alt_comp_id"))
-											.setPartNumberStr(resultSet.getString("pn"))
-											.setDescription(resultSet.getString("description"))
-											.setQty(resultSet.getInt("qty"));
-						costUnitBean.getMfrPartNumbers().add(costMfrPNBean);
+																	.setComponentId(resultSet.getInt("componentId"))
+																	.setQty(resultSet.getInt("qty"));
+						costUnitBean.getAlternativeComponentBeans().add(alternativeComponentBean);
 						
 						cost.add(costUnitBean);
+						logger.trace("\n\t{}\n\t{}", costUnitBean, cost);
 					}while(resultSet.next());
-					cost.reset();
 				}
 			}
 			}
@@ -292,9 +283,8 @@ public class CostDAO extends DataAccessObject {
 	 * @param componentId
 	 * @return Component's CostService
 	 */
-	public CostService getCost(int componentId) {
+	public CostService getCostService(int componentId) {
 		logger.entry(componentId);
-		CostService cost = null;
 
 		String query = "(SELECT`irt`.part_number(`part_number`)AS`pn`," +
 								"0 AS`alt_comp_id`," +
@@ -302,7 +292,7 @@ public class CostDAO extends DataAccessObject {
 								"`m`.`name`AS`mfr`," +
 								"`c`.`manuf_part_number`AS`mfrPN`," +
 								"`c`.`qty`AS`qty`," +
-								"0 AS`mfrPNId`," +
+								"0 AS`altCompId`," +
 								"`co`.`for`," +
 								"`co`.`cost`," +
 								"`cm`.`id`AS`CompanyId`," +
@@ -321,7 +311,7 @@ public class CostDAO extends DataAccessObject {
 								"`m`.`name`AS`mfr`," +
 								"`alt_mfr_part_number`AS`mfrPN`," +
 								"IF(`alt`.`id`IS NULL,`c`.`qty`,`alt`.`qty`)AS`qty`," +
-								"`ca`.`id`AS`mfrPNId`," +
+								"`ca`.`id`AS`altCompId`," +
 								"`co`.`for`," +
 								"`co`.`cost`," +
 								"`cm`.`id`AS`CompanyId`," +
@@ -335,8 +325,9 @@ public class CostDAO extends DataAccessObject {
 						"WHERE`ca`.`id_components`=?)" +
 						"ORDER BY`pn`,`mfrPN`,`for`";
 
-		logger.debug("\n\tQoery:\t{}\n\t? =\t{}", query, componentId);
+		logger.debug("\n\tQuery:\t{}\n\t? =\t{}", query, componentId);
 
+		CostService costService = null;
 		try(	Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(query);) {
 
@@ -344,33 +335,33 @@ public class CostDAO extends DataAccessObject {
 			statement.setInt(2, componentId);
 			try(ResultSet resultSet = statement.executeQuery();){
 
-			if(resultSet.next()){
-				CostBean costBean = new CostBean()
-											.setId(componentId)
-											.setPartnamber(resultSet.getString("pn"))
-											.setDescription(resultSet.getString("description"));
-				cost = new CostService(costBean);
-				do{
-					int companyId = resultSet.getInt("CompanyId");
+				if(resultSet.next()){
 
-					CostUnitBean costUnitBean = new CostUnitBean()
-								.setComponentId(componentId)
-								.setAlternativeComponentId(resultSet.getInt("alt_comp_id"))
-								.setPartNumberStr(resultSet.getString("pn"))
-								.setDescription(resultSet.getString("description"))
-								.setQty(resultSet.getInt("qty"));
-					CostMfrPNBean costMfrPNBean = new CostMfrPNBean()
-													.setAlternativeComponentId(resultSet.getInt("mfrPNId"));
-					CostCompanyBean costCompanyBean = new CostCompanyBean()
-																	.setId(companyId);
-					CostCompanyService.addForPriceBean(costCompanyBean, new ForPriceBean()
-																				.setPrice(resultSet.getBigDecimal("cost"))
-																				.setForUnits(resultSet.getInt("for")));
-					costMfrPNBean.getCostCompanyBeans().add(costCompanyBean);
-					costUnitBean.getMfrPartNumbers().add(costMfrPNBean);
+					costService = new CostService(new CostBean());
 
-					cost.add(costUnitBean);
-				}while(resultSet.next());
+					do{
+
+						ForPriceBean forPriceBean = new ForPriceBean()
+																.setForUnits(resultSet.getInt("for"))
+																.setPrice(resultSet.getBigDecimal("cost"));
+
+						CostCompanyBean costCompanyBean = new CostCompanyBean()
+																.setId(resultSet.getInt("CompanyId"));
+						costCompanyBean.getForPriceBeans().add(forPriceBean);
+
+						AlternativeComponentBean alternativeComponentBean = new AlternativeComponentBean()
+																.setAlternativeComponentId(resultSet.getInt("altCompId"));
+						alternativeComponentBean.getCostCompanyBeans().add(costCompanyBean);
+
+						CostUnitBean costUnitBean = new CostUnitBean()
+																.setComponentId(componentId)
+																.setQty(resultSet.getInt("qty"));
+						costUnitBean.getAlternativeComponentBeans().add(alternativeComponentBean);
+
+						costService.add(costUnitBean);
+						logger.trace("\n\t{}", costService);
+
+					}while(resultSet.next());
 			}
 			}
 
@@ -379,7 +370,7 @@ public class CostDAO extends DataAccessObject {
 			throw new RuntimeException(e);
 		}
 
-		return logger.exit(cost);
+		return logger.exit(costService);
 	}
 
 	public boolean hasCost(int componentId) {
@@ -404,7 +395,11 @@ public class CostDAO extends DataAccessObject {
 				int row = resultSet.getRow();
 				csu = new CostSetUnit[row];
 				do
-					csu[--row]= new CostSetUnit(resultSet.getInt("id_components"), resultSet.getInt("mfr_part_number"), resultSet.getInt("vendor"), resultSet.getInt("moq"));
+					csu[--row]= new CostSetUnit(
+											resultSet.getInt("id_components"),
+											resultSet.getInt("mfr_part_number"),
+											resultSet.getInt("vendor"),
+											resultSet.getInt("moq"));
 				while(resultSet.previous());
 			}
 

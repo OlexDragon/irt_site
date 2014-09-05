@@ -20,22 +20,23 @@
 
 <%@ include file="inc/top.tag" %>
 
-<%
-	isPN = true;/*use for static menu*/
-%>
+<%isPN = true;/*use for static menu*/ %>
 <div id="static_menu">
 <%@ include file="inc/staticMenu.tag" %>
 </div>
 <%
 boolean isExist = component.isExist();
 boolean hasLink = component.getLink().getId()>0;
-boolean isEditing = ub.isEditing();
+boolean isEditing = ub!=null && ub.isEditing();
 String partNumberStr = component.getPartNumberF();
 %>
 <c:set var="ub" value="<%=ub %>"/>
 <c:set var="isExist" value="<%=component.isExist()%>" />
-<c:set var="isEditing" value="<%=ub.isEditing()%>" />
-<c:set var="hasLink" value="<%=component.getLink().getId()>0%>" />
+<c:set var="isEditing" value="<%=ub!=null && ub.isEditing()%>" />
+<c:set var="hasLink" value="<%=component.getLink()!=null && component.getLink().getId()>0%>" />
+<c:set var="isWorkOrder" value="<%=ub!=null && ub.isWorkOrder()%>" />
+<c:set var="isSchematicPart" value="<%=ub!=null && ub.isSchematicPart()%>" />
+<c:set var="isSchematicLetter" value="<%=ub!=null && ub.isSchematicLetter()%>" />
 
 <div id="content" class="cCenter">
 	<form id="pn" method="post" action="part-numbers">
@@ -73,7 +74,11 @@ String partNumberStr = component.getPartNumberF();
 		<input type="submit" name="submit-cancel" id="submit-cancel" value="Reset" />
 		
 	<c:if test="${component.isSet() && isEditing && (!isExist || component.isEdit())}">
-		<input type="submit" name="submit-add" id="submit-add" value="${component.isEdit() ? 'Update' : 'Add' }" />
+		<input type="submit" name="submit-add" id="submit-add" value="Add" />
+	</c:if>
+		
+	<c:if test="${component.isSet() && isEditing && component.isEdit()}">
+		<input type="submit" name="submit-update" id="submit-update" value="Update" />
 	</c:if>
 
 	<c:if test="${isExist && !hasLink && isEditing}">
@@ -102,17 +107,19 @@ String partNumberStr = component.getPartNumberF();
     });
 </script>
 	<input type="submit" name="submit-parse" id="submit-parse" value="Parse" />
-<% if(ub!=null && isExist){ 
-		if(ub.isSchematicPart() || ub.isAdmin()){ %>
+<c:if test="${isExist}">
+	<c:if test="${isSchematicPart}">
 		<input type="submit" name="submit-part" id="submit-part" value="Schematic Part" onclick="return confirm('Do you want to save Schematic Part?');" />
-<%		}
-		if(ub.isSchematicLetter()){%>
+	</c:if>
+	<c:if test="${isSchematicLetter}">
 			<input type="submit" name="submit-letter" id="submit-letter" value="Schematic Letter" onclick="return confirm('Do you want to resave Schematic Letter?');" />
-<% }	}
-	if(isExist){
-%>		<input type="submit" name="submit-where" id="submit-where" value="Where Used" />
-<%	}
-	String mfrPN = component.getManufPartNumber();
+	</c:if>
+</c:if>
+	<c:if test="${isExist}">
+		<input type="submit" name="submit-where" id="submit-where" value="Where Used" />
+	</c:if>
+<%
+	String mfrPN = component.getMfrPN();
 	if(mfrPN!=null && mfrPN.startsWith("IRT BOM")){//has BOM
 %>
 		<input type="submit" name="submit-bom" id="submit-bom" value="get BOM" />
@@ -140,8 +147,8 @@ String partNumberStr = component.getPartNumberF();
 <%		if(partNumber.getPurchase()!=null && partNumber.getPurchase().getPurchaseOrder()!=null){ %>
 			<input type="submit" name="submit-purchase" id="submit-purchase" value="Purchase" />
 <%	}	}
-%>	<c:if test="<%=ub.isAdmin() || (ub.isWorkOrder()) %>">
-			<input type="submit" name="submit_to_wo" id="submit_to_wo" value="to WO" />
+%>	<c:if test="${isExists && isWorkOrder}">
+		<input type="submit" name="submit_to_wo" id="submit_to_wo" value="to WO" />
 	</c:if>
 	</p></div>
 <%	str = component.getTable();
@@ -158,7 +165,7 @@ String partNumberStr = component.getPartNumberF();
 			<input type="text" id="text_qty_set" name="text_qty_set" class="c3em" value="0" title="The number of received components" />
 			<input type="submit" id="submit_qty_add" name="submit_qty_add" value="+" title='Better to use the "Components Movement" tab' onclick="return confirm('Do you want to update the stock quantity?');" />
 <% } %>	</div>
-<%		}%>	
+<%		}%>
 	<c:if test="${component.getError().isError()}">
 		<h3 class="red" >${component.getError().getErrorMessage()}</h3>
 	</c:if>

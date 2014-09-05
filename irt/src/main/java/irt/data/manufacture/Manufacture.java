@@ -2,7 +2,7 @@ package irt.data.manufacture;
 
 import irt.data.dao.ManufactureDAO;
 import irt.data.user.UserBean;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Row;
 import irt.table.Table;
 import irt.data.Error;
@@ -15,7 +15,7 @@ public class Manufacture {
 	private String name;
 	private String link;
 
-	private OrderBy orderBy;
+	private OrderByService orderBy;
 	private UserBean userBean;
 	private Error error = new Error();
 	
@@ -131,7 +131,7 @@ public class Manufacture {
 				+ "]";
 	}
 
-	public void setOrderBy(OrderBy orderBy) {
+	public void setOrderBy(OrderByService orderBy) {
 		this.orderBy = orderBy;
 	}
 

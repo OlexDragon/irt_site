@@ -17,7 +17,7 @@ import irt.data.purchase.CostService;
 import irt.data.purchase.Purchase;
 import irt.data.user.UserBean;
 import irt.product.ProductStructure;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Table;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class PartNumber {
 	private Component component;
 
 	private Table table;
-	private OrderBy orderBy;
+	private OrderByService orderBy;
 
 	private static int browserId;
 	private ProductStructure productStructure;
@@ -294,7 +294,7 @@ public class PartNumber {
 		}
 	}
 
-	public	void search(Component component, OrderBy orderBy)	{ setOrderBy(orderBy);	search(component);		}
+	public	void search(Component component, OrderByService orderBy)	{ setOrderBy(orderBy);	search(component);		}
 	private void search(Component component){ table = new Search().componentBy(component); }
 	public void search(String string) {table = new ComponentDAO().getComponentsTable(string, orderBy);}
 
@@ -311,14 +311,14 @@ public class PartNumber {
 		return component!=null ? COST_DAO.hasCost(component.getId()) : false;
 	}
 
-	public boolean hasBom(){ String pn = component!=null ? component.getManufPartNumber() : null;
+	public boolean hasBom(){ String pn = component!=null ? component.getMfrPN() : null;
 		return pn!=null  ? pn.startsWith("IRT BOM") : false;
 	}
 	public boolean hasLink(){ return component!=null ? component.getLink().isSet() : false;	}
 
 	public static List<User>getUsers()		{ return users;		}
 	public Component		getComponent()	{ return component;	}
-	public OrderBy			getOrderBy()	{ return orderBy;	}
+	public OrderByService			getOrderBy()	{ return orderBy;	}
 	public Purchase			getPurchase()	{ return purchase;	}
 	public static int		getBrowserId()	{ return browserId;	}
 	public String			getPartNumber()			{ return (component!=null)		? component.getPartNumberF()	: "";	}
@@ -331,7 +331,7 @@ public class PartNumber {
 	public ComponentsMovement			getComponentsMovement()			{ return componentsMovement;		}
 	public List<SecondAndThirdDigits>	getSecondAndThirdDigitsList()	{ return secondAndThirdDigitsList;	}
 
-	public void setOrderBy		(OrderBy orderBy)		{ this.orderBy = orderBy;			}
+	public void setOrderBy		(OrderByService orderBy)		{ this.orderBy = orderBy;			}
 	public void setPurchase		(Purchase purchase)		{ this.purchase = purchase;			}
 	public static void setBrowserId	(int browserId) 		{ PartNumber.browserId = browserId;		}
 	private void setSelectedUser(String selectedUser)	{ this.selectedUser = selectedUser;	}
@@ -367,7 +367,7 @@ public class PartNumber {
 
 	public Table getPrices(int id) {
 
-		cost = COST_DAO.getCost(id);
+		cost = COST_DAO.getCostService(id);
 		if(cost!=null)
 			table = cost.getComponentTable();
 

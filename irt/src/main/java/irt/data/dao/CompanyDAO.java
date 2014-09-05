@@ -279,9 +279,7 @@ public class CompanyDAO extends DataAccessObject{
 	}
 
 	public Company getCompany(int companyId) {
-		Connection conecsion = null;
-		PreparedStatement statement = null;
-		ResultSet resultSet = null;
+
 		Company company= null;
 
 		String query = "SELECT`co`.*," +
@@ -292,21 +290,22 @@ public class CompanyDAO extends DataAccessObject{
 						"LEFT JOIN`irt`.`companies_telephone`AS`ct`ON`ct`.`id_companies`=`co`.`id`" +
 						"LEFT JOIN`irt`.`companies_fax`AS`cf`ON`cf`.`id_companies`=`co`.`id`" +
 						"LEFT JOIN`irt`.`companies_address`AS`ca`ON`ca`.`id_companies`=`co`.`id`" +
-						"WHERE`id`="+companyId;
+						"WHERE`id`=?";
+		logger.trace("\n\tqueru:\t{}\n\tcompany id:\t{}", query, companyId);
 
-		try {
-				conecsion = getDataSource().getConnection();
-				statement = conecsion.prepareStatement(query);
-				resultSet = statement.executeQuery();
+		try(	Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query)) {
 
-				if(resultSet.next()) 
-					company = new Company(resultSet);
+			statement.setInt(1, companyId);
 
+				try(ResultSet resultSet = statement.executeQuery();){
+
+					if(resultSet.next()) 
+						company = new Company(resultSet);
+				}
 			} catch (SQLException e) {
 				new ErrorDAO().saveError(e, "BomDAO.getCompany");
 				throw new RuntimeException(e);
-			} finally {
-				close(resultSet, statement, conecsion);
 			}
 
 		return company;

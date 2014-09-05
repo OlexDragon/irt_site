@@ -1,3 +1,4 @@
+<%@page import="irt.web.CostServlet"%>
 <%@ page import="irt.table.Table"%>
 <%@ page import="irt.data.companies.Company"%>
 <%@ page import="irt.data.purchase.CostService"%>
@@ -9,7 +10,7 @@
 <%@ page import="irt.data.HTMLWork" %>
 
 <jsp:useBean id="cost" scope="request" type="irt.data.purchase.CostService" />
-<jsp:useBean id="position" scope="request" type="java.lang.String" />
+<jsp:useBean id="parameters" scope="request" type="irt.web.CostServlet.RequestParameters" />
 <jsp:useBean id="error" scope="request" type="irt.data.Error" />
 
 <%@ include file="inc/top.tag" %>
@@ -22,10 +23,12 @@
 
 <div id="content">
 	<hr /><h3>IRT Cost</h3><hr />
-<%	String classId = cost.getClassId();
-	String componentId = cost.getComponentId();
+<%	String classId = parameters.getClassId()!=null ? parameters.getClassId() : "";
+	String tmpStr =  parameters.getTopComponentId();
+	int componentId = tmpStr!=null && !tmpStr.equals("Select") ? Integer.parseInt(tmpStr) : 0;
 	boolean isCostEdit = cost.isEdit();
 	boolean isEditCost = ub.isEditCost();
+	String position = parameters.getPosition()!=null ? parameters.getPosition() : "0";
 %>
 <form method="post" action="/irt/cost" onsubmit="storeScrollPosition()">
 	<p>
@@ -35,7 +38,7 @@
 		<input type="hidden" id="what" name="what" />
 		<%=HTMLWork.getHtmlSelect(new MenuDAO().getComboBoxFields("cost_class", OrderBy.DESCRIPTION), classId, "class_id", "onchange=\"oneClick('submit')\"", "Select")%>
 <%	if(!classId.isEmpty() && !classId.equals("Select")){
-%>		<%=HTMLWork.getHtmlSelect(new ComponentDAO().getComboBoxFields(classId), componentId, "component_id", "onchange=\"oneClick('submit')\"", "Select")%>
+%>		<%=HTMLWork.getHtmlSelect(new ComponentDAO().getComboBoxFields(classId), ""+componentId, CostServlet.PARAMETER_TOP_COMP_ID, "onchange=\"oneClick('submit')\"", "Select")%>
 <%	}
 %>		<input type="submit" id="submit" name="submit" value="submit" />
 		<select id="set" name="set" onchange="oneClick('submit')" >

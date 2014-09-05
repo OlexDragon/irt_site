@@ -15,7 +15,7 @@ import irt.data.purchase.Purchase;
 import irt.data.user.LogIn;
 import irt.data.user.UserBean;
 import irt.data.user.UsersLogsIn;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.work.TextWorker.PartNumberFirstChar;
 
 import java.io.IOException;
@@ -75,18 +75,8 @@ public class PartNumberServlet extends HttpServlet {
 		PartNumber partNumber = PartNumber.getPartNumber(request.getRemoteHost());
 		partNumber.setComponent(component);
 
-		logger.trace("exit with:\n\t"
-				+ "component:\t{},\n\t"
-				+ "browser:\t{},\n\t"
-				+ "partNumber:\t{}\n\t"
-				+ "tmpStr:\t{}",
-				component,
-				browser,
-				partNumber,
-				tmpStr);
-
 		ToDoClass search = getToDoClass(request, TABLE);
-		OrderBy orderBy = getOrderBy(request, response);
+		OrderByService orderBy = getOrderBy(request, response);
 		if (search != null) {
 			if (search.getCommand() == ToDo.SEARCH) {
 				String value = search.getValue();
@@ -107,6 +97,16 @@ public class PartNumberServlet extends HttpServlet {
 			}else if(search.getCommand() == ToDo.PROJECT_SERARCH)
 				component.setOrderBy(orderBy);
 		}
+
+		logger.trace("exit with:\n\t"
+				+ "component:\t{},\n\t"
+				+ "browser:\t{},\n\t"
+				+ "partNumber:\t{}\n\t"
+				+ "search:\t{}",
+				component,
+				browser,
+				partNumber,
+				search);
 
 		request.setAttribute("back_page", HTTP_ADDRESS );
 		request.setAttribute("component", component);
@@ -162,7 +162,15 @@ public class PartNumberServlet extends HttpServlet {
 			break;
 		case "submit-add":
 			if(userBean!=null && userBean.isEditing())
-				insertOrUpdate(request, userBean, component);
+				insert(request, userBean, component);
+			else{
+				response.sendRedirect("login?bp="+HTTP_ADDRESS);
+				return;
+			}
+			break;
+		case "submit-submit-update":
+			if(userBean!=null && userBean.isEditing())
+				update(request, userBean, component);
 			else{
 				response.sendRedirect("login?bp="+HTTP_ADDRESS);
 				return;
@@ -381,16 +389,34 @@ public class PartNumberServlet extends HttpServlet {
 		return toDoClass;
 	}
 
-	private void insertOrUpdate(HttpServletRequest request, UserBean userBean, Component component) {
+	private void insert(HttpServletRequest request, UserBean userBean, Component component) {
+		if (component != null){
+
+			boolean isAdmin = userBean.isEditing();
+			component = getComponent(request,  component, isAdmin);
+			int id = userBean.getID();
+
+			component.setId(0);
+
+			if (new ComponentDAO().insert(component, id)){
+				component.getError().setErrorMessage(component.getPartNumberF()+" - have been added.");
+				component.resetOldData();
+			} else
+				component.getError().setErrorMessage("Database Error. <small>(E036)</small>");
+		};
+	}
+
+	private void update(HttpServletRequest request, UserBean userBean, Component component) {
 		if (component != null){
 
 			boolean isAdmin = userBean.isAdmin()&&userBean.isEditing();
 			component = getComponent(request,  component, isAdmin);
 			int id = userBean.getID();
 
-			if ((component.getId()<=0 && new ComponentDAO().insert(component, id)) || (component.getId()>0 && new ComponentDAO().update(component, id, isAdmin)))
+			if (component.getId()>0 && new ComponentDAO().update(component, id, isAdmin)){
 				component.getError().setErrorMessage(component.getPartNumberF()+" - have been added.");
-			else
+				component.resetOldData();
+			} else
 				component.getError().setErrorMessage("Database Error. <small>(E036)</small>");
 		};
 	}
@@ -463,10 +489,10 @@ public class PartNumberServlet extends HttpServlet {
 		return logger.exit(c);
 	}
 
-	private OrderBy getOrderBy(HttpServletRequest request, HttpServletResponse response) {
+	private OrderByService getOrderBy(HttpServletRequest request, HttpServletResponse response) {
 
 		String orderByStr = request.getParameter("ob");//order by
-		OrderBy orderBy = OrderBy.parseOrderBy(CookiesWorker.getCookieValue(request, "ob"));
+		OrderByService orderBy = OrderByService.parseOrderBy(CookiesWorker.getCookieValue(request, "ob"));
 
 		logger.trace("ob={}; orderBy={}", orderByStr, orderBy);
 

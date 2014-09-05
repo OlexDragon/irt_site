@@ -18,7 +18,7 @@ public class Varicap extends Capacitor {
 		boolean isSetted = super.setValue(index, valueStr);
 		
 		if(isSetted && index==MAN_PART_NUM)
-			if(!(isSetted = !getManufPartNumber().isEmpty()))
+			if(!(isSetted = !getMfrPN().isEmpty()))
 				getError().setErrorMessage(" Type Manufacture P/N. ");
 		
 		return isSetted;
@@ -26,7 +26,7 @@ public class Varicap extends Capacitor {
 
 	@Override
 	public boolean isSet() {
-		return super.isSet() && !getManufPartNumber().isEmpty();
+		return super.isSet() && !getMfrPN().isEmpty();
 	}
 
 	@Override

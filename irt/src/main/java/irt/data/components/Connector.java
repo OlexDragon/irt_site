@@ -88,10 +88,10 @@ public class Connector extends Component {
 		
 		switch(index){
 		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
+			returnStr = getMfrPN();
 			break;
 		case MANUFACTURE:
-			returnStr = getManufId();
+			returnStr = getMfrId();
 			break;
 		case ID:
 			returnStr = getID();
@@ -300,7 +300,7 @@ public class Connector extends Component {
 	public boolean isSet() {
 		return 		!getContacts().isEmpty()
 				&&	!getFeMale().isEmpty()
-				&&	!getManufPartNumber().isEmpty()
+				&&	!getMfrPN().isEmpty()
 				&&	!getType().isEmpty();
 	}
 

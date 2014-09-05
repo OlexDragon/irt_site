@@ -3,13 +3,13 @@ package irt.data;
 import irt.data.components.Component;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.SecondAndThirdDigitsDAO;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Table;
 import irt.work.TextWorker;
 
 public class Search {
 
-	public Table components(String descriptionSecond, OrderBy orderBy) {
+	public Table components(String descriptionSecond, OrderByService orderBy) {
 		Table table = null;
 		String searchStr = new SecondAndThirdDigitsDAO().getId(descriptionSecond);
 		
@@ -19,7 +19,7 @@ public class Search {
 		return table;
 	}
 
-	public Table componentBy(String partNumberStr, OrderBy orderBy) {
+	public Table componentBy(String partNumberStr, OrderByService orderBy) {
 		Table table = null;
 
 		if((table = new ComponentDAO().getComponentsTable(TextWorker.pnValidation(partNumberStr), orderBy))!=null)

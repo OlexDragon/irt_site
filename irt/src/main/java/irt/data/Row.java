@@ -16,9 +16,9 @@ public class Row extends irt.table.Row {
 
 			add(new Field("<input type=\"checkbox\" name=\"checked"+dataTmp.getId()+"\" id=\"checked"+dataTmp.getId()+"\" />"));
 			add(new Field("<a href=\"/irt/part-numbers?pn="+dataTmp.getPartNumberF()+"\">"+dataTmp.getPartNumberF()+"</a>"));
-			add(new Field(dataTmp.getManufPartNumber()));
+			add(new Field(dataTmp.getMfrPN()));
 			add(new Field(dataTmp.getDescription()));
-			add(new Field(dataTmp.getManufId()));
+			add(new Field(dataTmp.getMfrId()));
 			add(new Field(dataTmp.getFootprint()));			//"FP"
 			add(new Field(dataTmp.getQuantityStr()));		//"Qty"
 			add(new Field(dataTmp.getLocation()));
