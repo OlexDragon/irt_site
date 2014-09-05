@@ -8,9 +8,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class CostCompanyService implements ComboBoxField{
 
-	private final CompanyDAO companyDAO = new CompanyDAO();
+	private static final Logger logger = LogManager.getLogger();
+
+	private static final CompanyDAO COMPANY_DAO = new CompanyDAO();
 	private CostCompanyBean costCompanyBean;
 	private final ForPriceService forPriceService = new ForPriceService();
 
@@ -38,21 +43,25 @@ public class CostCompanyService implements ComboBoxField{
 		String companyName = null;
 
 		if(costCompanyBean!=null){
-			Company company = companyDAO.getCompany(costCompanyBean.getId());
+			Company company = COMPANY_DAO.getCompany(costCompanyBean.getId());
 			if(company!=null)
 				companyName = company.getName();
 		}
 		return companyName;
 	}
 
-	public static String getName(int companyId) {
+	public static String getCompanyName(int companyId) {
 		String companyName = null;
 
-		Company company = new CompanyDAO().getCompany(companyId);
+		Company company = COMPANY_DAO.getCompany(companyId);
 		if(company!=null)
-			companyName = company.getName();
+			companyName = company.getCompanyName();
 
 		return companyName;
+	}
+
+	public static Company getCompany(CostCompanyBean costCompanyBean) {
+		return costCompanyBean!=null ? COMPANY_DAO.getCompany(costCompanyBean.getId()) : null;
 	}
 
 	@Override
@@ -82,17 +91,36 @@ public class CostCompanyService implements ComboBoxField{
 		return isSet(costCompanyBean);
 	}
 
-	public static void add(CostCompanyBean costCompanyBean, List<ForPriceBean> forPriceBeans) {
-		if(forPriceBeans!=null){
-			for(ForPriceBean fp:forPriceBeans){
-				List<ForPriceBean> f = costCompanyBean.getForPriceBeans();
-				if (fp != null)
-					if (f.contains(fp))
-						f.set(f.indexOf(fp), fp);
-					else if (ForPriceService.isSet(fp))
-						f.add(fp);
+	public static boolean add(List<ForPriceBean> newForPriceBeans, List<ForPriceBean> forPriceBeans) {
+		logger.entry("\n\t", newForPriceBeans, "\n\t", forPriceBeans);
+
+		boolean added = false;
+		if(forPriceBeans!=null && newForPriceBeans!=null){
+
+			for(ForPriceBean fpb:newForPriceBeans){
+
+				int indexOf = forPriceBeans.indexOf(fpb);
+				logger.trace("\n\tindexOf = {}", indexOf);
+
+				if (indexOf>=0){
+					ForPriceBean forPriceBean = forPriceBeans.get(indexOf);
+
+					BigDecimal newPrice = fpb.getNewPrice();
+					BigDecimal price = fpb.getPrice();
+					added = price!=null ? price.compareTo(forPriceBean.getPrice())!=0 : forPriceBean.getPrice()!=null ||
+							newPrice!=null
+								? forPriceBean.getNewPrice()==null || newPrice.compareTo(forPriceBean.getNewPrice())!=0
+								: forPriceBean.getNewPrice()!=null;
+
+					if(added){
+						forPriceBean.setNewPrice(newPrice);
+						forPriceBean.setPrice(price);
+					}
+				}else if (ForPriceService.isSet(fpb))
+					added = forPriceBeans.add(fpb);
 			}
 		}
+		return logger.exit(added);
 	}
 
 	public static void addForPriceBean(CostCompanyBean costCompanyBean, ForPriceBean forPriceBean) {
@@ -117,6 +145,8 @@ public class CostCompanyService implements ComboBoxField{
 
 	public static boolean isChanged(CostCompanyBean costCompanyBean) {
 		boolean isChanged = false;
+
+		if(costCompanyBean!=null)
 		for(ForPriceBean fp:costCompanyBean.getForPriceBeans())
 			if(ForPriceService.isChanged(fp)){
 				isChanged = true;
@@ -130,9 +160,10 @@ public class CostCompanyService implements ComboBoxField{
 	}
 
 	public static void setPrice(CostCompanyBean costCompanyBean, BigDecimal price) {
+		logger.entry(costCompanyBean, price);
 		List<ForPriceBean> forPrices = costCompanyBean.getForPriceBeans();
 		if(!forPrices.isEmpty())
-			forPrices.get(costCompanyBean.getSelectedIndex()).setPrice(price);
+			ForPriceService.setPrice(forPrices.get(costCompanyBean.getSelectedIndex()), price);
 	}
 
 	@Override

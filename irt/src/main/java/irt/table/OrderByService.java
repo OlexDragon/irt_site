@@ -3,7 +3,7 @@ package irt.table;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class OrderBy {
+public class OrderByService {
 
 	protected final static Logger logger = LogManager.getLogger();
 
@@ -35,8 +35,11 @@ public class OrderBy {
 	private static final String ORDER_BY = "ORDER BY`";
 	private OrderByBean orderByBean = new OrderByBean();
 
-	public OrderBy(String orderBy){
+	public OrderByService(String orderBy){
 		this.orderByBean.setOrderBy(orderBy);
+	}
+
+	public OrderByService() {
 	}
 
 	public void setOrderBy(String orderBy) { 
@@ -76,9 +79,9 @@ public class OrderBy {
 		return orderByBean.getOrderBy()!=null ? orderByBean.getOrderBy().hashCode()+(orderByBean.isDesc() ? 1231 : 1237) : super.hashCode();
 	}
 
-	public static OrderBy parseOrderBy(String orderByStr) {
+	public static OrderByService parseOrderBy(String orderByStr) {
 		logger.entry(orderByStr);
-		OrderBy orderBy = null;
+		OrderByService orderBy = null;
 
 		boolean desc = false;
 
@@ -93,7 +96,7 @@ public class OrderBy {
 		}else
 			orderByStr = "";
 
-		orderBy = new OrderBy(orderByStr);
+		orderBy = new OrderByService(orderByStr);
 		orderBy.setDesc(desc);
 
 		return logger.exit(orderBy);
@@ -103,7 +106,8 @@ public class OrderBy {
 		return orderByBean;
 	}
 
-	public void setOrderByBean(OrderByBean orderByBean) {
+	public OrderByService setOrderByBean(OrderByBean orderByBean) {
 		this.orderByBean = orderByBean;
+		return this;
 	}
 }

@@ -10,7 +10,8 @@ import irt.files.Excel;
 import irt.files.Pdf;
 import irt.product.BillOfMaterials;
 import irt.product.ProductStructure;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
+import irt.table.OrderByService.OrderByBean;
 import irt.work.Buffer;
 
 import java.io.ByteArrayOutputStream;
@@ -45,6 +46,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.exc.UnrecognizedPropertyException;
 
 public class ProductServlet extends HttpServlet {
 	private static final BomDAO BOM_DAO = new BomDAO();
@@ -468,7 +470,7 @@ public class ProductServlet extends HttpServlet {
 			folder.mkdirs();
 	}
 
-	private void getPdf(HttpServletResponse response, String partNumber, OrderBy orderBy) throws Exception {
+	private void getPdf(HttpServletResponse response, String partNumber, OrderByService orderBy) throws Exception {
 		logger.entry(response, partNumber, orderBy);
 
 		ByteArrayOutputStream baos = Pdf.getPdf(partNumber, pathLogo, orderBy);
@@ -496,7 +498,7 @@ public class ProductServlet extends HttpServlet {
 		}
 
 		private String partNumber;
-		private OrderBy orderBy;
+		private OrderByService orderBy;
 		private boolean isBOM;
 		private boolean isIgnoreFootprint;
 		private boolean isWithQty;
@@ -537,22 +539,29 @@ public class ProductServlet extends HttpServlet {
 			logger.trace("\n\tthis.partNumber=\t{}", this.partNumber);
 		}
 
-		public OrderBy getOrderBy() {
+		public OrderByService getOrderBy() {
 			return orderBy;
 		}
-		public void setOrderBy(OrderBy orderBy) throws JsonParseException, JsonMappingException, IOException {
+
+		public void setOrderBy(OrderByService orderBy) throws JsonParseException, JsonMappingException, IOException {
 			logger.entry(orderBy);
 			if(orderBy==null) {
 				String cookieValue = CookiesWorker.getCookieValue(request, "BomOB");
-				if(cookieValue!=null)
-					this.orderBy = Jackson.jsonStringToObject(OrderBy.class, cookieValue);
-				else{
+				logger.trace("\n\tBomOB={}", cookieValue);
+				if(cookieValue!=null) {
+					try{
+						OrderByBean orderByBean = Jackson.jsonStringToObject(OrderByBean.class, cookieValue);
+						this.orderBy = new OrderByService().setOrderByBean(orderByBean);
+					}catch(UnrecognizedPropertyException ex){
+						this.orderBy = null;
+					}
+				} else{
 					this.orderBy = null;
 					CookiesWorker.removeCookiesStartWith(request, response, "BomOB");
 				}
 			} else{
 				setOrderByReference("false");
-				CookiesWorker.addCookie(request, response, "BomOB", Jackson.objectToJsonString(orderBy), 24*60*60*1000);
+				CookiesWorker.addCookie(request, response, "BomOB", Jackson.objectToJsonString(orderBy.getOrderByBean()), 24*60*60*1000);
 				this.orderBy = orderBy;
 			}
 			logger.trace("\n\t"
@@ -650,11 +659,11 @@ public class ProductServlet extends HttpServlet {
 			this.command = command;
 		}
 
-		private OrderBy getOrderBy(String orderByStr) {
+		private OrderByService getOrderBy(String orderByStr) {
 
-			OrderBy orderBy = null;
+			OrderByService orderBy = null;
 			if(orderByStr!=null && !orderByStr.isEmpty())
-				orderBy = new OrderBy(orderByStr);
+				orderBy = new OrderByService(orderByStr);
 
 			return orderBy;
 		}

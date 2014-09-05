@@ -1,7 +1,7 @@
 package irt.data.dao;
 
 import irt.data.user.UserBean;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Row;
 import irt.table.Table;
 
@@ -259,7 +259,7 @@ public class UserBeanDAO extends DataAccessObject {
 		return table.toString();
 	}
 
-	public Table getTable(boolean isAdmin, OrderBy orderBy){
+	public Table getTable(boolean isAdmin, OrderByService orderBy){
 
 		String query = "SELECT`firstName`AS`First Name`," +
 								"`lastName`AS`Last Name`," +

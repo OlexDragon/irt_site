@@ -395,7 +395,7 @@ public class ComponentsMovementDAO extends DataAccessObject {
 	
 			while(resultSet.next()){
 				Data data = new PartNumberDetails(null).getComponent(resultSet.getString("part_number").substring(0, 3));
-				data.setValue(resultSet);
+				data.setValues(resultSet);
 				components.add((Component) data);
 			}
 	

@@ -53,7 +53,7 @@
 		</c:if>
 	<hr />
 		<c:if test="${error.isError()}">
-			<h3 class="red" ><c:out value="${error.errorMessage}" /></h3>
+			<h3 class="red" >${error.errorMessage}</h3>
 		</c:if>
 		<c:if test="${!partNumber.isEmpty()}">
 			<c:choose>

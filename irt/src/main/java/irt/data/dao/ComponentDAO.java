@@ -17,7 +17,7 @@ import irt.data.partnumber.PartNumber;
 import irt.data.partnumber.PartNumberDetails;
 import irt.data.purchase.PurchaseOrderUnit;
 import irt.product.ProductStructure;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Row;
 import irt.table.Table;
 import irt.work.ComboBoxField;
@@ -79,7 +79,7 @@ public class ComponentDAO extends DataAccessObject {
 			resultSet = statement.executeQuery();
 			while (resultSet.next()) {
 				Component data = new PartNumberDetails(null).getComponent(resultSet.getString("part_number").substring(0, 3));
-				data.setValue(resultSet);
+				data.setValues(resultSet);
 				components.add(data);
 			}
 
@@ -101,10 +101,10 @@ public class ComponentDAO extends DataAccessObject {
 		return object!=null ? (int)object : -1;
 	}
 
-	public Table getComponentsTable(String partNumberStr, OrderBy orderBy) {
+	public Table getComponentsTable(String partNumberStr, OrderByService orderBy) {
 
 		if(orderBy==null)
-			orderBy = new OrderBy("part_number");
+			orderBy = new OrderByService("part_number");
 
 		String query =String.format(componnentsTableQuery, "concat('<input type=\"checkbox\" name=\"checked',`c`.`id`,'\" id=\"checked',`c`.`id`,'\" />')AS''") + "WHERE`part_number`LIKE'" + partNumberStr + "'" + orderBy ;
 
@@ -419,7 +419,7 @@ public class ComponentDAO extends DataAccessObject {
 
 				if (resultSet.next()){
 					data = new PartNumberDetails(null).getComponent(partNumber.substring(0,3));
-					data.setValue(resultSet);
+					data.setValues(resultSet);
 				}
 			}
 
@@ -485,8 +485,8 @@ public class ComponentDAO extends DataAccessObject {
 			if (isExists(component.getPartNumber())){
 				if(!fillFreeFields(component))
 					component.setError(component.getPartNumberF() + " - already exist. ");
-			}else if(isMPN(component.getManufPartNumber()))
-				component.setError(" MfrP/N "+component.getManufPartNumber() + " - already exist. ");
+			}else if(isMPN(component.getMfrPN()))
+				component.setError(" MfrP/N "+component.getMfrPN() + " - already exist. ");
 			else
 				try {
 					String query = "INSERT INTO `irt`.`components` "
@@ -495,8 +495,8 @@ public class ComponentDAO extends DataAccessObject {
 							+ "(";
 						query += "'"+component.getPartNumber()+ "',"				//`part_number`
 							
-							+ ((!component.getManufPartNumber().isEmpty()) ? 	//`manuf_part_number`
-										"'"+component.getManufPartNumber()+"'"
+							+ ((!component.getMfrPN().isEmpty()) ? 	//`manuf_part_number`
+										"'"+component.getMfrPN()+"'"
 									: null)
 							+ ",";
 						query += ((component.getDbValue()!=null &&
@@ -509,8 +509,8 @@ public class ComponentDAO extends DataAccessObject {
 										 "'"+component.getDescription()+"'"
 									: null)
 							+ ",";
-						query += ((!component.getManufId().isEmpty()) ?			//`manuf_id`
-										"'"+component.getManufId()+"'"
+						query += ((!component.getMfrId().isEmpty()) ?			//`manuf_id`
+										"'"+component.getMfrId()+"'"
 									 : null)
 							+ ",";
 						query += ((component.getPartType()!=null &&
@@ -564,17 +564,17 @@ public class ComponentDAO extends DataAccessObject {
 			isUpdated = true;
 		}
 		
-		if(dataTmp.getManufPartNumber().isEmpty() && !component.getManufPartNumber().isEmpty()){
+		if(dataTmp.getMfrPN().isEmpty() && !component.getMfrPN().isEmpty()){
 			if(!toUpdate.isEmpty())
 				toUpdate +=',';
-			toUpdate += "`manuf_part_number`='"+component.getManufPartNumber()+"'";
+			toUpdate += "`manuf_part_number`='"+component.getMfrPN()+"'";
 			isUpdated = true;
 		}
 		
-		if(dataTmp.getManufId().isEmpty() && !component.getManufId().isEmpty()){
+		if(dataTmp.getMfrId().isEmpty() && !component.getMfrId().isEmpty()){
 			if(!toUpdate.isEmpty())
 				toUpdate +=',';
-			toUpdate += "`manuf_id`='"+component.getManufId()+"'";
+			toUpdate += "`manuf_id`='"+component.getMfrId()+"'";
 			isUpdated = true;
 		}
 
@@ -737,7 +737,7 @@ public class ComponentDAO extends DataAccessObject {
 			try(ResultSet resultSet = statement.executeQuery();){
 				if (resultSet.next()){
 					data = new PartNumberDetails(null).getComponent(resultSet.getString("part_number").substring(0, 3));
-					data.setValue(resultSet);
+					data.setValues(resultSet);
 				}
 			}
 		} catch (SQLException | CloneNotSupportedException e) {
@@ -975,8 +975,7 @@ public class ComponentDAO extends DataAccessObject {
 
 	public Component getComponent(Statement statement, int componentId) throws SQLException, CloneNotSupportedException {
 
-		String query = "SELECT*FROM`irt`.`components`" +
-				"WHERE`id`="+componentId;
+		String query = "SELECT*FROM`irt`.`components`" + "WHERE`id`="+componentId;
 		ResultSet resultSet = statement.executeQuery(query);
 
 		Component component = null;
@@ -986,7 +985,7 @@ public class ComponentDAO extends DataAccessObject {
 			if(pn!=null && pn.length()>3){
 				component = new PartNumberDetails(null).getComponent(pn.substring(0,3));
 				if(component!=null)
-					component.setValue(resultSet);
+					component.setValues(resultSet);
 			}
 		}
 		return component;
@@ -1157,10 +1156,10 @@ public class ComponentDAO extends DataAccessObject {
 			String description 		= validate(component!=null ? component.getDescription() : null);
 			if(!description.isEmpty()) needWhereClause = true;
 	
-			String manufactur 		= validate(component!=null ? component.getManufId() : null);
+			String manufactur 		= validate(component!=null ? component.getMfrId() : null);
 			if(!manufactur.isEmpty()) needWhereClause = true;
 	
-			String manufPartNumber	= validate(component!=null ? component.getManufPartNumber() : null);
+			String manufPartNumber	= validate(component!=null ? component.getMfrPN() : null);
 			if(!manufPartNumber.isEmpty()) needWhereClause = true;
 	
 			String query = String.format(componnentsTableQuery, "concat('<input type=\"checkbox\" name=\"checked',`c`.`id`,'\" id=\"checked',`c`.`id`,'\" />')AS''");
@@ -1571,5 +1570,33 @@ public class ComponentDAO extends DataAccessObject {
 		}
 
 		return alternativeComponent;
+	}
+
+	public Component getComponentByMfrPN(String mfrPN) {
+
+		Component component = null; 
+		final String query = "SELECT*FROM`irt`.`components`" + "WHERE`manuf_part_number`=?";
+
+		try (Connection conecsion = getDataSource().getConnection();
+				PreparedStatement statement = conecsion.prepareStatement(query)) {
+
+			statement.setString(1, mfrPN);
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (resultSet.next()) {
+					String pn = resultSet.getString("part_number");
+					if (pn != null && !pn.substring(0,3).contains("?")) {
+						component = new PartNumberDetails(null).getComponent(pn.substring(0, 3));
+						if (component != null)
+							component.setValues(resultSet);
+					}
+				}
+			}
+
+		} catch (SQLException | CloneNotSupportedException e) {
+			new ErrorDAO().saveError(e, "ComponentDAO.getComponentByMfrPN");
+			throw new RuntimeException(e);
+		}
+
+		return component;
 	}
 }

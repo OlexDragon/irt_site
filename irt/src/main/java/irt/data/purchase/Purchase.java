@@ -20,7 +20,7 @@ import irt.data.manufacture.ManufacturePartNumber;
 import irt.data.user.UserBean;
 import irt.table.Field;
 import irt.table.HTMLHeader;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Row;
 import irt.table.Table;
 
@@ -64,7 +64,7 @@ public class Purchase {
 	private int orderQty = -1;
 	private PurchaseOrder purchaseOrder;
 	private int statusToShow = PurchaseOrder.ACTIVE;
-	private OrderBy orderBy;
+	private OrderByService orderBy;
 	private boolean isOrderByReference = true;
 	private ComponentsQuantity alternative;
 	private int kitId;	//use in getTable
@@ -545,7 +545,7 @@ public class Purchase {
 
 	public void setOrderBy(String orderBy) {
 		if(this.orderBy==null)
-			this.orderBy = new OrderBy(orderBy);
+			this.orderBy = new OrderByService(orderBy);
 		else
 			this.orderBy.setOrderBy(orderBy);
 		isOrderByReference = false;
@@ -561,10 +561,10 @@ public class Purchase {
 		if(isOrderByReference)
 			orderBy = null;
 		else
-			orderBy = new OrderBy(BomDAO.PART_NUMBER);
+			orderBy = new OrderByService(BomDAO.PART_NUMBER);
 	}
 
-	public OrderBy getOrderBy() {
+	public OrderByService getOrderBy() {
 		return orderBy;
 	}
 

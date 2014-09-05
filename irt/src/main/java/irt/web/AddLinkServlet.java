@@ -6,7 +6,6 @@ import irt.data.dao.ComponentDAO;
 import irt.data.dao.ErrorDAO;
 import irt.data.dao.LinkDAO;
 import irt.data.dao.PurchaseDAO;
-import irt.data.partnumber.PartNumber;
 import irt.data.purchase.PurchaseOrder;
 import irt.data.user.UserBean;
 import irt.data.user.UsersLogsIn;
@@ -75,7 +74,7 @@ public class AddLinkServlet extends HttpServlet {
 		String partNumberStr = null;
 		if(component!=null){
 			partNumberStr = component.getPartNumberF();
-			manufPN = " : " + component.getManufPartNumber();
+			manufPN = " : " + component.getMfrPN();
 		}else
 			manufPN = "";
 

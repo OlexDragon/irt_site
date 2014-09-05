@@ -10,7 +10,7 @@ import irt.product.BomRef;
 import irt.product.BomUnit;
 import irt.product.BomUnitInterface;
 import irt.table.HTMLHeader;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Table;
 import irt.work.TextWorker;
 
@@ -327,7 +327,7 @@ public class BomDAO extends DataAccessObject {
 	 * @param orderBy 
 	 * @return
 	 */
-	public PdfPTable getPdfTable(String partNumber, Image logo, OrderBy orderBy) {
+	public PdfPTable getPdfTable(String partNumber, Image logo, OrderByService orderBy) {
 		logger.entry(partNumber, logo, orderBy);
 
 		Font font = FontFactory.getFont(FontFactory.HELVETICA, 8);
@@ -344,7 +344,7 @@ public class BomDAO extends DataAccessObject {
 		cell = new PdfPCell();
 		cell.setBorder(0);
 		pdfPTable.addCell(cell);	//2
-		cell = new PdfPCell(new Phrase("IRT Tecnologies. Bill Of Materials "+topComponent.getManufPartNumber().substring(8),fontIrt));
+		cell = new PdfPCell(new Phrase("IRT Tecnologies. Bill Of Materials "+topComponent.getMfrPN().substring(8),fontIrt));
 		cell.setBorder(0);
 		pdfPTable.addCell(cell);	//3
 
@@ -427,7 +427,7 @@ public class BomDAO extends DataAccessObject {
 		cell.setBorder(0);
 		cell.setRowspan(2);
 		pdfPTable.addCell(cell);	//1
-		cell = new PdfPCell(new Phrase("IRT Tecnologies. Bill Of Materials "+topComponent.getManufPartNumber().substring(8),fontIrt));
+		cell = new PdfPCell(new Phrase("IRT Tecnologies. Bill Of Materials "+topComponent.getMfrPN().substring(8),fontIrt));
 		cell.setBorder(0);
 		cell.setColspan(2);
 		pdfPTable.addCell(cell);	//2,3
@@ -485,7 +485,7 @@ public class BomDAO extends DataAccessObject {
 		return pdfPTable;
 	}
 
-	private ResultSet getBomResultSet(Statement statement, String topPartNumber, OrderBy orderBy) throws SQLException{
+	private ResultSet getBomResultSet(Statement statement, String topPartNumber, OrderByService orderBy) throws SQLException{
 
 		String query = "SELECT`c`.`part_number`AS`"+PART_NUMBER+"`," +
 				"`c`.`manuf_id`AS`"+MID+"`," +
@@ -585,7 +585,7 @@ public class BomDAO extends DataAccessObject {
 
 			while(resultSet.next()){
 				Data c = new PartNumberDetails(null).getComponent(resultSet.getString("part_number"));
-				c.setValue(resultSet);
+				c.setValues(resultSet);
 				if(c!=null)
 					componentWithBom.add((Component) c);
 			}
@@ -625,7 +625,7 @@ public class BomDAO extends DataAccessObject {
 		return componentsIdWithBom;
 	}
 
-	public Table getBomTable(String partNumber, OrderBy orderBy) {
+	public Table getBomTable(String partNumber, OrderByService orderBy) {
 		Table table = null;
 
 		if(partNumber!=null && !partNumber.isEmpty()){
@@ -701,7 +701,7 @@ public class BomDAO extends DataAccessObject {
 		return table;
 	}
 
-	public void getBomTableExel(XSSFSheet worksheet, String topPartNumber, boolean isQty, OrderBy orderBy, CellStyle titleStyle, XSSFCellStyle tableStyle) throws SQLException{
+	public void getBomTableExel(XSSFSheet worksheet, String topPartNumber, boolean isQty, OrderByService orderBy, CellStyle titleStyle, XSSFCellStyle tableStyle) throws SQLException{
 		Connection conecsion = null;
 		Statement statement = null;
 		ResultSet resultSet = null;
@@ -769,17 +769,17 @@ public class BomDAO extends DataAccessObject {
  
 	}
 
-	public Table getPOTable(List<ComponentIds> selectedComponents, int companyId, OrderBy orderBy) {
+	public Table getPOTable(List<ComponentIds> selectedComponents, int companyId, OrderByService orderBy) {
 		String sqlField = "if(`NQty`<=`SQty`,0,`NQty`-`SQty`)"+(companyId>0 ? "-`CQty`" : "")+"AS`MQty`";
 		return getStockTable(selectedComponents, sqlField, companyId, 0, orderBy);
 	}
 
-	public Table getCMTable(List<ComponentIds> selectedComponents, int companyId, int kitId, OrderBy orderBy) {
+	public Table getCMTable(List<ComponentIds> selectedComponents, int companyId, int kitId, OrderByService orderBy) {
 		String sqlField = "if(`NQty`<`SQty`,`NQty`,`SQty`)"+(companyId>0 ? "-`CQty`" : "")+(kitId>0 ? "-`KQty`" : "")+"AS`MQty`";
 		return getStockTable(selectedComponents, sqlField, companyId, kitId, orderBy);
 	}
 
-	private Table getStockTable(List<ComponentIds> selectedComponents, String sqlField, int companyId ,int kitId, OrderBy orderBy){
+	private Table getStockTable(List<ComponentIds> selectedComponents, String sqlField, int companyId ,int kitId, OrderByService orderBy){
 		Table table = null;
 		if(selectedComponents!=null && !selectedComponents.isEmpty()){
 			String query = "SELECT*," +

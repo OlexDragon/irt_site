@@ -1,6 +1,8 @@
 package irt.data.purchase;
 
 import irt.data.HTMLWork;
+import irt.data.components.Component;
+import irt.data.dao.ComponentDAO;
 import irt.data.dao.CostDAO;
 import irt.table.HTMLHeader;
 import irt.table.Row;
@@ -14,15 +16,12 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class CostService {
 
+	@JsonIgnore
 	private final Logger logger = LogManager.getLogger();
-	private CostBean costBean;
-
-	public CostService(CostBean costBean) {
-		this.costBean = costBean!=null ? costBean : new CostBean();
-	}
 
 	private static final int	ID	= 0,
 								PN	= 1,
@@ -35,17 +34,42 @@ public class CostService {
 								QT	= 8,
 								TL	= 9;
 
+	@JsonIgnore
+	private final static ComponentDAO componentDAO = new ComponentDAO();
+
+	private CostBean costBean;
+
+	public CostService() { }
+
+	public CostService(CostBean costBean) {
+		this.costBean = costBean!=null ? costBean : new CostBean();
+	}
+
+	public CostBean getCostBean() {
+		return costBean;
+	}
+
+	public void setCostBean(CostBean costBean) {
+		this.costBean = costBean;
+	}
+
+	@JsonIgnore
 	public Table getComponentTable() {
 		String[] titels = new String[]{"ID","Part Number","Mfr P/N","Mfr","Vendor","Price","MOQ","MOP","Qty","Total"};
 		Table table = new Table(titels, null);
 		for(CostUnitBean cu:costBean.getCostUnitBeans()){
+			boolean alternativeComponentBeansEmpty = cu.getAlternativeComponentBeans().isEmpty();
 			BigDecimal totalPrice ;
 			String[] row = new String[titels.length];
+
 			row[ID]	= ""+cu.getComponentId();
-			row[PN] = cu.getPartNumberStr();
 			row[QT] = ""+cu.getQty();
-			if(cu.getMfrPartNumbers().isEmpty()){
+
+			if(alternativeComponentBeansEmpty){
 				table.add( new Row(Arrays.copyOf(row, row.length)));
+
+				row[PN] = CostUnitService.getComponent(cu.getComponentId()).getPartNumberF();
+
 				row[MFR] = 
 				row[MPN] = 
 				row[VD] =
@@ -54,21 +78,13 @@ public class CostService {
 				row[MP] =
 				row[TL] = null;
 			}else
-				for(CostMfrPNBean cmpn:cu.getMfrPartNumbers()){
-//TODO
-//					if(cmpn.getAlternativeUnit()!=null){
-//						CostUnitBean alt = cmpn.getAlternativeUnit();
-//						row[ID]	= ""+alt.getComponentId();
-//						row[PN] = alt.getPartNumberStr();
-//						row[QT] = ""+alt.getQty();
-//					}else{
-//						row[ID]	= ""+cu.getComponentId();
-//						row[PN] = cu.getPartNumberStr();
-//						row[QT] = ""+cu.getQty();
-//					}
-//					row[MPN] = cmpn.getMfrPN();
-//					row[MFR] = cmpn.getMfr();
-					if(cmpn.getCostCompanyBeans().isEmpty()){
+
+				for(AlternativeComponentBean acb:cu.getAlternativeComponentBeans()){
+					int alternativeComponentId = acb.getAlternativeComponentId();
+					row[PN] = CostUnitService.getPartNumber(cu, alternativeComponentId);
+					row[MPN] = CostUnitService.getMfrPN(cu, alternativeComponentId);
+					row[MFR] = CostUnitService.getMfr(cu, alternativeComponentId);
+					if(acb.getCostCompanyBeans().isEmpty()){
 						table.add( new Row(Arrays.copyOf(row, row.length)));
 						row[VD] =
 						row[PR] =
@@ -76,9 +92,9 @@ public class CostService {
 						row[FR] =
 						row[TL] = null;
 					}else{
-						for(CostCompanyBean cc:cmpn.getCostCompanyBeans()){
-							row[VD] = CostCompanyService.getName(cc.getId());
-							if(CostMfrPNService.getForPrices(cmpn).isEmpty()){
+						for(CostCompanyBean cc:acb.getCostCompanyBeans()){
+							row[VD] = CostCompanyService.getCompanyName(cc.getId());
+							if(AlternativeComponentService.getForPrices(acb).isEmpty()){
 								table.add( new Row(Arrays.copyOf(row, row.length)));
 								row[PR] =
 								row[MP] =
@@ -99,24 +115,35 @@ public class CostService {
 				}
 			}
 		}
-		String partnamber = costBean.getPartnamber();
-		String description = costBean.getDescription();
-		if(partnamber!=null || description!=null)
-			table.setTitle(new HTMLHeader(partnamber+" - "+description, "cBlue", 3));
+
+		Component c =  getTopComponent();
+
+		if(c!=null){
+			String partnamber = c.getPartNumberF();
+			String description = c.getDescription();
+			if(partnamber!=null || description!=null)
+				table.setTitle(new HTMLHeader(partnamber+" - "+description, "cBlue", 3));
+		}
 
 		return table;
 	}
 
+	@JsonIgnore
+	private Component getTopComponent() {
+		return componentDAO.getComponent(costBean.getTopComponentId());
+	}
+
+	@JsonIgnore
 	public Table getTable(){
 
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
 		if(costBean.getSetIndex()>0 && costBean.isSet()){
-			CostSetUnit[] costSetUnits = new CostDAO().getCostSetUnits(costBean.getId(), costBean.getSetIndex());
+			CostSetUnit[] costSetUnits = new CostDAO().getCostSetUnits(costBean.getTopComponentId(), costBean.getSetIndex());
 			logger.trace(costSetUnits);
 			if(costSetUnits!=null){
 				reset();
 				for(CostSetUnit csu:costSetUnits){
-					int index = costUnitBeans.indexOf(new CostUnitService(csu.getComponentId(), 0, null, null, null, 0));
+					int index = costUnitBeans.indexOf(new CostUnitBean().setComponentId(csu.getComponentId()));
 					if(index>=0){
 						CostUnitBean cu = costUnitBeans.get(index);
 						CostUnitService.setSelectedMfrPN(cu, csu.getMfrPNInddex()) ;
@@ -128,89 +155,99 @@ public class CostService {
 		}
 
 		BigDecimal totalPrice = new BigDecimal(0);
+		BigDecimal totalPriceSum = new BigDecimal(0);
 		Table table = new Table(new String[]{"Part Number","Description","Mfr P/N","Mfr","Vendor","Price","MOQ","MOP","Qty","Total"}, null);
 		DecimalFormat decimalFormat = new DecimalFormat("#.00####");
 
-		for(CostUnitBean cu:costUnitBeans){
-			logger.trace(cu);
-			BigDecimal price = CostUnitService.getPrice(cu);
+		for(CostUnitBean cub:costUnitBeans){
+			logger.trace(cub);
+			BigDecimal price = CostUnitService.getPrice(cub);
+			Component component = CostUnitService.getComponent(cub.getComponentId());
 
-			List<CostCompanyService> companies = CostUnitService.getCompanyServices(cu.getMfrPartNumbers());
+			List<CostCompanyService> companies = CostUnitService.getCompanyServices(cub.getAlternativeComponentBeans());
 			logger.trace("\n\tprice:\t{};\n\t{}", price, companies);
-			ArrayList<CostMfrPNBean> mfrPartNumbers = cu.getMfrPartNumbers();
-			List<ForPriceBean> forPrices = CostUnitService.getForPrices(cu) ;
+			List<ForPriceBean> forPrices = CostUnitService.getForPrices(cub) ;
+
 			boolean isEdit = costBean.isEdit();
-			int qty = cu.getQty();
+			int qty = cub.getQty();
 			BigDecimal lineTotal = new BigDecimal(qty);
+			boolean acbOnlyOne = cub.getAlternativeComponentBeans().size()<2;
 			table.add(new Row(new String[]{
 					//Part Number
-					cu.getPartNumberStr(),
+					acbOnlyOne ? component.getPartNumberF() : CostUnitService.getHTMLSelectPartNumber(cub).toString(),
 					//Description
-					cu.getDescription(),
+					component.getDescription(),
 					//Mfr P/N
-					mfrPartNumbers.size()>1
-							? HTMLWork.getHtmlSelect(CostMfrPNService.toArray(mfrPartNumbers), ""+CostUnitService.getMfrPartNumberIndex(cu), "alt"+cu.getComponentId(),"onchange=\"whatEdit('mfrPN"+cu.getComponentId()+":'+this.selectedIndex)\"", null)
-							: CostUnitService.getMfrPN(cu),
+					acbOnlyOne ? CostUnitService.getMfrPN(cub) : CostUnitService.getHTMLSelectAlternativeComponentBeans(cub).toString(),
 					//Mfr
-					CostUnitService.getMfr(cu),
+					CostUnitService.getMfr(cub),
 					//Vendor
-					companies!=null && companies.size()>1
-							? HTMLWork.getHtmlSelect(companies.toArray(new CostCompanyService[companies.size()]), ""+CostUnitService.getCompanyId(cu), "vandor"+cu.getComponentId(), "onchange=\"whatEdit('vendor"+cu.getComponentId()+":'+this.selectedIndex)\"", null)
-							: CostUnitService.getCompanyName(cu),
+					companies!=null && companies.size()<2
+							? CostUnitService.getCompanyName(cub)
+							: CostUnitService.getHTMLSelectCompanyBeans(cub).toString(),
 					//Price
-					isEdit	? "<input class=\"c3em\" type=\"text\" id=\"price"+cu.getComponentId()+"\" name=\"price"+cu.getComponentId()+"\""+(price!=null	? " value=\""+decimalFormat.format( price)+"\""
+					isEdit	? "<input class=\"c3em\" type=\"text\" id=\"price"+cub.getComponentId()+"\" name=\"price"+cub.getComponentId()+"\""+(price!=null	? " value=\""+decimalFormat.format( price)+"\""
 																																							: "") +" />"
 							: price!=null	? decimalFormat.format(price)
 											: null,
 					//MOQ
-					forPrices!=null && forPrices.size()>1 || isEdit ? HTMLWork.getHtmlSelect(forPrices,CostUnitService.getMinimumOrderQty(cu),"for"+cu.getComponentId(),"onchange=\"whatEdit('for"+cu.getComponentId()+":'+this.selectedIndex)\"") : CostUnitService.getMinimumOrderQty(cu)>=0 ? ""+CostUnitService.getMinimumOrderQty(cu) : "",
+					forPrices!=null && forPrices.size()>1 || isEdit ? HTMLWork.getHtmlSelect(forPrices,CostUnitService.getMinimumOrderQty(cub),"for"+cub.getComponentId(),"onchange=\"whatEdit('for"+cub.getComponentId()+":'+this.selectedIndex)\"") : CostUnitService.getMinimumOrderQty(cub)>=0 ? ""+CostUnitService.getMinimumOrderQty(cub) : "",
 					//MOP
-					price!=null ? decimalFormat.format(price.multiply(new BigDecimal(CostUnitService.getMinimumOrderQty(cu)))): null,
+					price!=null ? decimalFormat.format(price.multiply(new BigDecimal(CostUnitService.getMinimumOrderQty(cub)))): null,
 					//Qty
 					""+qty,
 					//Total
-					price!=null  ? decimalFormat.format(price.multiply(lineTotal)) : null}));
+					price!=null  ? decimalFormat.format(totalPrice = price.multiply(lineTotal)) : null}));
 
-			if(price!=null)
-				totalPrice = totalPrice.add(lineTotal);
+			totalPriceSum = totalPriceSum.add(totalPrice);
+
 		}
-		if(totalPrice.compareTo(new BigDecimal(0))!=0){
-			Row row = new Row(new String[]{"","","","","","","Total","","", decimalFormat.format(totalPrice)});
+		if(totalPriceSum.compareTo(new BigDecimal(0))!=0){
+			decimalFormat.applyPattern("#.00");
+			Row row = new Row(new String[]{"","","","","","","Total","","", decimalFormat.format(totalPriceSum)});
 			table.add(row);
 			row.setClassName("cBgYellow");
 		}
-		String description = costBean.getDescription();
-		String partnamber = costBean.getPartnamber();
-		if(partnamber!=null || description!=null)
-		table.setTitle(new HTMLHeader(partnamber+(description!=null ? " - "+description : ""), "cBlue", 3));
+		Component topComponent = getTopComponent();
+		if(topComponent!=null){
+			String description = topComponent.getDescription();
+			String partnamber = topComponent.getPartNumberF();
+			if(partnamber!=null || description!=null)
+				table.setTitle(new HTMLHeader(partnamber+(description!=null ? " - "+description : ""), "cBlue", 3));
+		}
 		return table;
 	}
 
+	@JsonIgnore
 	public void reset() {
 		for(CostUnitBean cu:costBean.getCostUnitBeans())
 			CostUnitService.reset(cu);
 	}
 
+	@JsonIgnore
 	public boolean isEdit() {
 		return costBean.isEdit();
 	}
 
+	@JsonIgnore
 	public void setEdit(boolean isEdit) {
 		costBean.setEdit(isEdit);
 	}
 
+	@JsonIgnore
 	public void setForUnit(int componentId, int forUnit) {
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-		int index = costUnitBeans.indexOf(new CostUnitService(componentId, 0, null, null, null, 0));
+		int index = costUnitBeans.indexOf(new CostUnitBean().setComponentId(componentId));
 		if(index>=0)
 			CostUnitService.setForUnits(costUnitBeans.get(index), forUnit) ;
 	}
 
+	@JsonIgnore
 	public boolean isChanged(){
 		boolean isChanged = false;
 
 		for(CostUnitBean cu:costBean.getCostUnitBeans())
-			if(CostUnitService.isChanged(cu)){
+			if(cu!=null && CostUnitService.isChanged(cu)){
 				isChanged = true;
 				break;
 			}
@@ -218,46 +255,37 @@ public class CostService {
 		return isChanged;
 	}
 
+	@JsonIgnore
 	public void setPrices(int componentId, String priceStr){
+		logger.entry(componentId, priceStr);
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-		int index = costUnitBeans.indexOf(new CostUnitService(componentId, 0, null, null, null, 0));
+		int index = costUnitBeans.indexOf(new CostUnitBean().setComponentId(componentId));
 		if(index>=0 && !priceStr.isEmpty())
 			CostUnitService.setPrice(costUnitBeans.get(index), new BigDecimal(priceStr));
 	}
 
-	public CostUnitBean getCostUnitBean(int componentId) {
-		CostUnitBean costUnitBean = null;
-		for(CostUnitBean cub:costBean.getCostUnitBeans())
-			if(cub.getComponentId()==componentId){
-				costUnitBean = cub;
-				break;
-			}
-		return costUnitBean;
-	}
-
+	@JsonIgnore
 	public List<CostUnitBean> getCostUnitBeans() {
 		return costBean.getCostUnitBeans();
 	}
 
+	@JsonIgnore
 	public String getClassId() {
 		String classId = costBean.getClassId();
 		return classId!=null ? classId : "";
 	}
 
-	public String getComponentId() {
-		String componentId = costBean.getComponentId();
-		return componentId!=null ? componentId : "";
+	@JsonIgnore
+	public int getComponentId() {
+		return costBean.getTopComponentId();
 	}
 
+	@JsonIgnore
 	public void setClassId(String classId) {
 		costBean.setClassId(classId);
 	}
 
-	public CostService setComponentId(String componentId) {
-		costBean.setComponentId(componentId);
-		return this;
-	}
-
+	@JsonIgnore
 	public boolean setSelectedCompanyIndex(String id_index) {
 
 		boolean set = false;
@@ -266,7 +294,7 @@ public class CostService {
 			String[] split = id_index.split(":");
 			if(split.length==2) {
 				List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-				CostUnitBean costUnit = costUnitBeans.get(costUnitBeans.indexOf(new CostUnitService(Integer.parseInt(split[0].replaceAll("\\D", "")), 0, null, null, null, 0)));
+				CostUnitBean costUnit = costUnitBeans.get(costUnitBeans.indexOf(new CostUnitBean().setComponentId(Integer.parseInt(split[0].replaceAll("\\D", "")))));
 				if(set = costUnit!=null)
 					CostUnitService.setSelectedCompanyIndex(costUnit, Integer.parseInt(split[1]));
 			}
@@ -275,164 +303,176 @@ public class CostService {
 		return set;
 	}
 
+	@JsonIgnore
 	public boolean setSelectedMfrPNIndex(String id_index) {
+		logger.entry(id_index);
 		boolean set = false;
 		if(id_index!=null){
 			String[] split = id_index.split(":");
 			if(split.length==2) {
-				CostUnitService cu = new CostUnitService(Integer.parseInt(split[0].replaceAll("\\D", "")), 0, null, null, null, 0);
+
+				CostUnitBean cubTmp = new CostUnitBean().setComponentId(Integer.parseInt(split[0].replaceAll("\\D", "")));
 				List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-				int indexOf = costUnitBeans.indexOf(cu);
+
+				int indexOf = costUnitBeans.indexOf(cubTmp);
+				logger.trace("\n\tindexOf = {}", indexOf);
+
 				if(indexOf>=0){
 					CostUnitBean costUnit = costUnitBeans.get(indexOf);
-					if(set = costUnit!=null)
-						CostUnitService.setSelectedMfrPN(costUnit, Integer.parseInt(split[1]));
+					if(costUnit!=null)
+						set = CostUnitService.setSelectedMfrPN(costUnit, Integer.parseInt(split[1]));
 				}
 			}
 		}
-		return set;
+		return logger.exit(set);
 	}
 
+	@JsonIgnore
 	public boolean setForPriceIndex(int id, int index) {
 
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-		CostUnitBean costUnit = costUnitBeans.get(costUnitBeans.indexOf(new CostUnitService(id, 0, null, null, null, 0)));
+		CostUnitBean costUnit = costUnitBeans.get(costUnitBeans.indexOf(new CostUnitBean().setComponentId(id)));
 		boolean isSet = CostUnitService.setForPriceIndex(costUnit, index) ;
 
 		return isSet;
 	}
 
-	public void add(CostUnitBean costUnitBean) {
+	@JsonIgnore
+	public boolean add(CostUnitBean costUnitBean) {
+		logger.entry("\n\t", costUnitBean);
+
+		boolean added = false;
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-		if(costUnitBeans.contains(costUnitBean)){
-			CostUnitBean cuTmp = costUnitBeans.get(costUnitBeans.indexOf(costUnitBean));
-			CostUnitService.add(cuTmp, costUnitBean.getMfrPartNumbers()) ;
+
+		int indexOf = costUnitBeans.indexOf(costUnitBean);
+		logger.trace("\n\tindexOf = {}", indexOf);
+
+		if(indexOf>=0){
+			CostUnitBean cuTmp = costUnitBeans.get(indexOf);
+			added = CostUnitService.add(costUnitBean.getAlternativeComponentBeans(), cuTmp.getAlternativeComponentBeans()) ;
 		}else
-			costUnitBeans.add(costUnitBean);
+			added = costUnitBeans.add(costUnitBean);
+
+		return logger.exit(added);
 	}
 
+	@JsonIgnore
 	public void add(int componentId, CostCompanyBean costCompanyBean) {
-		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
 
-		logger.trace("\n\tadd(int componentId={}, CostCompanyBean costCompany={})\n\tcostUnitBeans=\t", componentId, costCompanyBean, costUnitBeans);
+		logger.trace("\n\tadd(int componentId={}, CostCompanyBean costCompany={})", componentId, costCompanyBean);
 
-		int indexOf = costUnitBeans.indexOf(new CostUnitService(componentId, 0, null, null, null, 0));
-		if(indexOf>=0){
-			CostUnitBean costUnitBean = costUnitBeans.get(indexOf);
-			CostMfrPNBean mfrPartNumberBean = CostUnitService.getMfrPartNumberBean(costUnitBean);
-			CostMfrPNService.add(mfrPartNumberBean, costCompanyBean);
+		CostUnitBean costUnitBean = getCostUnitBean(componentId);
+		if(costUnitBean!=null){
+			AlternativeComponentBean alternativeComponentBean = CostUnitService.getAlternativeComponentBean(costUnitBean);
+			List<CostCompanyBean> ccbs = new ArrayList<>();
+			ccbs.add(costCompanyBean);
+			AlternativeComponentService.add(ccbs, alternativeComponentBean.getCostCompanyBeans());
 		}else
 			logger.warn("Component with componentId = '{}' do not exist.", componentId);
 	}
 
+	@JsonIgnore
+	public void setSelectedIndex(int componentId, CostCompanyBean costCompanyBean) {
+		CostUnitBean costUnitBean = getCostUnitBean(componentId);
+		if(costUnitBean!=null);
+			for(AlternativeComponentBean acb:costUnitBean.getAlternativeComponentBeans()){
+				List<CostCompanyBean> costCompanyBeans = acb.getCostCompanyBeans();
+				int indexOf = costCompanyBeans.indexOf(costUnitBean);
+				if(indexOf>=0)
+					acb.setSelectedIndex(indexOf);
+			}
+	}
+
+	@JsonIgnore
+	public CostUnitBean getCostUnitBean(int componentId) {
+
+		CostUnitBean costUnitBean = null;
+		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
+		int indexOf = costUnitBeans.indexOf(new CostUnitBean().setComponentId(componentId));
+
+		if(indexOf>=0)
+			costUnitBean = costUnitBeans.get(indexOf);
+
+		return costUnitBean;
+	}
+
+	@JsonIgnore
 	public void remove(int componentId, CostCompanyBean costCompanyBean) {
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
 
 		logger.trace("\n\tadd(int componentId={}, CostCompanyBean costCompany={})\n\tcostUnitBeans=\t", componentId, costCompanyBean, costUnitBeans);
 
-		int indexOf = costUnitBeans.indexOf(new CostUnitService(componentId, 0, null, null, null, 0));
+		int indexOf = costUnitBeans.indexOf(new CostUnitBean().setComponentId(componentId));
 		if(indexOf>=0){
 			CostUnitBean costUnitBean = costUnitBeans.get(indexOf);
-			CostMfrPNBean mfrPartNumberBean = CostUnitService.getMfrPartNumberBean(costUnitBean);
-			CostMfrPNService.remove(mfrPartNumberBean, costCompanyBean);
+			AlternativeComponentBean mfrPartNumberBean = CostUnitService.getAlternativeComponentBean(costUnitBean);
+			AlternativeComponentService.remove(mfrPartNumberBean, costCompanyBean);
 		}else
 			logger.warn("Component with componentId = '{}' do not exist.", componentId);
 	}
 
+	@JsonIgnore
 	public int getId() {
-		return costBean.getId();
+		return costBean.getTopComponentId();
 	}
 
+	@JsonIgnore
 	public boolean isSet(){
 		return !costBean.getCostUnitBeans().isEmpty();
 	}
 
-	public CostMfrPNBean getCostMfrPN(int id) {
+	@JsonIgnore
+	public AlternativeComponentBean getCostMfrPN(int componentId) {
 
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-		int indexOf = costUnitBeans.indexOf(new CostUnitService(id, 0, null, null, null, 0));
-		CostMfrPNBean costMfrPNBean = null;
+		int indexOf = costUnitBeans.indexOf(new CostUnitBean().setComponentId(componentId));
+		AlternativeComponentBean costMfrPNBean = null;
 		if(indexOf>=0)
-			costMfrPNBean = CostUnitService.getMfrPartNumberBean(costUnitBeans.get(indexOf));
+			costMfrPNBean = CostUnitService.getAlternativeComponentBean(costUnitBeans.get(indexOf));
 
 		logger.debug("\n\t"
 				+ "ID=\t{}\n\t"
 				+ "indexOf=\t{}\n\t"
-				+ "costMfrPNBean:\t{}", id, indexOf, costMfrPNBean);
+				+ "costMfrPNBean:\t{}", componentId, indexOf, costMfrPNBean);
 		return costMfrPNBean;
 	}
 
-	public CostCompanyBean getCostCompany(int id) {
+	@JsonIgnore
+	public CostCompanyBean getCostCompany(int componentId) {
 		List<CostUnitBean> costUnitBeans = costBean.getCostUnitBeans();
-		int indexOf = costUnitBeans.indexOf(new CostUnitService(id, 0, null, null, null, 0));
-		CostMfrPNBean costMfrPN = null;
+		int indexOf = costUnitBeans.indexOf(new CostUnitBean().setComponentId(componentId));
+		AlternativeComponentBean costMfrPN = null;
 
 		if(indexOf>=0)
-			costMfrPN = CostUnitService.getMfrPartNumberBean(costUnitBeans.get(indexOf)) ;
+			costMfrPN = CostUnitService.getAlternativeComponentBean(costUnitBeans.get(indexOf)) ;
 
 		logger.debug("\n\t{}", costMfrPN);
-		return costMfrPN!=null ? CostMfrPNService.getCostCompanyBean(costMfrPN) : null;
+		return costMfrPN!=null ? AlternativeComponentService.getCostCompanyBean(costMfrPN) : null;
 	}
 
+	@JsonIgnore
 	public void setSetIndex(int setIndex) {
 		costBean.setSetIndex(setIndex);
 	}
 
+	@JsonIgnore
 	public int getSetIndex() {
 		return costBean.getSetIndex();
 	}
 
 	public boolean hasSet(){
-		return new CostDAO().hasSet(costBean.getSetIndex(), costBean.getId());
+		return new CostDAO().hasSet(costBean.getSetIndex(), costBean.getTopComponentId());
 	}
 
+	@JsonIgnore
 	public void setSet(boolean isSet) {
 		costBean.setSet( isSet);
 	}
 
-//Cost [id=40,
-//	partnamber=00C-10E4CS-02504,
-//	description=10nF,
-//	costUnits=[
-//		CostUnit [componentId=40,
-//				partNumberStr=00C-10E4CS-02504,
-//				description=10nF,
-//				selectedIndex=0,
-//				qty=8420,
-//				mfrPartNumbers=[
-//					CostMfrPN [id=0,
-//							mfrPN=GRM155R71E103KA01D,
-//							mfr=Murata,
-//							selectedIndex=1,
-//							costCompanies=[
-//								CostCompany [id=0,
-//											name=Murata,
-//											selectedIndex=0,
-//											forPrices=[
-//												ForPrice [forUnit=1000,
-//															price=0.0040000,
-//															newPrice=null,
-//															getStatus()=SAVED]
-//											],
-//											isSet()=true
-//								],
-//								CostCompany [id=6, name=Future electronics, selectedIndex=0, forPrices=[ForPrice [forUnit=10000, price=0.0023000, newPrice=null, getStatus()=SAVED]], isSet()=true]]], CostMfrPN [id=60, mfrPN=GRM155R71H103KA88D, mfr=Murata, selectedIndex=0, costCompanies=[CostCompany [id=6, name=Future electronics, selectedIndex=0, forPrices=[ForPrice [forUnit=10000, price=0E-7, newPrice=null, getStatus()=SAVED]], isSet()=true]]]]]], isEdit=true, classId=Select, componentId=null, position=65px:445px, setIndex=0, isSet=false]
-		public static CostService parseCost(String cookieValue) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-		public CostBean getCostBean() {
-			return costBean;
-		}
-
-		public void setCostBean(CostBean costBean) {
-			this.costBean = costBean;
-		}
-
+	@JsonIgnore
 		public void clearChanges() {
 			for(CostUnitBean cub:costBean.getCostUnitBeans())
-				for(CostMfrPNBean cmpnb:cub.getMfrPartNumbers())
+				for(AlternativeComponentBean cmpnb:cub.getAlternativeComponentBeans())
 					for(CostCompanyBean ccb:cmpnb.getCostCompanyBeans())
 						for(ForPriceBean fpb:ccb.getForPriceBeans())
 							if(fpb.getNewPrice()!=null)

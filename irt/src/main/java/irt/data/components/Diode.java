@@ -100,7 +100,7 @@ public class Diode extends Component {
 		
 		switch(index){
 		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
+			returnStr = getMfrPN();
 			break;
 		case ID:
 			returnStr = getID();
@@ -163,7 +163,7 @@ public class Diode extends Component {
 					if(getClassId().equals(tmpComp.getPartNumber().substring(0, 3)))
 						isSetted = true;
 					else
-						getError().setErrorMessage("Manufacture P/N '"+getManufPartNumber()
+						getError().setErrorMessage("Manufacture P/N '"+getMfrPN()
 								+"' - alredy exist.<br />P/N - "+tmpComp.getPartNumberF());				
 				}else{
 					super.setValue(Data.MAN_PART_NUM, valueStr);
@@ -284,7 +284,7 @@ public class Diode extends Component {
 
 	@Override
 	public boolean isSet() {
-		return 		!getManufPartNumber().isEmpty() 
+		return 		!getMfrPN().isEmpty() 
 				&&	getID()!=null
 				&&	!getType().isEmpty()
 				&&	!getPackage().isEmpty();

@@ -77,7 +77,7 @@ public class IC extends Component {
 		
 		switch(index){
 		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
+			returnStr = getMfrPN();
 			break;
 		case MANUFACTURE:
 			returnStr = getManufactureId();
@@ -302,7 +302,7 @@ public class IC extends Component {
 
 	@Override
 	public boolean isSet() {
-		return 		!getManufPartNumber().isEmpty() 
+		return 		!getMfrPN().isEmpty() 
 				&&	TextWorker.isValid(getManufactureId())
 				&&	!getDescription().isEmpty()
 				&&	TextWorker.isValid(getPackage())

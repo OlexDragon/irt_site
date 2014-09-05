@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import irt.data.dao.BomDAO;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.MenuDAO;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 import irt.table.Table;
 
 import com.itextpdf.text.Image;
@@ -24,7 +24,7 @@ public class ProductStructure {
 
 	private BillOfMaterials billOfMaterials;
 	private Table table;
-	private OrderBy orderBy;
+	private OrderByService orderBy;
 	private boolean isOrderByReference = true;
 	private boolean isBom;
 
@@ -54,7 +54,7 @@ public class ProductStructure {
 		else if(this.orderBy!=null)
 			this.orderBy.setOrderBy(orderBy);
 		else 
-			this.orderBy = new OrderBy(orderBy);
+			this.orderBy = new OrderByService(orderBy);
 
 		table = null;
 		isOrderByReference = false;
@@ -161,7 +161,7 @@ public class ProductStructure {
 			if(isOrderByReference)
 				orderBy = null;
 			else
-				orderBy = new OrderBy(BomDAO.PART_REFERENCE);
+				orderBy = new OrderByService(BomDAO.PART_REFERENCE);
 
 			this.isOrderByReference = isOrderByReference;
 
@@ -177,7 +177,7 @@ public class ProductStructure {
 		return isBom;
 	}
 
-	public OrderBy getOrderBy() {
+	public OrderByService getOrderBy() {
 		return orderBy;
 	}
 }

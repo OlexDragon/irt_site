@@ -20,8 +20,8 @@ public class Component extends Data{
 	public Component(int componentId) {
 		Component component = new ComponentDAO().getComponent(componentId);
 		if(component!=null && !component.getPartNumber().isEmpty()){
-			set(componentId, component.getPartNumber(), component.getManufPartNumber(),
-					component.getManufId(), component.getDescription(), component.getQuantityStr(),
+			set(componentId, component.getPartNumber(), component.getMfrPN(),
+					component.getMfrId(), component.getDescription(), component.getQuantityStr(),
 					component.getLocation(), component.getLink(), component.getFootprint(), component.getSchematicLetter());
 		}
 	}
@@ -72,8 +72,8 @@ public class Component extends Data{
 						: "";
 	}
 
-	public String getManufPartNumber() {
-		String manufPartNumber = super.getManufPartNumber();
+	public String getMfrPN() {
+		String manufPartNumber = super.getMfrPN();
 		return (manufPartNumber!=null)
 				? manufPartNumber
 						: "";

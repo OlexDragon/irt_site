@@ -7,7 +7,7 @@ import irt.data.manufacture.Manufacture;
 import irt.data.user.UserBean;
 import irt.data.user.UsersLogsIn;
 import irt.files.Pdf;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class ManufactureServlet extends HttpServlet {
 	//	private Logger logger = Logger.getLogger(this.getClass());
 	private RequestDispatcher jsp;
 	private String httpAddress = "manufacture-links";
-	private OrderBy orderBy;
+	private OrderByService orderBy;
 
 	private String pathLogo;
 	private Error error;
@@ -62,7 +62,7 @@ public class ManufactureServlet extends HttpServlet {
 		String orderBy	= request.getParameter("order_by");
 		if(orderBy!=null && !orderBy.isEmpty()){
 			if(this.orderBy==null)
-				this.orderBy = new OrderBy(orderBy);
+				this.orderBy = new OrderByService(orderBy);
 			else
 				this.orderBy.setOrderBy(orderBy);
 			manufacture.setOrderBy(this.orderBy);

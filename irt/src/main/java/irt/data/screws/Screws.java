@@ -80,7 +80,7 @@ public class Screws extends Component {
 			break;
 			
 		case MAN_PART_NUM:
-			returnStr = getManufPartNumber();
+			returnStr = getMfrPN();
 			break;
 		case MANUFACTURE:
 			returnStr = super.getValue(Component.MANUFACTURE);

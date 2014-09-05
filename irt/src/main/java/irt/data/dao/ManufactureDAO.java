@@ -1,7 +1,7 @@
 package irt.data.dao;
 
 import irt.data.manufacture.Manufacture;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +23,7 @@ public class ManufactureDAO extends DataAccessObject {
 
 //	private Logger logger = Logger.getLogger(this.getClass());
 
-	public Manufacture[] getAll(OrderBy orderBy) {
+	public Manufacture[] getAll(OrderByService orderBy) {
 		Connection conecsion = null;
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;

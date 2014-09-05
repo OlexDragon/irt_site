@@ -4,47 +4,48 @@
 		<Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout pattern="%n%-5p%n%d [%t] %C{2} %M (%F:%L) - %m%xEx%n" />
 		</Console>
-
 	</Appenders>
 
 	<Loggers>
-		<logger name="irt.web.ComponentsMovementServlet" 	level="WARN" />
-		<logger name="irt.web.CostServlet" 					level="WARN" />
-		<logger name="irt.web.PartNumberServlet" 			level="all" />
-		<logger name="irt.web.WorkOrderServlet" 			level="WARN" />
-		<logger name="irt.web.ProductServlet" 				level="WARN" />
+		<logger name="irt.web.ComponentsMovementServlet" 			level="WARN" />
+		<logger name="irt.web.CostServlet" 							level="debug" />
+		<logger name="irt.web.PartNumberServlet" 					level="WARN" />
+		<logger name="irt.web.WorkOrderServlet" 					level="WARN" />
+		<logger name="irt.web.ProductServlet" 						level="WARN" />
 
-		<logger name="irt.data.Jackson" 					level="WARN" />
-		<logger name="irt.data.CookiesWorker" 				level="all" />
+		<logger name="irt.data.Jackson" 							level="WARN" />
+		<logger name="irt.data.CookiesWorker" 						level="WARN" />
 
-		<logger name="irt.data.partnumber.PartNumber"		level="WARN" />
-		<logger name="irt.data.partnumber.PartNumberDetails" level="all" />
+		<logger name="irt.data.partnumber.PartNumber"				level="WARN" />
+		<logger name="irt.data.partnumber.PartNumberDetails"		level="WARN" />
 
-		<logger name="irt.data.components.Component" 		level="WARN" />
-		<logger name="irt.data.components.Isolator" 		level="WARN" />
-		<logger name="irt.data.components.Resistor"			level="WARN" />
-		<logger name="irt.data.components.Other" 			level="WARN" />
-		<logger name="irt.data.components.Unknown" 			level="WARN" />
+		<logger name="irt.data.components.Component" 				level="WARN" />
+		<logger name="irt.data.components.Isolator" 				level="WARN" />
+		<logger name="irt.data.components.Resistor"					level="WARN" />
+		<logger name="irt.data.components.Other" 					level="WARN" />
+		<logger name="irt.data.components.Unknown" 					level="WARN" />
 
-		<logger name="irt.data.purchase.ForPriceBean" 		level="WARN" />
-		<logger name="irt.data.purchase.CostService"		level="WARN" />
-		<logger name="irt.data.purchase.CostMfrPNService" 	level="WARN" />
-		<logger name="irt.data.purchase.CostUnitService" 	level="WARN" />
+		<logger name="irt.data.purchase.ForPriceService" 			level="all" />
+		<logger name="irt.data.purchase.CostCompanyService" 		level="WARN" />
+		<logger name="irt.data.purchase.AlternativeComponentService" level="WARN" />
+		<logger name="irt.data.purchase.CostUnitService" 			level="WARN" />
+		<logger name="irt.data.purchase.CostService"				level="WARN" />
 
-		<logger name="irt.data.dao.MenuDAO" 				level="WARN" />
-		<logger name="irt.data.dao.ComponentDAO" 			level="WARN" />
-		<logger name="irt.data.dao.CostDAO" 				level="WARN" />
-		<logger name="irt.data.dao.SecondAndThirdDigitsDAO" level="WARN" />
-		<logger name="irt.data.dao.DataAccessObject" 		level="WARN" />
+		<logger name="irt.data.dao.MenuDAO" 						level="WARN" />
+		<logger name="irt.data.dao.CostDAO" 						level="WARN" />
+		<logger name="irt.data.dao.CompanyDAO" 						level="WARN" />
+		<logger name="irt.data.dao.ComponentDAO" 					level="WARN" />
+		<logger name="irt.data.dao.SecondAndThirdDigitsDAO" 		level="WARN" />
+		<logger name="irt.data.dao.DataAccessObject" 				level="WARN" />
 
-		<logger name="irt.data.workorder.WorkOrder"			level="WARN" />
+		<logger name="irt.data.workorder.WorkOrder"					level="WARN" />
 
-		<logger name="irt.product.ProductStructure"			level="WARN" />
-		<logger name="irt.product.BillOfMaterials"			level="WARN" />
+		<logger name="irt.product.ProductStructure"					level="WARN" />
+		<logger name="irt.product.BillOfMaterials"					level="WARN" />
 
-		<logger name="irt.table.OrderBy"					level="WARN" />
+		<logger name="irt.table.OrderBy"							level="WARN" />
 
-		<logger name="static.Component.logger"				level="WARN" />
+		<logger name="static.Component.logger"						level="WARN" />
 
 		<Root level="WARN">
 			<AppenderRef ref="STDOUT" />

@@ -4,7 +4,7 @@ import irt.data.components.Data;
 import irt.data.dao.BomDAO;
 import irt.data.dao.ComponentDAO;
 import irt.data.dao.ErrorDAO;
-import irt.table.OrderBy;
+import irt.table.OrderByService;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Excel {
 
-	public static void uploadExcel(HttpServletResponse response, String partNumberStr, String pathLogo, boolean isQty, OrderBy orderBy) throws SQLException {
+	public static void uploadExcel(HttpServletResponse response, String partNumberStr, String pathLogo, boolean isQty, OrderByService orderBy) throws SQLException {
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		XSSFSheet worksheet = workbook.createSheet("IRT Technologies. BOM");
 		XSSFFont font = workbook.createFont();
@@ -86,7 +86,7 @@ public class Excel {
 
 			row = worksheet.createRow(2);
 			cell = row.createCell(2);
-			cell.setCellValue("from "+topComponent.getManufPartNumber().substring(8));
+			cell.setCellValue("from "+topComponent.getMfrPN().substring(8));
 			cell.setCellStyle(style);
 
 			row = worksheet.createRow(3);
