@@ -1,0 +1,25 @@
+@CHARSET "UTF-8";
+body{
+	padding-top: 4em;
+}
+a.navbar-brand img{
+	width: 30px
+}
+#pnLi{
+	margin-top: 15px;
+}
+.mt10{
+	margin-top: 10px
+}
+.ml5{
+	margin-left: 5px
+}
+.w2em{
+	width: 2em;
+}
+.w3em{
+	width: 3em;
+}
+ul.ui-front {
+  z-index: 9999;
+}

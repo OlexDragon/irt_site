@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="en">
+<head>
+<title th:text="${status!=null ? status + ':Error' : 'Error'}">Error</title>
+<th:block th:include="partnumber :: index_head">
+</th:block>
+</head>
+<body th:with="menuFormAction=${'bom'}">
+<div class="container-fluid">
+<div th:replace="fragments/menu :: menu"></div>
+ <!--/*  As we are using Thymeleaf, you might consider using 
+ 	      ${#httpServletRequest.requestURL}. But that returns the path 
+ 	      to this error page.  Hence we explicitly add the url to the 
+ 	      Model in some of the example code. */--> 
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3>Error Page</h3> 
+	</div>
+	<div class="panel-body">
+		<p th:if="${url}"> 
+ 			<b>Page:</b> <span th:text="${url}">Page URL</span> 
+		</p> 
+
+		<p th:if="${timestamp}" id='created'> 
+			<b>Occurred:</b> <span th:text="${timestamp}">Timestamp</span> 
+		</p> 
+
+ 		<p th:if="${status}"> 
+ 			<b>Response Status:</b>
+ 			<span th:text="${status}">status-code</span>
+ 			<span th:if="${error}" th:text="'('+${error}+')'">error ...</span> 
+ 		</p> 
+ 
+ 
+ 		<p th:if="${ex} or ${exception} or (${message} and ${message.length() != 0})"> 
+ 			<b>Cause:</b>
+ 			<span th:if="${ex}" th:text="${ex.message}">exception...</span>
+ 			<span th:if="${exception}" th:text="${exception instanceof T(java.lang.String) ? exception : exception.message}">exception...</span>
+ 			<span th:if="${message} and ${message.length() != 0}" th:text="${message}">message ...</span> 
+ 		</p> 
+	</div>
+</div>
+</div>
+<footer th:replace="partnumber :: footer"></footer>
+</body>
+</html>
