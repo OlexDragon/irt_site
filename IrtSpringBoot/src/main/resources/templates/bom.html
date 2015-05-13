@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="en">
+<head>
+<title th:text="${bomView.partNumber!=null ? 'BOM:'+bomView.partNumber : 'BOM'}">BOM</title>
+<th:block th:include="partnumber :: index_head">
+</th:block>
+</head>
+<body th:with="menuFormAction=${'bom'}">
+<div class="container-fluid">
+<div th:replace="fragments/menu :: menu"></div>
+	<h4 th:if="${componentBean.partNumber!=null and bomView.bomEntities==null}">This part number doesn't have BOM</h4>
+	<div class="panel panel-default" th:if="${bomView.partNumber!=null}">
+ 		<div class="panel-heading">
+    		<h3 class="panel-title" th:text="${bomView.partNumber + ' : ' + bomView.description}">Panel title</h3>
+  		</div>
+  		 <div class="panel-body">
+		<table class="table table-bordered table-striped table-hover table-condensed">
+			<thead>
+				<tr>
+					<td></td>
+					<td th:each="onv:${onvs}" th:if="${onv.visible}" th:class="${onv.className}" th:text="${onv.name}">QTY</td>
+				</tr>
+			</thead>
+			<tr th:each="bom,iterationStatus : ${bomView.bomEntities}">
+				<td th:text="${iterationStatus.count}">1</td>
+				<td th:each="onv:${onvs}" th:if="${onv.visible}" th:with="link=${onv.bomEntityFieldToString.getLink(bom)}">
+					<a th:if="${link!=null}" th:href="${link}" th:text="${onv.bomEntityFieldToString.toString(bom)}" target="_blank"></a>
+					<span th:if="${link==null}" th:text="${onv.bomEntityFieldToString.toString(bom)}"></span>
+				</td>
+			</tr>
+		</table>
+		</div>
+	</div>
+</div><!--/*
+
+	Setting Modal Dialog
+
+*/--><div id="setting" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="bomLabel" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 id="bomLabel" class="modal-title">Setting</h4>
+			</div>
+			<div class="modal-body">
+				<form action="/bom">
+				<ul>
+					<li th:each="onv : ${onvs}" class="checkbox" th:classappend="${onv.visible ? 'has-success' : 'has-warning'}">
+						<input type="checkbox"
+								th:name="${'cb_'+onv.id}"
+								th:checked="${onv.visible}"/>
+						<input type="number"
+								min="1"
+								max="10"
+								class="w3em"
+								th:name="${'num_'+onv.id}"
+								th:value="${onv.order}"/>
+						<label th:for="${onv.id}" th:text="${onv.name}">Label</label>
+					</li>
+				</ul>
+				<button type="submit">Set</button>
+				<button name="reset" type="submit">Reset</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<footer th:replace="partnumber :: footer"></footer>
+</body>
+</html>

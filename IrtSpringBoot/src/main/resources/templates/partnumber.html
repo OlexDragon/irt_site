@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="en">
+<head>
+	<title th:text="${componentView.partNumber!=null ? 'PN:'+componentView.partNumber : 'Part Number'}">Part Number</title>
+	<meta charset="UTF-8" />
+<th:block th:fragment="index_head">
+	<link rel="stylesheet" href="../static/css/irt.css" th:href="@{/css/irt.css}"/>
+	<link rel="stylesheet" href="../static/css/jquery-ui.css" th:href="@{/css/jquery-ui.css}"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="../static/js/jquery-ui.min.js" th:src="@{/js/jquery-ui.min.js}"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</th:block>
+</head>
+<body th:with="menuFormAction=${'/'}"><!--/*
+
+	Menu
+
+	*/--><div th:replace="fragments/menu :: menu"></div><!--/*
+
+	Content
+
+*/--><div class="container-fluid"><!--/*
+
+	  		Component details
+
+	*/-->	<div role="tabpanel" th:if="${componentBean.status==T(irt.web.view.beans.ComponentBean.Status).SUCCESS}"><!--/*
+
+			Tabs
+
+	 	 */-->	<ul class="nav nav-tabs" role="tablist"><!--/*
+
+	Details
+
+ 				*/--><li role="presentation" class="active"><a href="#details" aria-controls="details" role="tab" data-toggle="tab">Details</a></li><!--/*
+
+	History
+
+ 				*/--><li role="presentation" th:if="${componentView.componentEntity.movementDetailsEntities!=null and componentView.componentEntity.movementDetailsEntities.size()!=0}"><a href="#history" aria-controls="history" role="tab" data-toggle="tab">History</a></li><!--/*
+
+	Move To Stock
+
+ 				*/--><li role="presentation"  th:if="${#authorization.expression('hasRole(''STOCK'')')}"><a href="#toStock" aria-controls="toStock" role="tab" data-toggle="tab">Move to Stock</a></li>
+				</ul><!--/*
+
+				Tab content
+
+		  */-->	<div class="tab-content"><!--/*
+
+					Details
+
+ */-->	<div role="tabpanel" class="tab-pane active" id="details">
+			<table th:with="ce=${componentView.componentEntity},
+			   							cv=${ce.componentValue},
+			   							vol=${ce.voltage},
+			   							mPN=${ce.manufPartNumber},
+			   							mfr=${ce.manufacture},
+			   							l=${ce.location},
+			   							link=${ce.link}"
+			   					 class="table table-bordered table-striped table-hover table-condensed">
+				<thead>
+			   					<tr>
+			   						<th>Part Number</th>
+			   						<th th:if="${cv!=null and cv!=mPN}">Value</th>
+			   						<th th:if="${vol!=null}">Volt</th>
+			   						<th th:if="${mPN!=null}">Mfr P/N</th>
+			   						<th th:if="${mfr!=null}">Mfr</th>
+			   						<th>Description</th>
+			   						<th th:if="${l!=null}">Location</th>
+			   						<th>Qty</th>
+			   					</tr>
+			   	</thead>
+			   	<tbody>
+			   					<tr>
+			   						<td th:text="${componentView.partNumber}">Part Number</td>
+			   						<td th:if="${cv!=null and cv!=mPN}" th:text="${cv}">Value</td>
+			   						<td th:if="${vol!=null}" th:text="${vol}">Volt</td>
+			   						<td th:if="${mPN!=null}">
+			   							<a th:if="${link!=null}"
+			   							 	th:href="@{${#strings.startsWith(link.link,'http') ? link.link : '//irttechnologies:8080'+link.link}}"
+			   							 	th:text="${mPN}"
+			   							 	target="_blank">Mfr P/N</a>
+			   							<span th:if="${link==null}" th:text="${mPN}"></span>
+			   						</td>
+			   						<td th:if="${mfr!=null}"><a th:href="${mfr.link}" th:text="${mfr.name}" target="_blank">Mfr</a></td>
+			   						<td th:text="${ce.description}">Description</td>
+			   						<td th:if="${l!=null}" th:text="l">Location</td>
+			   						<td th:text="${ce.qty}">Qty</td>
+			   					</tr>
+			   	</tbody>
+			</table>
+		</div><!--/*
+
+					History
+
+ */-->	<div role="tabpanel" class="tab-pane" id="history">
+	<table class="table table-striped table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Date</th>
+				<th>By</th>
+				<th>From</th>
+				<th>Detail</th>
+				<th>To</th>
+				<th>Detail</th>
+				<th>Description</th>
+				<th>Qty</th>
+			</tr>
+			<tr th:each="md,st:${componentView.componentEntity.movementDetailsEntities}">
+				<td th:text="${st.count}">#</td>
+				<td th:text="${#calendars.format(md.movementEntity.dateTime,'HH:mm dd MMMM yyyy')}">#</td>
+				<td th:text="${md.movementEntity.who.firstname}">From</td>
+				<td th:text="${md.movementEntity.from.placeName}">From</td>
+				<td th:text="${md.movementEntity.fromDetail!=null ? md.movementEntity.fromDetail.company : null}">Detail</td>
+				<td th:text="${md.movementEntity.to.placeName}">To</td>
+				<td th:text="${md.movementEntity.toDetail!=null ? md.movementEntity.toDetail.company : null}">Detail</td>
+				<td th:text="${md.movementEntity.description}">Description</td>
+				<td th:text="${md.qty}">Qty</td>
+			</tr>
+		</thead>
+	</table>
+		</div><!--/*
+
+				Move to Stock "hasAnyRole('ADMIN', 'DEVELOPER')"
+
+ */-->	<div th:if="${#authorization.expression('hasAnyRole(''ADMIN'', ''STOCK'')')}" role="tabpanel" class="tab-pane" id="toStock" th:include="fragments/movement :: movement(sqty = ${componentView.componentEntity.qty})">
+ 		</div><!--/*	end of toStock
+			*/--></div>
+			</div>
+		</div>
+	<footer class="navbar-fixed-bottom" th:fragment="footer">
+		<a href="mailto:oleksandr@irttechnologies.com"><small>oleksandr@irttechnologies.com</small></a>
+	</footer>
+</body>
+</html>

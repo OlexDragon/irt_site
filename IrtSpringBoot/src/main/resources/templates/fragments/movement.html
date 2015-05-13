@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Menu</title>
+<link rel="stylesheet" type="text/css" href="../../static/css/jk.css" th:href="@{/css/jk.css}"></link>
+</head>
+<body>
+	<form action="" th:fragment="movement">
+	<div class="container-fluid">
+		<div class="row">
+			<label for="move-description">Movement Description: </label><input id="move-description" name="move-description" class="form-control"></input>
+			<div id="from" class="col-md-2 task">
+				<h3>From:</h3>
+					<h6 th:text="${'SQTY: '+sqty}">Stock quantity</h6>
+			</div>
+			<div id="to" class="col-md-2 task">
+				<h3>To:</h3>
+				<label for="move-qty">Quantity to move: </label><input id="move-qty" name="move-qty" class="form-control"></input>
+			</div>
+			<div class="col-md-8">
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+	var selectedTag
+	$(function(){
+		$.get('/load/select', {classNames:'places'}, function(data){appendPlacesSelect(data)});
+	});
+	function appendPlacesSelect(data){
+		$('h3').after(data);
+		$('.places').on('change', function(){placeChangeAction(this)});
+	}
+	function placeChangeAction(tag){
+		selectedTag = $(this);
+		$.get('/movement/palce-change', {name: $(this).parent().attr('id'), id: $(this).val()}, function(data){setPlaceDetails(data});
+	}
+	function setPlaceDetails(data){
+		selectedTag.parent().remove('.detail');
+		selectedTag.after(data);
+	}
+	</script>
+	</form><!--/*
+
+	****	ENF OF BODY		****
+
+*/-->
+</body>
+</html>

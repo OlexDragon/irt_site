@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="en">
+<head>
+	<title>Menu</title>
+	<meta charset="UTF-8"/>
+	<link rel="stylesheet" href="../../static/css/irt.css" th:href="@{/css/irt.css}"/>
+	<link rel="stylesheet" href="../../static/css/normalize.css" th:href="@{/css/normalize.css}"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div th:fragment="menu">
+	<form th:action="@{${menuFormAction}}" method="get" th:object="${componentBean}"><!--/*
+
+	Logo Icon
+
+	*/--><nav class="navbar navbar-default navbar-fixed-top">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#irtMenu">
+			        <span class="sr-only">Toggle IRT Menu</span>
+    			    <span class="icon-bar"></span>
+   					<span class="icon-bar"></span>
+      				<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">
+				 	<img alt="Brand"
+				 		src="../../static/images/logo.png"
+						th:src="@{/images/logo.png}" />
+				</a>
+			</div><!--/*
+
+	Part Number Menu
+
+	   */--><div id="irtMenu" class="collapse navbar-collapse">
+				<ul id="menu" class="nav navbar-nav">
+					<li class="active" th:class="${menuPartNumber!=null ? 'active dropdown' : null}">
+						<a th:class="${menuPartNumber!=null ? 'dropdown-toggle' : null}"
+							th:attrappend="data-toggle=${menuPartNumber!=null ? 'dropdown':null}, role=${menuPartNumber!=null ? 'button':null}, aria-expanded=${menuPartNumber!=null ? 'false':null}"
+							data-icon="ui-icon-home"
+							href="/">
+								Part Numbers
+								<span class="caret" 
+									th:if="${menuPartNumber!=null}">
+								</span>
+						</a>
+						<ul class="dropdown-menu" role="menu" th:if="${menuPartNumber!=null}">
+							<li th:class="*{bom ? null : 'disabled'}">
+								<a th:href="*{bom ? '/bom?partNumber='+partNumber : '#'}">Get BOM</a>
+							</li>
+						</ul>
+					</li><!--/*
+
+	BOM Menu 
+
+				*/--><li th:class="${menuBOM!=null ? 'active' : null}"><a data-icon="ui-icon-search" href="/bom">BOM</a></li>
+					<li th:class="${menuMfrs!=null ? 'active' : null}"><a data-icon="ui-icon-bookmark" href="/mfrs">Manufactures</a></li>
+					<li th:if="${componentBean}!=null" id="pnLi" class="form-inline">
+						<div class="input-group"
+								th:classappend="*{status==T(irt.web.view.beans.ComponentBean.Status).ERROR ? 'has-error' : status==T(irt.web.view.beans.ComponentBean.Status).SUCCESS ? 'has-success' : null}">
+							<span class="input-group-addon">P/N</span>
+							<input type="text"
+									class="form-control"
+									placeholder="Part Number"
+									th:field="*{partNumber}"/>
+							<span class="input-group-btn">
+								<button id="pnBttn"
+										class="btn btn-default glyphicon glyphicon-search"></button>
+							</span>
+						</div>
+						<script>
+							$('#partNumber').autocomplete({ source: '/autocomplete/partnumber' });
+						</script>
+					</li><!--/*
+
+	BOM Setting Menu
+
+				*/--><li th:if="${menuBOM}!=null">
+						<a href="#" data-toggle="modal" data-target="#setting">Setting</a>
+					</li><!--/*
+
+	Get Excel Menu
+
+				*/--><li th:if="${menuBOM}" th:class="*{bom ? null : 'disabled'}">
+						<a id="excelBttn" th:href="*{bom ? '/bom/excel/'+partNumber : '#'}">Excel</a>
+					</li><!--/*
+
+	Log In Menu
+
+				*/--><li>
+						<a th:if="${#authentication==null or #authentication.name=='anonymousUser'}" href="#" data-toggle="modal" data-target="#logInModal">Log In</a>
+						<a th:if="${#authentication!=null and #authentication.name!='anonymousUser'}" href="/logout">Log Out</a>
+					</li><!--/*
+
+	Management Menu
+
+				*/--><li th:if="${#authentication}!=null" class="dropdown">
+						<a th:if="${#authentication.name!='anonymousUser'}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Management<span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li sec:authorize="hasRole('USER')"><a href="/management/users">Users</a></li>
+						</ul>
+					</li>					
+				</ul>
+			</div>			
+	</nav>
+	</form>
+	<h3 class="text-warning" th:if="${componentBean!=null and componentBean.partNumber==null}">Type the part number in the input field.</h3><!--/*
+
+	Modal Log In
+
+ */-->	<div class="modal fade" id="logInModal" tabindex="-1" role="dialog" aria-labelledby="logInModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header" th:classappend="${loginEror!=null ? 'alert alert-danger' : null}" th:attr="role=${loginEror!=null ? 'alert' : null}">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+						<h4 class="modal-title" id="logInModalLabel" th:text="${msgEror==null ? 'Log In' : msgEror}">Log In</h4>
+					</div>
+					<div class="modal-body">
+						<form action="login" method="post">
+							<input name="requestURI" type="hidden" th:value="${#httpServletRequest.requestURI}" />
+							<div class="form-group">
+								<label for="username" class="control-label">Username</label>
+								<input type="text" name="username" required="required"/>
+							</div>
+							<div class="form-group">
+								<label for="password" class="control-label">Password</label>
+								<input type="password" name="password" required="required"/>
+							</div>
+							<button type="submit" class="btn btn-primary">Log In</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script th:if="${loginEror!=null or login!=null}" type="text/javascript">
+		$(function() {
+				$('#logInModal').modal('show');
+			}
+		);
+		</script>
+	</div>
+</body>
+</html>

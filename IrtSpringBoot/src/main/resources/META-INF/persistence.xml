@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="org.springframework.samples_IrtSpringBoot_jar_0.0.1-SNAPSHOTPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>irt.web.entities.all.SerialNumbersEntity</class>
+    <class>irt.web.entities.all.MovementDetailsEntity</class>
+    <class>irt.web.entities.all.CompanyEntity</class>
+    <class>irt.web.entities.all.CompaniesFaxEntity</class>
+    <class>irt.web.entities.all.PurchaseTaxEntity</class>
+    <class>irt.web.entities.all.SecondAndThirdDigitEntity</class>
+    <class>irt.web.entities.all.BomEntity</class>
+    <class>irt.web.entities.all.PurchaseEntity</class>
+    <class>irt.web.entities.all.CompaniesAddressEntity</class>
+    <class>irt.web.entities.all.KitEntity</class>
+    <class>irt.web.entities.all.CostEntity</class>
+    <class>irt.web.entities.all.CompaniesTelephoneEntity</class>
+    <class>irt.web.entities.all.BackupEntity</class>
+    <class>irt.web.entities.all.WorkOrderDetailEntity</class>
+    <class>irt.web.entities.all.BomunitEntity</class>
+    <class>irt.web.entities.all.BomRefEntity</class>
+    <class>irt.web.entities.all.FirstDigitsEntity</class>
+    <class>irt.web.entities.all.CompaniesActivityEntity</class>
+    <class>irt.web.entities.all.KitDetailsEntity</class>
+    <class>irt.web.entities.all.CostSetEntity</class>
+    <class>irt.web.entities.all.ComponentsOldSchematicLetterEntity</class>
+    <class>irt.web.entities.all.CountEntity</class>
+    <class>irt.web.entities.all.WorkOrdersEntity</class>
+    <class>irt.web.entities.all.ArrayEntity</class>
+    <class>irt.web.entities.all.ComponentsAlternativeEntity</class>
+    <class>irt.web.entities.all.CompaniesComponentsEntity</class>
+    <class>irt.web.entities.all.ErrorEntity</class>
+    <class>irt.web.entities.all.PurchaseComponentsEntity</class>
+    <class>irt.web.entities.all.BomTopEntity</class>
+    <class>irt.web.entities.all.SellersEntity</class>
+    <class>irt.web.entities.component.ComponentEntity</class>
+    <class>irt.web.entities.component.LinkEntity</class>
+    <class>irt.web.entities.component.ManufactureEntity</class>
+    <class>irt.web.entities.bom.BomRefEntity</class>
+    <class>irt.web.entities.bom.BomEntity</class>
+    <class>irt.web.entities.all.HistoryDetailEntity</class>
+    <class>irt.web.entities.component.PlaceEntity</class>
+    <class>irt.web.entities.all.Companies</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/irt?zeroDateTimeBehavior=convertToNull"/>
+      <property name="javax.persistence.jdbc.password" value="vsat"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.user" value="irt"/>
+      <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+    </properties>
+  </persistence-unit>
+</persistence>
