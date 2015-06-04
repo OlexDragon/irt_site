@@ -35,41 +35,43 @@
 					<td class="password" th:text="${user.password}">password</td>
 					<td class="firstname" th:text="${user.firstname}">First Name</td>
 					<td class="lastname" th:text="${user.lastname}">Last Name</td>
-					<td class='permissions'>
-						<select>
-							<option th:each="p:${user.permissions}" th:value="${p}" th:text="${p}"></option>
-						</select>
+					<td class="permissions">
+							<select class="form-control">
+								<option th:each="p:${user.permissions}" th:value="${p}" th:text="${p}"></option>
+							</select>
+							<th:block sec:authorize="hasRole('USER_EDIT','ADMIN')">
+								<button type="button" class="btn form-success btn-xs permissions" th:value="${user.id}">Edit</button>
+								<script sec:authorize="hasRole('USER_EDIT')" type="text/javascript" th:inline="javascript">
+									$('button.permissions').click(function(){
+										$('#userLabel').text('Uset Permissions')
+										$('#saveForm').empty();
+										$('#saveForm').prop('action', '/management/users/permissions')
+										$('#saveForm').append($('<input></input>').prop('type', 'hidden').prop('name','id').val($(this).val()));
+										var options =[]; $(this).prev().find('option').each(function(){options.push($(this).val())});
+										$.each([[${T(irt.web.entities.all.UsersEntity.Permission).values()}]], function(index, option){
+											$('#saveForm')
+											.append(
+													$('<div />')
+													.append(
+															$('<label />')
+															.append(
+																	$('<input />')
+																	.prop('type', 'checkbox')
+																	.prop('name', option.$name)
+																	.prop('checked', $.inArray(option.$name, options)>=0))
+													.append(option.$name)));
+										});
+										$('#saveForm').append($('<button />').prop('type', 'submit').text('Save').addClass('btn btn-primary'));
+										$('#userModal').modal('show');
+									});
+								</script>
+							</th:block>
 					</td>
 					<td class="extension" th:text="${user.extension}">Extension</td>
 					<td class="email" th:text="${user.eMail}">email</td>
 				</tr>
 		</table>
 		</div>
-		<script sec:authorize="hasRole('USER_EDIT')" type="text/javascript">
-			$('tbody tr').on('click',
-				function(){
-					var tr = $(this);
-					$.each($('#perm option'), function(index, option){
-						$(option).removeAttr('class');
-						var val = $(option).val();
-						if(val){
-							if(tr.find('select option[value="'+val+'"]').html())
-								$(option).addClass('text-success');
-							else
-								$(option).addClass('text-danger');
-						}
-					});
-
-				$('#id').val($(this).children('.id').text());
-					$('#un').val($(this).children('.username').text());
-					$('#up').val($(this).children('.password').text());
-					$('#fn').val($(this).children('.firstname').text());
-					$('#ln').val($(this).children('.lastname').text());
-					$('#ex').val($(this).children('.extension').text());
-					$('#em').val($(this).children('.email').text());
-					$('#userModal').modal('show');
-			});
-		</script>
 	</div>
 </div><!--/*
 
@@ -80,62 +82,10 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 id="bomLabel" class="modal-title">User</h4>
+				<h4 id="userLabel" class="modal-title">User</h4>
 			</div>
 			<div class="modal-body">
-				<form action="/management/users" class="form-horizontal">
-					<input type="hidden" id="id" name="id"/>
-					<div class="form-group form-group-sm">
-						<label class="col-sm-3" for="username">Username: </label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" id="un" name="username"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3" for="password">Password: </label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" id="up" name="password"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3" for="firstname">First Name: </label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" id="fn" name="firstname"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3" for="lastname">Last Name: </label>
-						<div class="col-sm-9">
-							<input  type="text" class="form-control" id="ln" name="lastname"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3" for="permission">Permissions: </label>
-						<div class="col-sm-9">
-							<select class="form-control" id="perm" name="permission">
-								<option value=""/>
-								<option th:each="p:${T(irt.web.entities.all.UsersEntity.Permission).values()}" th:value="${p}" th:text="${p}"/>
-							</select>
-							<script type="text/javascript">
-							$('#perm').on('change',
-								function(){
-									alert('yes');
-							});
-							</script>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3" for="extension">Extension: </label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" id="ex" name="extension"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3" for="email">Email: </label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" id="em" name="email"/>
-						</div>
-					</div>
+				<form id="saveForm" action="/management/users" class="form-horizontal" method="post">
 					<button type="button">Save</button>
 				</form>
 			</div>
