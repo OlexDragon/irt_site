@@ -79,7 +79,6 @@ public class UsersEntity implements Serializable {
 			return permissions;
 		}
 
-		private Comparator comparator = new C
 		public static Set<Permission> toPermissions(Long permissions){
 			SortedSet<Permission> set;
 
