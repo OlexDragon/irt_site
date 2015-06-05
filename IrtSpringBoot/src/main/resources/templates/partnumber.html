@@ -23,7 +23,10 @@
 
 	Content
 
-*/--><div class="container-fluid"><!--/*
+*/--><div id="content" class="container-fluid" th:remove="${addPartNumber} ? 'all-but-first' : 'none">
+	<script th:if="${addPartNumber}" type="text/javascript">
+		$('#content').load('add-pn-fragment');
+	</script> <!--/*
 
 	  		Component details
 

@@ -51,6 +51,9 @@
 							<li th:class="*{bom ? null : 'disabled'}">
 								<a th:href="*{bom ? '/bom?partNumber='+partNumber : '#'}">Get BOM</a>
 							</li>
+							<li sec:authorize="hasRole('PART_NUMBER_EDIT')">
+								<a href="/add-part-number">Create New Part Number</a>
+							</li>
 						</ul>
 					</li><!--/*
 
@@ -134,13 +137,13 @@
 					</div>
 				</div>
 			</div>
-		</div>
 		<script th:if="${loginEror!=null or login!=null}" type="text/javascript">
 		$(function() {
 				$('#logInModal').modal('show');
 			}
 		);
 		</script>
+		</div>
 	</div>
 </body>
 </html>
