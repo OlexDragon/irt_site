@@ -24,9 +24,7 @@
 	</div>
 	<script type="text/javascript">
 	var selectedTag
-	$(function(){
-		$.get('/load/select', {classNames:'places'}, function(data){appendPlacesSelect(data)});
-	});
+	$(function(){$.get('/load/select', {classNames:'places'}, function(data){ appendPlacesSelect( data)});});
 	function appendPlacesSelect(data){
 		$('h3').after(data);
 		$('.places').on('change', function(){placeChangeAction(this)});

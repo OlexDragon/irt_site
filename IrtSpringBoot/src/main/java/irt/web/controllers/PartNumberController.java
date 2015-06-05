@@ -1,5 +1,6 @@
 package irt.web.controllers;
 
+import irt.web.entities.all.repository.SecondAndThirdDigitRepository;
 import irt.web.entities.company.CompanyEntity;
 import irt.web.entities.company.repositories.CompanyRepository;
 import irt.web.entities.component.PlaceEntity;
@@ -123,11 +124,15 @@ public class PartNumberController {
 
 		return "fragments/movement :: details";
 	}
+	@Autowired
+	private SecondAndThirdDigitRepository secondAndThirdDigitRepository;
 
 	@PreAuthorize("hasRole('PART_NUMBER_EDIT')")
 	@RequestMapping("add-part-number")
 	public String addPartNumber(ComponentBean componentBean, Model model){
-		model.addAttribute("addPartNumber");
+
+		model.addAttribute("addPartNumber", true);
+
 		return partNumber(componentBean);
 	}
 }
