@@ -39,7 +39,7 @@
 							<select class="form-control">
 								<option th:each="p:${user.permissions}" th:value="${p}" th:text="${p}"></option>
 							</select>
-							<th:block sec:authorize="hasRole('USER_EDIT','ADMIN')">
+							<th:block sec:authorize="hasRole('USER_EDIT')">
 								<button type="button" class="btn form-success btn-xs permissions" th:value="${user.id}">Edit</button>
 								<script sec:authorize="hasRole('USER_EDIT')" type="text/javascript" th:inline="javascript">
 									$('button.permissions').click(function(){

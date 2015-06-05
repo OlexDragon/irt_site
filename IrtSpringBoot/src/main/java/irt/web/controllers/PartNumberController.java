@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+@RequestMapping("/")
 public class PartNumberController {
 
 	private static final Logger logger = LogManager.getLogger();
@@ -41,7 +43,7 @@ public class PartNumberController {
 		return componentView;
 	}
 
-	@RequestMapping("/")
+	@RequestMapping
 	public String partNumber(final ComponentBean componentBean){
 		logger.entry(componentBean);
 
@@ -120,5 +122,12 @@ public class PartNumberController {
 		model.addAttribute("details", companyRepository.findAll());
 
 		return "fragments/movement :: details";
+	}
+
+	@PreAuthorize("hasRole('PART_NUMBER_EDIT')")
+	@RequestMapping("add-part-number")
+	public String addPartNumber(ComponentBean componentBean, Model model){
+		model.addAttribute("addPartNumber");
+		return partNumber(componentBean);
 	}
 }

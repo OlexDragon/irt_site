@@ -33,27 +33,40 @@ public class UsersController {
 	}
 
 	@PreAuthorize("hasRole('USER')")
-	@RequestMapping({"/","permissions"})
+	@RequestMapping({"","permissions"})
 	public String users() {
 		logger.entry();
 
 		return "management/users";
 	}
 
-	@PreAuthorize("hasRole('USER_EDIT','ADMIN')")
+	@PreAuthorize("hasRole('USER_EDIT')")
 	@RequestMapping(value="permissions", method=RequestMethod.POST)
 	public String usersPermissions(@RequestParam Map<String, Boolean> params, @RequestParam("id") long userId) {
-		logger.entry(userId, params);
 
-		List<Permission> permissions = new ArrayList<>();
-		for(String s:params.keySet()){
-			if(!s.equals("id")){
-				try{
-					Permission p = Permission.valueOf(s);
-					permissions.add(p);
-				}catch(IllegalArgumentException e){
-					logger.catching(e);
+		UsersEntity usersEntity = userRepository.findOne(userId);
+		logger.entry(userId, params, usersEntity);
+
+		if(usersEntity!=null){
+			List<Permission> permissions = new ArrayList<>();
+			for(String s:params.keySet()){
+				if(!s.equals("id")){
+					try{
+						Permission p = Permission.valueOf(s);
+						permissions.add(p);
+					}catch(IllegalArgumentException e){
+						logger.catching(e);
+					}
 				}
+			}
+			long newPermissions = 0;
+			for(Permission p:permissions)
+				newPermissions |= p.toLong();
+
+			if(!usersEntity.getPermission().equals(newPermissions)){
+				usersEntity.setPermission(newPermissions);
+				userRepository.save(usersEntity);
+				logger.info("\n\tpermissions for {} has been chenged to {}", usersEntity.getUsername(), permissions);
 			}
 		}
 

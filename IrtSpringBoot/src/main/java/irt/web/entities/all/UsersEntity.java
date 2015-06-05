@@ -45,14 +45,14 @@ public class UsersEntity implements Serializable {
 		USER_EDIT			(1<<11),//2048),
 		SCHEMATIC_LETTER	(1<<12),//4096),
 		ALT_PART_NUMBER		(1<<13),//8192),
-		EDIT_COST			(1<<14),//16384),
+		COST_EDIT			(1<<14),//16384),
 		DEVICE_TYPE			(1<<15),//32768),
 		SCHEMATIC_PART		(1<<16),//65536),
 		STOCK				(1<<17),//131072),
-		EDIT_COMPANIES		(1<<18),//262144),
+		COMPANIES_EDIT		(1<<18),//262144),
 		USER				(1<<19),//524288),
 		ADMIN				(1<<20),//1048576),
-		EDITING				(1<<21),//2097152),
+		PART_NUMBER_EDIT	(1<<21),//2097152),
 		SELLERS				(1<<22),//4194304),
 		DATABASE			(1<<23);//8388608);
 
