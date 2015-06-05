@@ -5,6 +5,8 @@
  */
 package irt.web.entities.all;
 
+import irt.web.workers.beans.interfaces.ValueText;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -23,15 +25,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "second_and_third_digit", catalog = "irt", schema = "")
 @XmlRootElement
-public class SecondAndThirdDigitEntity implements Serializable {
+public class SecondAndThirdDigitEntity implements Serializable, ValueText {
     private static final long serialVersionUID = 1L;
+
     @EmbeddedId
     protected SecondAndThirdDigitEntityPK secondAndThirdDigitEntityPK;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "description")
     private String description;
+
     @Basic(optional = false)
     @Column(name = "class_id")
     private int classId;
@@ -101,5 +106,15 @@ public class SecondAndThirdDigitEntity implements Serializable {
     public String toString() {
         return "irt.web.entities.SecondAndThirdDigitEntity[ secondAndThirdDigitEntityPK=" + secondAndThirdDigitEntityPK + " ]";
     }
+
+	@Override
+	public String getValue() {
+		return secondAndThirdDigitEntityPK.getId();
+	}
+
+	@Override
+	public String getText() {
+		return description;
+	}
     
 }

@@ -23,10 +23,8 @@
 
 	Content
 
-*/--><div id="content" class="container-fluid" th:remove="${addPartNumber} ? 'all-but-first' : 'none">
-	<script th:if="${addPartNumber}" type="text/javascript">
-		$('#content').load('add-pn-fragment');
-	</script> <!--/*
+*/--><div id="content" class="container-fluid" th:remove="${addPartNumber!=null} ? 'all-but-first' : 'none'">
+<th:block th:if="${addPartNumber!=null}"><form class="form-inline" action="/add-part-number" th:replace="fragments/add-part-number :: add-part-number"></form></th:block><!--/*
 
 	  		Component details
 
@@ -137,6 +135,11 @@
 		</div>
 	<footer class="navbar-fixed-bottom" th:fragment="footer">
 		<a href="mailto:oleksandr@irttechnologies.com"><small>oleksandr@irttechnologies.com</small></a>
-	</footer>
+	</footer><!--/*
+
+
+	BODY END
+
+*/-->
 </body>
 </html>

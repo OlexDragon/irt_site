@@ -9,7 +9,7 @@
     <Loggers>
 <!-- 		<logger name="irt.web.controllers.AutoCompleteController" level="all" /> -->
 		<logger name="irt.web.controllers.BomController" level="info" />
-<!-- 		<logger name="irt.web.controllers.PartNumberController" level="all" /> -->
+		<logger name="irt.web.controllers.PartNumberController" level="all" />
 <!-- 		<logger name="irt.web.controllers.LoginController" level="all" /> -->
 <!-- 		<logger name="irt.web.controllers.LoadComponentsController" level="all" /> -->
 		<logger name="irt.web.controllers.managent.UsersController" level="all" />

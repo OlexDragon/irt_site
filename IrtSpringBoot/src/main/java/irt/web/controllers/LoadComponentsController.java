@@ -1,5 +1,10 @@
 package irt.web.controllers;
 
+import java.util.List;
+
+import irt.web.entities.all.FirstDigitsEntity;
+import irt.web.entities.all.repository.FirstDigitsRepository;
+import irt.web.entities.all.repository.SecondAndThirdDigitRepository;
 import irt.web.entities.component.repositories.PlacesRepository;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +23,7 @@ public class LoadComponentsController {
 
 	@Autowired
 	private PlacesRepository placesRepository;
+
 	@RequestMapping("select")
 	public String  getPlaces(@RequestParam(required=false) String id, @RequestParam(required=false) String classNames, Model model){
 		return getHtmlSelect(id, classNames, placesRepository.findAll(), model);
@@ -29,5 +35,20 @@ public class LoadComponentsController {
 		model.addAttribute("classNames", classNames);
 		model.addAttribute("options", objectToSend);
 		return "fragments/html-components :: select";
+	}
+
+	List<FirstDigitsEntity> firstDigitsEntities;
+	@Autowired
+	private FirstDigitsRepository firstDigitsRepository;
+	@RequestMapping("first-letters")
+	public String  getFirstLetters(@RequestParam(required=false) String id, @RequestParam(required=false) String classNames, Model model){
+		return getHtmlSelect(id, classNames, firstDigitsRepository.findAll(), model);
+	}
+
+	@Autowired
+	private SecondAndThirdDigitRepository secondAndThirdDigitRepository;
+	@RequestMapping("secon-and-third-letters")
+	public String  getSecondAndThirdLetters(@RequestParam int firstLetter, @RequestParam(required=false) String id, @RequestParam(required=false) String classNames, Model model){
+		return getHtmlSelect(id, classNames, firstDigitsRepository.findAll(), model);
 	}
 }

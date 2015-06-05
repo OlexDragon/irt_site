@@ -5,6 +5,8 @@
  */
 package irt.web.entities.all;
 
+import irt.web.workers.beans.interfaces.ValueText;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -25,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "first_digits", catalog = "irt", schema = "")
 @XmlRootElement
-public class FirstDigitsEntity implements Serializable {
+public class FirstDigitsEntity implements Serializable, ValueText {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -103,5 +105,15 @@ public class FirstDigitsEntity implements Serializable {
     public String toString() {
         return "irt.web.entities.FirstDigitsEntity[ idFirstDigits=" + idFirstDigits + " ]";
     }
+
+	@Override
+	public String getValue() {
+		return idFirstDigits.toString();
+	}
+
+	@Override
+	public String getText() {
+		return description;
+	}
     
 }
