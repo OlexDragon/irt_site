@@ -2,25 +2,25 @@
 <Configuration>
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="%n%-5p%n%d [%t] %C{2} %M (%F:%L) - %m%xEx%n" />
+            <PatternLayout pattern="%-5p %d [%t] %C{2} %M (%F:%L) - %m%xEx%n" />
         </Console>
      </Appenders>
 
     <Loggers>
 <!-- 		<logger name="irt.web.controllers.AutoCompleteController" level="all" /> -->
 		<logger name="irt.web.controllers.BomController" level="info" />
-		<logger name="irt.web.controllers.PartNumberController" level="all" />
+<!-- 		<logger name="irt.web.controllers.PartNumberController" level="all" /> -->
 <!-- 		<logger name="irt.web.controllers.LoginController" level="all" /> -->
-<!-- 		<logger name="irt.web.controllers.LoadComponentsController" level="all" /> -->
-		<logger name="irt.web.controllers.managent.UsersController" level="all" />
-		<logger name="irt.web.view.ComponentView" level="all" />
+		<logger name="irt.web.controllers.LoadComponentsController" level="all" />
+<!-- 		<logger name="irt.web.controllers.managent.UsersController" level="all" /> -->
+<!-- 		<logger name="irt.web.view.ComponentView" level="all" /> -->
 <!-- 		<logger name="irt.web.workers.IrtPasswordEncoder" level="all" /> -->
 		<logger name="irt.web.workers.excel.ExcelBuilder" level="info" />
 		<logger name="irt.web.workers.excel.ExcelBuilder" level="info" />
 <!--     	<logger name="irt.web.workers.beans.LoginDetails" level="ALL" /> -->
 <!--     	<logger name="irt.web.workers.beans.IrtUserDetailsServiceImpl" level="ALL" /> -->
 		<logger name="irt.web.workers.beans.bom.FieldPartReference" level="info" />
-        <Root level="info">
+        <Root level="error">
 			<AppenderRef ref="STDOUT" />
          </Root>
     </Loggers>

@@ -13,6 +13,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,6 +28,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "second_and_third_digit", catalog = "irt", schema = "")
 @XmlRootElement
 public class SecondAndThirdDigitEntity implements Serializable, ValueText {
+    @JoinColumn(name = "id_first_digits", referencedColumnName = "id_first_digits", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private FirstDigitsEntity firstDigitsEntity;
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
@@ -116,5 +121,13 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
 	public String getText() {
 		return description;
 	}
+
+    public FirstDigitsEntity getFirstDigitsEntity() {
+        return firstDigitsEntity;
+    }
+
+    public void setFirstDigitsEntity(FirstDigitsEntity firstDigitsEntity) {
+        this.firstDigitsEntity = firstDigitsEntity;
+    }
     
 }

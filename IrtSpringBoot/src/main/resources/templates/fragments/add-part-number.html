@@ -6,27 +6,37 @@
 <link rel="stylesheet" type="text/css" href="../../static/css/jk.css" th:href="@{/css/jk.css}"></link>
 </head>
 <body>
+<!--/*
+
+		
+
+*/-->
 	<form class="form-inline" action="/add-part-number" th:fragment="add-part-number">
 		<div id="add-pn" class="form-group">
 		</div>
 		<script type="text/javascript">
 			$('#add-pn').load('/load/first-letters',{id:'firstLetter'}, function(){
 				$('#firstLetter').on('change', function(){
-					var parent = $(this).parent();
-					parent.find('*').not('#firstLetter').remove();
+					$('#add-pn').children().not(':first').remove();
 					if($(this).val()){
-						$.get('/load/secon-and-third-letters',{firstLetter: $(this).val(), id: "secondLetter"}, function(data){
-							parent.append(data);
+						$.get('/load/secon-and-third-letters',{firstLetter: $(this).val(), id: "secondLetters"}, function(data){
+							$('#add-pn').append(data);
+							$('#secondLetters').on('change', function(){
+								$('#add-pn').children().not(':first').not(':first').remove();
+								var secondLetters = $('#secondLetters').val()
+								if(secondLetters){
+									$.get('/load/part-number-details', {firstLetter: $('#firstLetter').val(), secondLetters: secondLetters});
+								}
+							});
 						});
 					}
 				});
 			});
 		</script>
 	</form>
-<!--/*
 
-	****	END OF BODY		****
 
-*/-->
+	<div class="container-fluid">
+	</div>
 </body>
 </html>
