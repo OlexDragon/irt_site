@@ -82,8 +82,8 @@ public class ArrayEntityPK implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "irt.web.entities.ArrayEntityPK[ name=" + name + ", id=" + id + " ]";
-    }
+	public String toString() {
+		return "ArrayEntityPK [id=" + id + ", name=" + name + "]";
+	}
 
 }

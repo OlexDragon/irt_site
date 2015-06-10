@@ -14,6 +14,8 @@
 	<form class="form-inline" action="/add-part-number" th:fragment="add-part-number">
 		<div id="add-pn" class="form-group">
 		</div>
+		<div id="pn-details" class="form-group">
+		</div>
 		<script type="text/javascript">
 			$('#add-pn').load('/load/first-letters',{id:'firstLetter'}, function(){
 				$('#firstLetter').on('change', function(){
@@ -25,7 +27,7 @@
 								$('#add-pn').children().not(':first').not(':first').remove();
 								var secondLetters = $('#secondLetters').val()
 								if(secondLetters){
-									$.get('/load/part-number-details', {firstLetter: $('#firstLetter').val(), secondLetters: secondLetters});
+									$('#pn-details').load('/load/part-number-details', {firstLetter: $('#firstLetter').val(), secondLetters: secondLetters});
 								}
 							});
 						});
@@ -35,8 +37,11 @@
 		</script>
 	</form>
 
-
-	<div class="container-fluid">
-	</div>
+<!-- Add New Part Number Details -->
+	<th:block th:each="arr:${arrayEntities}" th:switch="${arr.description}" th:fragment="pn-details">
+		<input th:case="'text'" type="text" class="form-control" th:placeholder="${arr.arrayEntityPK.id}" ></input>
+		<select th:case="'select'" class="form-control" th:title="${arr.arrayEntityPK.id}"></select>
+		<label th:case="'label'" class="control-label" th:text="${arr.arrayEntityPK.id}">Label</label>
+	</th:block>
 </body>
 </html>

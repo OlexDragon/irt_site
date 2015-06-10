@@ -32,23 +32,27 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "first_digits", catalog = "irt", schema = "")
 @XmlRootElement
 public class FirstDigitsEntity implements Serializable, ValueText {
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "firstDigitsEntity")
-    private Collection<SecondAndThirdDigitEntity> secondAndThirdDigitEntityCollection;
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_first_digits")
     private Integer idFirstDigits;
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "part_numbet_first_char")
     private Character partNumbetFirstChar;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "description")
     private String description;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "firstDigitsEntity")
+    private Collection<SecondAndThirdDigitEntity> secondAndThirdDigitEntityCollection;
 
     public FirstDigitsEntity() {
     }
@@ -107,11 +111,6 @@ public class FirstDigitsEntity implements Serializable, ValueText {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "irt.web.entities.FirstDigitsEntity[ idFirstDigits=" + idFirstDigits + " ]";
-    }
-
 	@Override
 	public String getValue() {
 		return idFirstDigits.toString();
@@ -130,5 +129,13 @@ public class FirstDigitsEntity implements Serializable, ValueText {
     public void setSecondAndThirdDigitEntityCollection(Collection<SecondAndThirdDigitEntity> secondAndThirdDigitEntityCollection) {
         this.secondAndThirdDigitEntityCollection = secondAndThirdDigitEntityCollection;
     }
-    
+
+    @Override
+	public String toString() {
+		return "FirstDigitsEntity [idFirstDigits=" + idFirstDigits
+				+ ", partNumbetFirstChar=" + partNumbetFirstChar
+				+ ", description=" + description
+				+ ", secondAndThirdDigitEntityCollection="
+				+ secondAndThirdDigitEntityCollection + "]";
+	}
 }
