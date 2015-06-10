@@ -13,12 +13,17 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 /**
  *
@@ -28,9 +33,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "second_and_third_digit", catalog = "irt", schema = "")
 @XmlRootElement
 public class SecondAndThirdDigitEntity implements Serializable, ValueText {
-    @JoinColumn(name = "id_first_digits", referencedColumnName = "id_first_digits", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private FirstDigitsEntity firstDigitsEntity;
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
@@ -42,21 +44,20 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
     @Column(name = "description")
     private String description;
 
-    @Basic(optional = false)
-    @Column(name = "class_id")
-    private int classId;
+    @JoinColumn(name = "id_first_digits", referencedColumnName = "id_first_digits", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private FirstDigitsEntity firstDigitsEntity;
+
+    @JoinColumn(name = "class_id", referencedColumnName = "class_id")
+    @OneToOne(optional = true, fetch=FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private ClassIdHasArrayEntity classIdHasArrayEntity;
 
     public SecondAndThirdDigitEntity() {
     }
 
     public SecondAndThirdDigitEntity(SecondAndThirdDigitEntityPK secondAndThirdDigitEntityPK) {
         this.secondAndThirdDigitEntityPK = secondAndThirdDigitEntityPK;
-    }
-
-    public SecondAndThirdDigitEntity(SecondAndThirdDigitEntityPK secondAndThirdDigitEntityPK, String description, int classId) {
-        this.secondAndThirdDigitEntityPK = secondAndThirdDigitEntityPK;
-        this.description = description;
-        this.classId = classId;
     }
 
     public SecondAndThirdDigitEntity(String id, int idFirstDigits) {
@@ -79,14 +80,6 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
         this.description = description;
     }
 
-    public int getClassId() {
-        return classId;
-    }
-
-    public void setClassId(int classId) {
-        this.classId = classId;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -107,9 +100,20 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "irt.web.entities.SecondAndThirdDigitEntity[ secondAndThirdDigitEntityPK=" + secondAndThirdDigitEntityPK + " ]";
+    public FirstDigitsEntity getFirstDigitsEntity() {
+        return firstDigitsEntity;
+    }
+
+    public void setFirstDigitsEntity(FirstDigitsEntity firstDigitsEntity) {
+        this.firstDigitsEntity = firstDigitsEntity;
+    }    
+
+    public ClassIdHasArrayEntity getClassIdHasArrayEntity() {
+        return classIdHasArrayEntity;
+    }
+
+    public void setClassIdHasArrayEntity(ClassIdHasArrayEntity classIdHasArrayEntity) {
+        this.classIdHasArrayEntity = classIdHasArrayEntity;
     }
 
 	@Override
@@ -122,12 +126,10 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
 		return description;
 	}
 
-    public FirstDigitsEntity getFirstDigitsEntity() {
-        return firstDigitsEntity;
-    }
-
-    public void setFirstDigitsEntity(FirstDigitsEntity firstDigitsEntity) {
-        this.firstDigitsEntity = firstDigitsEntity;
-    }
-    
+    @Override
+	public String toString() {
+		return "SecondAndThirdDigitEntity [secondAndThirdDigitEntityPK="
+				+ secondAndThirdDigitEntityPK + ", description=" + description
+				+ ", classIdHasArrayEntity=" + classIdHasArrayEntity + "]";
+	}
 }

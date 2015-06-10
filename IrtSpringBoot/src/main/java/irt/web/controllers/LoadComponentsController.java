@@ -1,11 +1,16 @@
 package irt.web.controllers;
 
-import java.util.List;
-
+import irt.web.entities.all.ArrayEntity;
 import irt.web.entities.all.FirstDigitsEntity;
+import irt.web.entities.all.SecondAndThirdDigitEntity;
+import irt.web.entities.all.SecondAndThirdDigitEntityPK;
 import irt.web.entities.all.repository.FirstDigitsRepository;
 import irt.web.entities.all.repository.SecondAndThirdDigitRepository;
 import irt.web.entities.component.repositories.PlacesRepository;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,8 +63,31 @@ public class LoadComponentsController {
 	public String getPartNumberDetails(@RequestParam Integer firstLetter, @RequestParam String secondLetters, Model model){
 		logger.entry(firstLetter, secondLetters);
 
-		
+		SecondAndThirdDigitEntity secondAndThirdDigitEntity = secondAndThirdDigitRepository.findOne(new SecondAndThirdDigitEntityPK(secondLetters, firstLetter));
+		if(secondAndThirdDigitEntity == null || secondAndThirdDigitEntity.getClassIdHasArrayEntity()==null){
+			logger.error("\n\tHave to add relation to  'ClassIdHasArrayEntity' with  firstLetterId='{}' and secondLetters='{}'\n\tsecondAndThirdDigitEntity={}", firstLetter, secondLetters, secondAndThirdDigitEntity);
+			return null;
+		}
 
-		return "fragments/html-components :: select";
+		model.addAttribute("arrayEntities", getHtmlFieldsArray(secondAndThirdDigitEntity));
+
+		return "fragments/add-part-number :: pn-details";
+	}
+
+	private List<ArrayEntity> getHtmlFieldsArray(
+			SecondAndThirdDigitEntity secondAndThirdDigitEntity) {
+		List<ArrayEntity> arrayEntities = secondAndThirdDigitEntity.getClassIdHasArrayEntity().getArrayEntityList();
+		for(ArrayEntity ae:arrayEntities){
+			String text = ae.getArrayEntityPK().getId();
+			int i = text.indexOf("<");
+			if(i>=0) ae.getArrayEntityPK().setId(text.substring(text.indexOf(">")+1));
+		}
+		Collections.sort(arrayEntities, new Comparator<ArrayEntity>() {
+			@Override
+			public int compare(ArrayEntity o1, ArrayEntity o2) {
+				return o1.getSequence().compareTo(o2.getSequence());
+			}
+		});
+		return arrayEntities;
 	}
 }

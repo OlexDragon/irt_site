@@ -29,12 +29,12 @@ public class SecondAndThirdDigitEntityPK implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "id_first_digits")
-    private int idFirstDigits;
+    private Integer idFirstDigits;
 
     public SecondAndThirdDigitEntityPK() {
     }
 
-    public SecondAndThirdDigitEntityPK(String id, int idFirstDigits) {
+    public SecondAndThirdDigitEntityPK(String id, Integer idFirstDigits) {
         this.id = id;
         this.idFirstDigits = idFirstDigits;
     }
@@ -47,11 +47,11 @@ public class SecondAndThirdDigitEntityPK implements Serializable {
         this.id = id;
     }
 
-    public int getIdFirstDigits() {
+    public Integer getIdFirstDigits() {
         return idFirstDigits;
     }
 
-    public void setIdFirstDigits(int idFirstDigits) {
+    public void setIdFirstDigits(Integer idFirstDigits) {
         this.idFirstDigits = idFirstDigits;
     }
 
@@ -80,8 +80,9 @@ public class SecondAndThirdDigitEntityPK implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "irt.web.entities.SecondAndThirdDigitEntityPK[ id=" + id + ", idFirstDigits=" + idFirstDigits + " ]";
-    }
+	public String toString() {
+		return "SecondAndThirdDigitEntityPK [id=" + id + ", idFirstDigits="
+				+ idFirstDigits + "]";
+	}
     
 }

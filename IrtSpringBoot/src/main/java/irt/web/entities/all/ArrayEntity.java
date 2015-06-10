@@ -11,6 +11,9 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -25,16 +28,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class ArrayEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @EmbeddedId
     protected ArrayEntityPK arrayEntityPK;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "description")
     private String description;
+
     @Column(name = "sequence")
     private Short sequence;
 
+	@JoinColumn(name = "name", referencedColumnName = "name", insertable = false, updatable = false)
+    @ManyToOne(optional = true, fetch=FetchType.LAZY)
+    private ClassIdHasArrayEntity classIdHasArrayEntity;
+ 
     public ArrayEntity() {
     }
 
@@ -75,6 +85,14 @@ public class ArrayEntity implements Serializable {
         this.sequence = sequence;
     }
 
+    public ClassIdHasArrayEntity getClassIdHasArrayEntity() {
+        return classIdHasArrayEntity;
+    }
+
+    public void setClassIdHasArrayEntity(ClassIdHasArrayEntity classIdHasArrayEntity) {
+        this.classIdHasArrayEntity = classIdHasArrayEntity;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -96,8 +114,8 @@ public class ArrayEntity implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "irt.web.entities.ArrayEntity[ arrayEntityPK=" + arrayEntityPK + " ]";
-    }
-    
+	public String toString() {
+		return "ArrayEntity [arrayEntityPK=" + arrayEntityPK + ", description="
+				+ description + ", sequence=" + sequence + "]";
+	}
 }
