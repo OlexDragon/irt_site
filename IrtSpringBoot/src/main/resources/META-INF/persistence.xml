@@ -40,6 +40,9 @@
     <class>irt.web.entities.all.HistoryDetailEntity</class>
     <class>irt.web.entities.component.PlaceEntity</class>
     <class>irt.web.entities.all.Companies</class>
+    <class>irt.web.entities.all.HtmOptions</class>
+    <class>irt.web.entities.all.HtmlOptionsView</class>
+    <class>irt.web.entities.all.PartNumberDetailsView</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/irt?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.password" value="vsat"/>

@@ -3,29 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package irt.web.entities.component;
+package irt.web.entities.part_number;
 
 import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Oleksandr
  */
-@Entity
-@Table(name = "manufacture", catalog = "irt", schema = "")
-@XmlRootElement
-public class ManufactureEntity implements Serializable {
+@Embeddable
+public class SecondAndThirdDigitPK implements Serializable {
     private static final long serialVersionUID = 1L;
-    @Id
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 2)
@@ -34,24 +29,15 @@ public class ManufactureEntity implements Serializable {
 
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 45)
-    @Column(name = "name")
-    private String name;
+    @Column(name = "id_first_digits")
+    private Integer idFirstDigit;
 
-    @Size(max = 100)
-    @Column(name = "link")
-    private String link;
-
-    public ManufactureEntity() {
+    public SecondAndThirdDigitPK() {
     }
 
-    public ManufactureEntity(String id) {
+    public SecondAndThirdDigitPK(String id, Integer idFirstDigits) {
         this.id = id;
-    }
-
-    public ManufactureEntity(String id, String name) {
-        this.id = id;
-        this.name = name;
+        this.idFirstDigit = idFirstDigits;
     }
 
     public String getId() {
@@ -62,45 +48,42 @@ public class ManufactureEntity implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Integer getIdFirstDigit() {
+        return idFirstDigit;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
+    public void setIdFirstDigit(Integer idFirstDigits) {
+        this.idFirstDigit = idFirstDigits;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
+        hash += (int) idFirstDigit;
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ManufactureEntity)) {
+        if (!(object instanceof SecondAndThirdDigitPK)) {
             return false;
         }
-        ManufactureEntity other = (ManufactureEntity) object;
+        SecondAndThirdDigitPK other = (SecondAndThirdDigitPK) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        if (this.idFirstDigit != other.idFirstDigit) {
             return false;
         }
         return true;
     }
 
-	@Override
+    @Override
 	public String toString() {
-		return "\n\tManufactureEntity [\n\t\tid=" + id + ",\n\t\tname=" + name + ",\n\t\tlink="
-				+ link + "]";
+		return "SecondAndThirdDigitEntityPK [id=" + id + ", idFirstDigits="
+				+ idFirstDigit + "]";
 	}
+    
 }

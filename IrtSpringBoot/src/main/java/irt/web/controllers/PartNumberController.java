@@ -1,10 +1,10 @@
 package irt.web.controllers;
 
-import irt.web.entities.all.repository.SecondAndThirdDigitRepository;
 import irt.web.entities.company.CompanyEntity;
 import irt.web.entities.company.repositories.CompanyRepository;
 import irt.web.entities.component.PlaceEntity;
 import irt.web.entities.component.repositories.PlacesRepository;
+import irt.web.entities.part_number.repository.SecondAndThirdDigitRepository;
 import irt.web.view.ComponentMovementView;
 import irt.web.view.ComponentView;
 import irt.web.view.beans.ComponentBean;

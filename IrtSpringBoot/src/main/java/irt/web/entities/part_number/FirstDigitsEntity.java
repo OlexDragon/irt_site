@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package irt.web.entities.all;
+package irt.web.entities.part_number;
 
 import irt.web.workers.beans.interfaces.ValueText;
 
@@ -24,6 +24,8 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  *
  * @author Oleksandr
@@ -38,7 +40,7 @@ public class FirstDigitsEntity implements Serializable, ValueText {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_first_digits")
-    private Integer idFirstDigits;
+    private Integer firstDigitsId;
 
     @Basic(optional = false)
     @NotNull
@@ -51,6 +53,7 @@ public class FirstDigitsEntity implements Serializable, ValueText {
     @Column(name = "description")
     private String description;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "firstDigitsEntity")
     private Collection<SecondAndThirdDigitEntity> secondAndThirdDigitEntityCollection;
 
@@ -58,21 +61,21 @@ public class FirstDigitsEntity implements Serializable, ValueText {
     }
 
     public FirstDigitsEntity(Integer idFirstDigits) {
-        this.idFirstDigits = idFirstDigits;
+        this.firstDigitsId = idFirstDigits;
     }
 
     public FirstDigitsEntity(Integer idFirstDigits, Character partNumbetFirstChar, String description) {
-        this.idFirstDigits = idFirstDigits;
+        this.firstDigitsId = idFirstDigits;
         this.partNumbetFirstChar = partNumbetFirstChar;
         this.description = description;
     }
 
-    public Integer getIdFirstDigits() {
-        return idFirstDigits;
+    public Integer getFirstDigitId() {
+        return firstDigitsId;
     }
 
-    public void setIdFirstDigits(Integer idFirstDigits) {
-        this.idFirstDigits = idFirstDigits;
+    public void setFirstDigitsId(Integer idFirstDigits) {
+        this.firstDigitsId = idFirstDigits;
     }
 
     public Character getPartNumbetFirstChar() {
@@ -94,7 +97,7 @@ public class FirstDigitsEntity implements Serializable, ValueText {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (idFirstDigits != null ? idFirstDigits.hashCode() : 0);
+        hash += (firstDigitsId != null ? firstDigitsId.hashCode() : 0);
         return hash;
     }
 
@@ -105,7 +108,7 @@ public class FirstDigitsEntity implements Serializable, ValueText {
             return false;
         }
         FirstDigitsEntity other = (FirstDigitsEntity) object;
-        if ((this.idFirstDigits == null && other.idFirstDigits != null) || (this.idFirstDigits != null && !this.idFirstDigits.equals(other.idFirstDigits))) {
+        if ((this.firstDigitsId == null && other.firstDigitsId != null) || (this.firstDigitsId != null && !this.firstDigitsId.equals(other.firstDigitsId))) {
             return false;
         }
         return true;
@@ -113,7 +116,7 @@ public class FirstDigitsEntity implements Serializable, ValueText {
 
 	@Override
 	public String getValue() {
-		return idFirstDigits.toString();
+		return firstDigitsId.toString();
 	}
 
 	@Override
@@ -132,7 +135,7 @@ public class FirstDigitsEntity implements Serializable, ValueText {
 
     @Override
 	public String toString() {
-		return "FirstDigitsEntity [idFirstDigits=" + idFirstDigits
+		return "\n\tFirstDigitsEntity [idFirstDigits=" + firstDigitsId
 				+ ", partNumbetFirstChar=" + partNumbetFirstChar
 				+ ", description=" + description
 				+ ", secondAndThirdDigitEntityCollection="

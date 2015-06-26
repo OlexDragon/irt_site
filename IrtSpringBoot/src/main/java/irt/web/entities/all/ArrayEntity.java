@@ -30,7 +30,7 @@ public class ArrayEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    protected ArrayEntityPK arrayEntityPK;
+    protected ArrayEntityPK key;
 
     @Basic(optional = false)
     @NotNull
@@ -43,30 +43,30 @@ public class ArrayEntity implements Serializable {
 
 	@JoinColumn(name = "name", referencedColumnName = "name", insertable = false, updatable = false)
     @ManyToOne(optional = true, fetch=FetchType.LAZY)
-    private ClassIdHasArrayEntity classIdHasArrayEntity;
+    private ClassIdHasArrayEntity hasArrayEntity;
  
     public ArrayEntity() {
     }
 
     public ArrayEntity(ArrayEntityPK arrayEntityPK) {
-        this.arrayEntityPK = arrayEntityPK;
+    	key = arrayEntityPK;
     }
 
     public ArrayEntity(ArrayEntityPK arrayEntityPK, String description) {
-        this.arrayEntityPK = arrayEntityPK;
+    	key = arrayEntityPK;
         this.description = description;
     }
 
     public ArrayEntity(String name, String id) {
-        this.arrayEntityPK = new ArrayEntityPK(name, id);
+    	key = new ArrayEntityPK(name, id);
     }
 
-    public ArrayEntityPK getArrayEntityPK() {
-        return arrayEntityPK;
+    public ArrayEntityPK getKey() {
+        return key;
     }
 
-    public void setArrayEntityPK(ArrayEntityPK arrayEntityPK) {
-        this.arrayEntityPK = arrayEntityPK;
+    public void setKey(ArrayEntityPK arrayEntityPK) {
+    	key = arrayEntityPK;
     }
 
     public String getDescription() {
@@ -85,37 +85,27 @@ public class ArrayEntity implements Serializable {
         this.sequence = sequence;
     }
 
-    public ClassIdHasArrayEntity getClassIdHasArrayEntity() {
-        return classIdHasArrayEntity;
+    public ClassIdHasArrayEntity getHasArrayEntity() {
+        return hasArrayEntity;
     }
 
-    public void setClassIdHasArrayEntity(ClassIdHasArrayEntity classIdHasArrayEntity) {
-        this.classIdHasArrayEntity = classIdHasArrayEntity;
+    public void setHasArrayEntity(ClassIdHasArrayEntity classIdHasArrayEntity) {
+        this.hasArrayEntity = classIdHasArrayEntity;
     }
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (arrayEntityPK != null ? arrayEntityPK.hashCode() : 0);
-        return hash;
+        return key != null ? key.hashCode() : 0;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ArrayEntity)) {
-            return false;
-        }
-        ArrayEntity other = (ArrayEntity) object;
-        if ((this.arrayEntityPK == null && other.arrayEntityPK != null) || (this.arrayEntityPK != null && !this.arrayEntityPK.equals(other.arrayEntityPK))) {
-            return false;
-        }
-        return true;
+        return object instanceof ArrayEntity ? object.hashCode() == hashCode() : false;
     }
 
     @Override
 	public String toString() {
-		return "ArrayEntity [arrayEntityPK=" + arrayEntityPK + ", description="
+		return "\n\tArrayEntity [key=" + key + ", description="
 				+ description + ", sequence=" + sequence + "]";
 	}
 }

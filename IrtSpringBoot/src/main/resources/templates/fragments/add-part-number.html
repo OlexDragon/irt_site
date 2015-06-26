@@ -3,7 +3,7 @@
 	xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>Menu</title>
-<link rel="stylesheet" type="text/css" href="../../static/css/jk.css" th:href="@{/css/jk.css}"></link>
+<link rel="stylesheet" type="text/css" href="../../static/css/irt.css" th:href="@{/css/irt.css}"></link>
 </head>
 <body>
 <!--/*
@@ -11,37 +11,110 @@
 		
 
 */-->
-	<form class="form-inline" action="/add-part-number" th:fragment="add-part-number">
-		<div id="add-pn" class="form-group">
-		</div>
-		<div id="pn-details" class="form-group">
-		</div>
-		<script type="text/javascript">
-			$('#add-pn').load('/load/first-letters',{id:'firstLetter'}, function(){
+	<form class="form-inline" action="/add-part-number" th:fragment="add-part-number"><!--/*
+
+
+	"firstLetters" used for first three part number letters
+
+*/-->	<div id="firstLetters" class="form-group">
+		</div><!--/*
+
+
+	"pn-details" used to set part number details
+
+*/-->	<div id="pn-details" class="form-group">
+		</div><!--/*
+
+
+	Part Number
+
+*/-->	<h2 id="pn">
+		</h2><!--/*
+
+
+	Script
+
+*/-->	<script type="text/javascript">
+//	Load First Letter selection
+			$('#firstLetters').load('/load/first-letter',{id:'firstLetter'}, function(){
+//	On change First Letter 
 				$('#firstLetter').on('change', function(){
-					$('#add-pn').children().not(':first').remove();
+					$('#firstLetters').children().not(':first').remove();
+					$('#pn-details').empty();
 					if($(this).val()){
+// if selected First Letter load Second and Third letters
 						$.get('/load/secon-and-third-letters',{firstLetter: $(this).val(), id: "secondLetters"}, function(data){
-							$('#add-pn').append(data);
+							$('#firstLetters').append(data);
 							$('#secondLetters').on('change', function(){
-								$('#add-pn').children().not(':first').not(':first').remove();
+								$('#firstLetters').children().not(':first').not(':first').remove();
 								var secondLetters = $('#secondLetters').val()
 								if(secondLetters){
+//	if selected Second and Third letters load Details
 									$('#pn-details').load('/load/part-number-details', {firstLetter: $('#firstLetter').val(), secondLetters: secondLetters});
 								}
+//	Chenge Part Number Second and Therd Letters
+								$('#pn').text( $('#pn').text().substring(0,1) + $('#secondLetters').val());
 							});
 						});
 					}
+//	Chenge Part Number First Letter
+					var val = $('#firstLetter').val();
+					if(val){
+						$.get('/load/first-digit?id=' + val, function(data){
+							$('#pn').text(data.partNumbetFirstChar);
+						});
+					}else{
+						$('#pn').empty();
+					};
 				});
 			});
 		</script>
 	</form>
 
 <!-- Add New Part Number Details -->
-	<th:block th:each="arr:${arrayEntities}" th:switch="${arr.description}" th:fragment="pn-details">
-		<input th:case="'text'" type="text" class="form-control" th:placeholder="${arr.arrayEntityPK.id}" ></input>
-		<select th:case="'select'" class="form-control" th:title="${arr.arrayEntityPK.id}"></select>
-		<label th:case="'label'" class="control-label" th:text="${arr.arrayEntityPK.id}">Label</label>
+	<th:block th:fragment="pn-details">
+	<th:block th:each="arr:${arrayEntities}" th:switch="${arr.description}" >
+		<th:block th:case="'text'" >
+			<input type="text" th:id="${arr.sequence}" class="form-control" th:placeholder="${arr.key.id}" th:title="${arr.key.id}"></input>
+		</th:block>
+
+		<th:block th:case="'select'">
+			<select th:id="${arr.sequence}" class="form-control" th:title="${arr.key.id}"></select>
+			<script type="text/javascript" th:inline="javascript">
+			/*<![CDATA[*/
+				var arrSequence = [[${arr.sequence}]];
+				var $select = $(document.getElementById(arrSequence));
+				$select.load('/load/pn-options', {classId: [[${classId}]] , arraySequence: arrSequence, title: [[${arr.key.id}]]});
+			/*]]>*/
+			</script>
+		</th:block>
+
+		<label th:case="'label'" class="control-label" th:id="${arr.key.id}" th:text="${arr.key.id}">Label</label>
+	</th:block>
+		<script type="text/javascript">
+		/*<![CDATA[*/
+//losd Part Number to $('#pn')
+			$('select').on('change', function(){
+				$.get('/load/part-number', {
+									sequence: $(this).attr('id'),
+									detailId: $(this).val(),
+									pn:$('#pn').text()},
+						function(pn){
+							$('#pn').text(pn);
+				});
+			});
+			$('input').on('input', function(){
+				$.get('/load/part-number/input', {
+					sequence: $(this).attr('id'),
+					detailId: $(this).val(),
+					pn:$('#pn').text(),
+					seqN:$('#SeqN').text()!=null},
+						function(pn){
+							$('#pn').text(pn);
+				});
+			});
+		/*]]>*/
+		</script>
 	</th:block>
 </body>
 </html>
