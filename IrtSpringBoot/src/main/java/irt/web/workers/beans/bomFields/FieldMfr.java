@@ -1,7 +1,7 @@
 package irt.web.workers.beans.bomFields;
 
+import irt.web.entities.all.ManufactureEntity;
 import irt.web.entities.bom.BomEntity;
-import irt.web.entities.component.ManufactureEntity;
 import irt.web.workers.beans.interfaces.BOMEntityFieldToString;
 
 public class FieldMfr implements BOMEntityFieldToString {

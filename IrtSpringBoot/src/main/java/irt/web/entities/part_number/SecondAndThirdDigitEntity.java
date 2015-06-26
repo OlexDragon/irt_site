@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package irt.web.entities.all;
+package irt.web.entities.part_number;
 
+import irt.web.entities.all.ClassIdHasArrayEntity;
 import irt.web.workers.beans.interfaces.ValueText;
 
 import java.io.Serializable;
@@ -36,7 +37,7 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    protected SecondAndThirdDigitEntityPK secondAndThirdDigitEntityPK;
+    protected SecondAndThirdDigitPK key;
 
     @Basic(optional = false)
     @NotNull
@@ -51,25 +52,25 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
     @JoinColumn(name = "class_id", referencedColumnName = "class_id")
     @OneToOne(optional = true, fetch=FetchType.EAGER)
     @NotFound(action = NotFoundAction.IGNORE)
-    private ClassIdHasArrayEntity classIdHasArrayEntity;
+    private ClassIdHasArrayEntity hasArrayEntity;
 
     public SecondAndThirdDigitEntity() {
     }
 
-    public SecondAndThirdDigitEntity(SecondAndThirdDigitEntityPK secondAndThirdDigitEntityPK) {
-        this.secondAndThirdDigitEntityPK = secondAndThirdDigitEntityPK;
+    public SecondAndThirdDigitEntity(SecondAndThirdDigitPK secondAndThirdDigitEntityPK) {
+        this.key = secondAndThirdDigitEntityPK;
     }
 
     public SecondAndThirdDigitEntity(String id, int idFirstDigits) {
-        this.secondAndThirdDigitEntityPK = new SecondAndThirdDigitEntityPK(id, idFirstDigits);
+        this.key = new SecondAndThirdDigitPK(id, idFirstDigits);
     }
 
-    public SecondAndThirdDigitEntityPK getSecondAndThirdDigitEntityPK() {
-        return secondAndThirdDigitEntityPK;
+    public SecondAndThirdDigitPK getKet() {
+        return key;
     }
 
-    public void setSecondAndThirdDigitEntityPK(SecondAndThirdDigitEntityPK secondAndThirdDigitEntityPK) {
-        this.secondAndThirdDigitEntityPK = secondAndThirdDigitEntityPK;
+    public void setKey(SecondAndThirdDigitPK secondAndThirdDigitEntityPK) {
+        this.key = secondAndThirdDigitEntityPK;
     }
 
     public String getDescription() {
@@ -83,7 +84,7 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (secondAndThirdDigitEntityPK != null ? secondAndThirdDigitEntityPK.hashCode() : 0);
+        hash += (key != null ? key.hashCode() : 0);
         return hash;
     }
 
@@ -94,7 +95,7 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
             return false;
         }
         SecondAndThirdDigitEntity other = (SecondAndThirdDigitEntity) object;
-        if ((this.secondAndThirdDigitEntityPK == null && other.secondAndThirdDigitEntityPK != null) || (this.secondAndThirdDigitEntityPK != null && !this.secondAndThirdDigitEntityPK.equals(other.secondAndThirdDigitEntityPK))) {
+        if ((this.key == null && other.key != null) || (this.key != null && !this.key.equals(other.key))) {
             return false;
         }
         return true;
@@ -108,17 +109,17 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
         this.firstDigitsEntity = firstDigitsEntity;
     }    
 
-    public ClassIdHasArrayEntity getClassIdHasArrayEntity() {
-        return classIdHasArrayEntity;
+    public ClassIdHasArrayEntity getHasArrayEntity() {
+        return hasArrayEntity;
     }
 
-    public void setClassIdHasArrayEntity(ClassIdHasArrayEntity classIdHasArrayEntity) {
-        this.classIdHasArrayEntity = classIdHasArrayEntity;
+    public void setHasArrayEntity(ClassIdHasArrayEntity classIdHasArrayEntity) {
+        this.hasArrayEntity = classIdHasArrayEntity;
     }
 
 	@Override
 	public String getValue() {
-		return secondAndThirdDigitEntityPK.getId();
+		return key.getId();
 	}
 
 	@Override
@@ -128,8 +129,8 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
 
     @Override
 	public String toString() {
-		return "SecondAndThirdDigitEntity [secondAndThirdDigitEntityPK="
-				+ secondAndThirdDigitEntityPK + ", description=" + description
-				+ ", classIdHasArrayEntity=" + classIdHasArrayEntity + "]";
+		return "\n\tSecondAndThirdDigitEntity [key="
+				+ key + ", description=" + description
+				+ ", classIdHasArrayEntity=" + hasArrayEntity + "]";
 	}
 }

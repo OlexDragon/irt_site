@@ -25,8 +25,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class CostEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @EmbeddedId
     protected CostEntityPK costEntityPK;
+
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull

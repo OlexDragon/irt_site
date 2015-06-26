@@ -9,8 +9,10 @@
 </head>
 <body>
 	<select th:id="${id}" class="form-control" th:classappend="${classNames}" required="required" th:fragment="select">
-		<option>Select</option>
+	<th:block th:fragment="options">
+		<option th:text="${title!=null ? '--- ' + title + ' ---' : 'Select'}" value="">Select</option>
 		<option th:each="option:${options}" th:value="${option.value}" th:text="${option.text}">Options</option>
+	</th:block>
 	</select>
 </body>
 </html>

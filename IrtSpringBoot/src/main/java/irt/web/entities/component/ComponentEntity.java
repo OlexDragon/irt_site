@@ -5,6 +5,8 @@
  */
 package irt.web.entities.component;
 
+import irt.web.entities.all.ManufactureEntity;
+
 import java.io.Serializable;
 import java.util.List;
 

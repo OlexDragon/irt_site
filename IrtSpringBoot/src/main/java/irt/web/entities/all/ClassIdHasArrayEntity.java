@@ -5,8 +5,12 @@
  */
 package irt.web.entities.all;
 
+import irt.web.entities.part_number.HtmlOptionEntity;
+import irt.web.entities.part_number.SecondAndThirdDigitEntity;
+
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -46,11 +50,14 @@ public class ClassIdHasArrayEntity implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "classIdHasArrayEntity")
+    @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "hasArrayEntity")
     private SecondAndThirdDigitEntity secondAndThirdDigitEntity;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "classIdHasArrayEntity")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "hasArrayEntity")
     private List<ArrayEntity> arrayEntityList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "hasArrayEntity")
+    private List<HtmlOptionEntity> htmOptionsList;
 
     public ClassIdHasArrayEntity() {
     }
@@ -117,10 +124,19 @@ public class ClassIdHasArrayEntity implements Serializable {
         return true;
     }
 
+
+    @XmlTransient
+    public List<HtmlOptionEntity> getHtmOptionsList() {
+        return htmOptionsList;
+    }
+
+    public void setHtmOptionsList(List<HtmlOptionEntity> htmOptionsList) {
+        this.htmOptionsList = htmOptionsList;
+    }
+
     @Override
 	public String toString() {
-		return "ClassIdHasArrayEntity [classId=" + classId + ", name=" + name
+		return "\n\tClassIdHasArrayEntity [classId=" + classId + ", name=" + name
 				+ ", arrayEntityList=" + arrayEntityList + "]";
 	}
-    
 }
