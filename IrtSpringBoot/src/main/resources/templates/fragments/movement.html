@@ -31,7 +31,7 @@
 	}
 	function placeChangeAction(tag){
 		selectedTag = $(this);
-		$.get('/movement/palce-change', {name: $(this).parent().attr('id'), id: $(this).val()}, function(data){setPlaceDetails(data});
+		$.get('/movement/palce-change', {name: $(this).parent().attr('id'), id: $(this).val()}, function(data){setPlaceDetails(data}));
 	}
 	function setPlaceDetails(data){
 		selectedTag.parent().remove('.detail');

@@ -1,8 +1,12 @@
 package irt.web.controllers;
 
+import irt.web.entities.all.ManufactureEntity;
 import irt.web.entities.company.CompanyEntity;
 import irt.web.entities.company.repositories.CompanyRepository;
+import irt.web.entities.component.ComponentEntity;
 import irt.web.entities.component.PlaceEntity;
+import irt.web.entities.component.repositories.ComponentsRepository;
+import irt.web.entities.component.repositories.ManufactureRepository;
 import irt.web.entities.component.repositories.PlacesRepository;
 import irt.web.entities.part_number.repository.SecondAndThirdDigitRepository;
 import irt.web.view.ComponentMovementView;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/")
@@ -134,5 +139,60 @@ public class PartNumberController {
 		model.addAttribute("addPartNumber", true);
 
 		return partNumber(componentBean);
+	}
+
+	public enum PartNumberStatus{
+		NOT_COMPLETE,
+		LENGTH_ERROR,
+		SAVED,
+		EXISTS
+	}
+	@Autowired ComponentsRepository componentsRepository;
+	@Autowired ManufactureRepository manufactureRepository;
+	@RequestMapping("add-part-number/validation")
+	@ResponseBody
+	public PartNumberStatus partNumberValidation(@RequestParam String pn, @RequestParam String description, @RequestParam(required=false) String mfr, @RequestParam(required=false) String mfrPN){
+		logger.entry( pn, description, mfr,  mfrPN);
+
+		PartNumberStatus status;
+
+		if(pn!=null && pn.length()>3 && !(pn.contains("_") || pn.contains("ERR"))){
+			pn = pn.replaceAll("-", "").trim();
+			ComponentEntity entity = componentsRepository.findOneByPartNumber(pn);
+			if(entity!=null)
+				status = PartNumberStatus.EXISTS;
+			else{
+				if(mfrPN!=null && !mfrPN.isEmpty())
+					entity = componentsRepository.findFirstByManufPartNumber(mfrPN = mfrPN.toUpperCase());
+
+				if(entity==null){
+					entity = componentsRepository.findFirstByPartNumberStartingWith(pn.substring(0, 3));
+
+					if(entity==null || entity.getPartNumber().length() == pn.length()){
+
+						entity = new ComponentEntity();
+						entity.setPartNumber(pn);
+						entity.setDescription(description.toUpperCase());
+
+						if(mfr!=null && !mfr.isEmpty()){
+							ManufactureEntity mfrEntity = manufactureRepository.findOne(mfr);
+							if(mfrEntity!=null)
+								entity.setManufacture(mfrEntity);
+						}
+
+						if(mfrPN!=null && !mfrPN.isEmpty())
+							entity.setManufPartNumber(mfrPN);
+						componentsRepository.save(entity);
+
+						status = PartNumberStatus.SAVED;
+					}else
+						status = PartNumberStatus.LENGTH_ERROR;
+				}else
+					status = PartNumberStatus.EXISTS;
+			}
+		}else
+			status = PartNumberStatus.NOT_COMPLETE;
+
+		return status;
 	}
 }

@@ -5,20 +5,21 @@
  */
 package irt.web.entities.part_number;
 
-import irt.web.entities.all.ClassIdHasArrayEntity;
-
 import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -31,7 +32,7 @@ public class HtmlOptionEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    protected HtmOptionEntityPK htmOptionsPK;
+    protected HtmOptionEntityPK key;
 
 	@Basic(optional = false)
     @NotNull
@@ -42,24 +43,26 @@ public class HtmlOptionEntity implements Serializable {
 	private Integer size;
 
 	private Integer position;
+	private Integer htmlInputMaxLength;
 
+	@JsonIgnore
 	@JoinColumn(name = "class_id", referencedColumnName = "class_id", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch=FetchType.LAZY)
     private ClassIdHasArrayEntity hasArrayEntity;
 
     public HtmlOptionEntity() {
     }
 
     public HtmlOptionEntity(HtmOptionEntityPK htmOptionsPK) {
-        this.htmOptionsPK = htmOptionsPK;
+        this.key = htmOptionsPK;
     }
 
     public HtmlOptionEntity(int classId, short arraySequence) {
-        this.htmOptionsPK = new HtmOptionEntityPK(classId, arraySequence);
+        this.key = new HtmOptionEntityPK(classId, arraySequence);
     }
 
-    public HtmOptionEntityPK getHtmOptionsPK() {
-        return htmOptionsPK;
+    public HtmOptionEntityPK getKey() {
+        return key;
     }
 
     public String getArrayName() {
@@ -86,8 +89,16 @@ public class HtmlOptionEntity implements Serializable {
 		this.position = position;
 	}
 
-	public void setHtmOptionsPK(HtmOptionEntityPK htmOptionsPK) {
-        this.htmOptionsPK = htmOptionsPK;
+	public Integer getHtmlInputMaxLength() {
+		return htmlInputMaxLength;
+	}
+
+	public void setHtmlInputMaxLength(Integer htmlInputMaxLength) {
+		this.htmlInputMaxLength = htmlInputMaxLength;
+	}
+
+	public void setKey(HtmOptionEntityPK htmOptionsPK) {
+        key = htmOptionsPK;
     }
 
     public ClassIdHasArrayEntity getHasArrayEntity() {
@@ -100,7 +111,7 @@ public class HtmlOptionEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return htmOptionsPK != null ? htmOptionsPK.hashCode() : 0;
+        return key != null ? key.hashCode() : super.hashCode();
     }
 
     @Override
@@ -110,9 +121,10 @@ public class HtmlOptionEntity implements Serializable {
 
     @Override
 	public String toString() {
-		return "\n\tHtmlOptionEntity [htmOptionsPK=" + htmOptionsPK
-				+ ", arrayName=" + arrayName + ", size=" + size + ", position="
-				+ position + ", hasArrayEntity=" + hasArrayEntity + "]";
+		return "\n\tHtmlOptionEntity [key=" + key + ", arrayName=" + arrayName
+				+ ", size=" + size + ", position=" + position
+				+ ", htmlInputMaxLength=" + htmlInputMaxLength
+				+ ", hasArrayEntity=" + hasArrayEntity + "]";
 	}
     
 }

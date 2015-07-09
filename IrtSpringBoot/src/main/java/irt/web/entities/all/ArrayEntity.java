@@ -5,6 +5,8 @@
  */
 package irt.web.entities.all;
 
+import irt.web.entities.part_number.ClassIdHasArrayEntity;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;

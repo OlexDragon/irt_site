@@ -5,6 +5,8 @@ import irt.web.entities.part_number.HtmlOptionEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface HtmlOptionEntityRepository extends JpaRepository<HtmlOptionEntity, HtmOptionEntityPK>{
+public interface HtmlOptionRepository extends JpaRepository<HtmlOptionEntity, HtmOptionEntityPK>{
+
+	HtmlOptionEntity findFirstByArrayName(String title);
 
 }

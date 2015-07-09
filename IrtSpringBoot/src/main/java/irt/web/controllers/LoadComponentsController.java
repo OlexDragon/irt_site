@@ -3,23 +3,26 @@ package irt.web.controllers;
 import irt.web.data.Numbers;
 import irt.web.entities.all.ArrayEntity;
 import irt.web.entities.all.repository.ArrayEntityRepository;
+import irt.web.entities.component.ComponentEntity;
 import irt.web.entities.component.repositories.ComponentsRepository;
 import irt.web.entities.component.repositories.ManufactureRepository;
 import irt.web.entities.component.repositories.PlacesRepository;
 import irt.web.entities.part_number.FirstDigitsEntity;
 import irt.web.entities.part_number.HtmOptionEntityPK;
 import irt.web.entities.part_number.HtmlOptionEntity;
-import irt.web.entities.part_number.PartNumberDetailsPK;
 import irt.web.entities.part_number.PartNumberDetailsView;
 import irt.web.entities.part_number.SecondAndThirdDigitEntity;
 import irt.web.entities.part_number.SecondAndThirdDigitPK;
+import irt.web.entities.part_number.SequentialNumberEntity;
 import irt.web.entities.part_number.repository.FirstDigitsRepository;
-import irt.web.entities.part_number.repository.HtmlOptionEntityRepository;
+import irt.web.entities.part_number.repository.HtmlOptionRepository;
 import irt.web.entities.part_number.repository.HtmlOptionsViewRepository;
 import irt.web.entities.part_number.repository.PartNumberDetailsViewRepository;
 import irt.web.entities.part_number.repository.SecondAndThirdDigitRepository;
+import irt.web.entities.part_number.repository.SequentialNumberRepository;
 import irt.web.workers.beans.interfaces.ValueText;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -85,7 +88,7 @@ public class LoadComponentsController {
 		SecondAndThirdDigitEntity secondAndThirdDigitEntity = secondAndThirdDigitRepository.findOne(new SecondAndThirdDigitPK(secondLetters, firstLetter));
 		if(secondAndThirdDigitEntity == null || secondAndThirdDigitEntity.getHasArrayEntity()==null){
 			logger.error("\n\tHave to add relation to  'ClassIdHasArrayEntity' with  firstLetterId='{}' and secondLetters='{}'\n\tsecondAndThirdDigitEntity={}", firstLetter, secondLetters, secondAndThirdDigitEntity);
-			return null;
+			return "fragments/add-part-number :: empty-block";
 		}
 
 		model.addAttribute("classId", secondAndThirdDigitEntity.getHasArrayEntity().getClassId());
@@ -114,7 +117,7 @@ public class LoadComponentsController {
 	@Autowired
 	private HtmlOptionsViewRepository htmlOptionsViewRepository;
 	@Autowired
-	private HtmlOptionEntityRepository htmlOptionEntityRepository;
+	private HtmlOptionRepository htmlOptionEntityRepository;
 	@Autowired
 	private ManufactureRepository manufactureRepository;
 	@RequestMapping("pn-options")
@@ -155,31 +158,32 @@ public class LoadComponentsController {
 
 		if(pn!=null && pn.length()>=3){
 			PartNumberDetailsView partNumberDetailsView;
-			if(detailId==null){
+			String firstThreeChars = pn.substring(0, 3);
 
-				partNumberDetailsView = partNumberDetailsViewRepository.findFirstByKeyFirstThreeCharsAndKeySequence(pn.substring(0, 3), sequence);
-				Integer size = partNumberDetailsView.getSize();
-
-				if(size!=null)
-					detailId = new String(new char[size]);
-				else
-					partNumberDetailsView = null;;
-
-			}else
-				partNumberDetailsView = partNumberDetailsViewRepository.findOne(new PartNumberDetailsPK(pn.substring(0, 3), sequence, detailId));
-			logger.trace("\n\t{}", partNumberDetailsView);
+			partNumberDetailsView = partNumberDetailsViewRepository.findFirstByKeyFirstThreeCharsAndKeySequence(firstThreeChars, sequence);
+			if(partNumberDetailsView==null)
+				partNumberDetailsView = partNumberDetailsViewRepository.findFirstByKeyFirstThreeCharsAndKeySequence(firstThreeChars, sequence);
 
 			if(partNumberDetailsView!=null){
-				Integer position1 = partNumberDetailsView.getPosition();
+
 				Integer size = partNumberDetailsView.getSize();
-				pn = getPartNumber(pn, detailId, position1, size);
+				if(size!=null){
+					if((detailId==null || detailId.isEmpty()))
+						detailId = new String(new char[size]).replaceAll("\0", "_");
+
+					Integer position1 = partNumberDetailsView.getPosition();
+					pn = getPartNumber(pn, detailId, position1, size);
+					pn = setSequentialNumber(partNumberDetailsView.getClassId(),pn);
+					pn = componentsRepository.partNumberWithDashes(pn);
+				}
 			}
+			logger.debug("\n\tpartNumberDetailsView : {}", partNumberDetailsView);
 		}
 		return pn;
 	}
 
-	private String getPartNumber(String pn, String detailId, Integer position1,
-			Integer size) {
+	private String getPartNumber(String pn, String detailId, Integer position1, Integer size) {
+
 		if(position1!=null){
 			int position2 = position1 + size;
 
@@ -187,30 +191,90 @@ public class LoadComponentsController {
 			pn = String.format("%1$-18s", pn);
 			pn = pn.substring(0, position1) + detailId + pn.substring(position2);
 			pn = pn.trim().replaceAll(" ", "_");
-			pn = componentsRepository.partNumberWithDashes(pn);
-			logger.trace("'{}'", pn);
 		}
-		return pn;
+		return logger.exit(pn);
 	}
+
+	@Autowired SequentialNumberRepository sequentialNumberRepository;
 	@RequestMapping("part-number/input")
 	@ResponseBody
 	public String getPartNumberFromInputField(
 			@RequestParam Integer sequence,
 			@RequestParam String detailId,
-			@RequestParam String pn,
-			@RequestParam boolean seqN){
+			@RequestParam String pn){
 
-		logger.entry(sequence, detailId, pn, seqN);
+		logger.entry(sequence, detailId, pn);
 
-		PartNumberDetailsView partNumberDetailsView = partNumberDetailsViewRepository.findFirstByKeyFirstThreeCharsAndKeySequence(pn.substring(0, 3), sequence);
+		String firstThree = pn.substring(0, 3);
+		PartNumberDetailsView partNumberDetailsView = partNumberDetailsViewRepository.findFirstByKeyFirstThreeCharsAndKeySequence(firstThree, sequence);
 		logger.trace(partNumberDetailsView);
 
 		if(partNumberDetailsView!=null){
+
 			Integer size = partNumberDetailsView.getSize();
-			detailId = Numbers.numberToExponential(detailId, size);
+			switch(partNumberDetailsView.getArrayName()){
+			case "leads_number":
+				detailId = Numbers.stringFormat(detailId, size, '0', false);
+				break;
+			case "Length(cm)":
+				detailId = Numbers.numberToExponential(detailId, size);
+			}
 			pn = getPartNumber(pn, detailId, partNumberDetailsView.getPosition(), size);
+
+			Long classId = partNumberDetailsView.getClassId();
+			pn = setSequentialNumber(classId, pn);
+			pn = componentsRepository.partNumberWithDashes(pn);
 		}
 
 		return pn;
+	}
+
+	private String setSequentialNumber(Long classId, String pn) {
+		logger.debug("classId={}; pn={}", classId, pn);
+		if(!pn.contains("ERR")){
+
+			SequentialNumberEntity sequentialNumberEntity = sequentialNumberRepository.findOne(classId);
+			logger.debug(sequentialNumberEntity);
+			if(sequentialNumberEntity!=null){
+				int seqStart = sequentialNumberEntity.getStart();
+				int seqSize = sequentialNumberEntity.getSize();
+				if(sequentialNumberEntity!=null && pn.length()>=seqStart){
+					List<ComponentEntity> componentEntities = componentsRepository.findByPartNumberStartingWith(pn.substring(0, 3));
+
+					List<Integer> pns = new ArrayList<>();
+					int seqEndIndex = seqStart+seqSize;
+					for(ComponentEntity ce:componentEntities){
+
+						String partNumber = ce.getPartNumber();
+						pns.add(Integer.parseInt(partNumber.length()>seqEndIndex ? partNumber.substring(seqStart, seqSize) : partNumber.substring(seqStart)));
+					}
+					Collections.sort(pns);
+					logger.trace("{}", pns);
+
+					int i;
+					for(i=0; i<pns.size(); i++)
+						if(pns.indexOf(i)<0)
+							break;
+
+					pn = pn.substring(0, seqStart) + String.format("%1$"+ (seqSize) +"s", i).replaceAll(" ", "0") + (pn.length()>seqEndIndex ? pn.substring(seqStart, seqEndIndex) : "");
+				}
+			}
+		}
+		return pn;
+	}
+
+	@RequestMapping("part-number/input/size")
+	@ResponseBody
+	public HtmlOptionEntity getPartNumberFromInputField(@RequestParam String title){
+
+		HtmlOptionEntity htmlOptionEntity;
+		if(title!=null) {
+			htmlOptionEntity = htmlOptionEntityRepository.findFirstByArrayName(title);
+		}else
+			htmlOptionEntity = null;
+
+		logger.trace("{} : {}", title, htmlOptionEntity);
+
+		return htmlOptionEntity;
 	}
 }
