@@ -8,5 +8,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PartNumberDetailsViewRepository  extends JpaRepository<PartNumberDetailsView, PartNumberDetailsPK>{
 
 	PartNumberDetailsView findFirstByKeyFirstThreeCharsAndKeySequence(String substring, Integer sequence);
-
 }

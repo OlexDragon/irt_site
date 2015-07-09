@@ -31,7 +31,7 @@ public class PartNumberDetailsView implements Serializable {
     private int firstDigitsId;
 
     @Column(name = "class_id")
-    private int classId;
+    private Long classId;
 
     @Size(min = 1, max = 20)
     @Column(name = "array_name", length = 20)
@@ -64,11 +64,11 @@ public class PartNumberDetailsView implements Serializable {
         this.firstDigitsId = firstDigitsId;
     }
 
-    public int getClassId() {
+    public Long getClassId() {
         return classId;
     }
 
-    public void setClassId(int classId) {
+    public void setClassId(Long classId) {
         this.classId = classId;
     }
 

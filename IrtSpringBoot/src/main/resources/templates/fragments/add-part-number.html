@@ -11,7 +11,7 @@
 		
 
 */-->
-	<form class="form-inline" action="/add-part-number" th:fragment="add-part-number"><!--/*
+	<form id="addPNForm" class="form-inline" action="/add-part-number" th:fragment="add-part-number"><!--/*
 
 
 	"firstLetters" used for first three part number letters
@@ -41,17 +41,16 @@
 				$('#firstLetter').on('change', function(){
 					$('#firstLetters').children().not(':first').remove();
 					$('#pn-details').empty();
+					$('#sbmtPN').remove();
 					if($(this).val()){
 // if selected First Letter load Second and Third letters
 						$.get('/load/secon-and-third-letters',{firstLetter: $(this).val(), id: "secondLetters"}, function(data){
 							$('#firstLetters').append(data);
 							$('#secondLetters').on('change', function(){
+								$('#sbmtPN').remove();
 								$('#firstLetters').children().not(':first').not(':first').remove();
-								var secondLetters = $('#secondLetters').val()
-								if(secondLetters){
 //	if selected Second and Third letters load Details
-									$('#pn-details').load('/load/part-number-details', {firstLetter: $('#firstLetter').val(), secondLetters: secondLetters});
-								}
+								$('#pn-details').load('/load/part-number-details', {firstLetter: $('#firstLetter').val(), secondLetters: $('#secondLetters').val()});
 //	Chenge Part Number Second and Therd Letters
 								$('#pn').text( $('#pn').text().substring(0,1) + $('#secondLetters').val());
 							});
@@ -68,14 +67,42 @@
 					};
 				});
 			});
+//	On submit
+			$('#addPNForm').on('submit', function(e){
+				e.preventDefault();
+				$.get("/add-part-number/validation",
+						{pn:$('#pn').text(),
+						description:$('input[title="Description"]').val(),
+						mfr:$('select[title="Mfr"]').val(),
+						mfrPN:$('input[title="Mfr P/N"]').val()},
+						function(status){
+							if(status=='SAVED')
+								window.location.href = "/?partNumber="+$('#pn').text();
+							else
+								alert(status);
+				});
+			});
 		</script>
 	</form>
 
 <!-- Add New Part Number Details -->
 	<th:block th:fragment="pn-details">
-	<th:block th:each="arr:${arrayEntities}" th:switch="${arr.description}" >
+	<th:block th:each="arr:${arrayEntities}" th:switch="${arr.description}">
 		<th:block th:case="'text'" >
 			<input type="text" th:id="${arr.sequence}" class="form-control" th:placeholder="${arr.key.id}" th:title="${arr.key.id}"></input>
+			<script type="text/javascript" th:inline="javascript">
+			/*<![CDATA[*/
+				$.get('/load/part-number/input/size', {title:[[${arr.key.id}]]}, function(htmlOptionEntity){
+					var $input = $(document.getElementById([[${arr.sequence}]]));
+					if(htmlOptionEntity.htmlInputMaxLength){
+						$input.attr('maxlength', htmlOptionEntity.htmlInputMaxLength);
+					}
+					if(htmlOptionEntity.position){
+						$input.attr('required','required');
+					}
+				});
+			/*]]>*/
+			</script>
 		</th:block>
 
 		<th:block th:case="'select'">
@@ -89,32 +116,46 @@
 			</script>
 		</th:block>
 
-		<label th:case="'label'" class="control-label" th:id="${arr.key.id}" th:text="${arr.key.id}">Label</label>
+		<label th:case="'label'" class="control-label" th:text="${arr.key.id}">Label</label>
 	</th:block>
 		<script type="text/javascript">
 		/*<![CDATA[*/
 //losd Part Number to $('#pn')
-			$('select').on('change', function(){
+			$('#pn-details select').on('change', function(){
 				$.get('/load/part-number', {
 									sequence: $(this).attr('id'),
 									detailId: $(this).val(),
 									pn:$('#pn').text()},
 						function(pn){
 							$('#pn').text(pn);
+							addButton();
 				});
 			});
 			$('input').on('input', function(){
 				$.get('/load/part-number/input', {
 					sequence: $(this).attr('id'),
 					detailId: $(this).val(),
-					pn:$('#pn').text(),
-					seqN:$('#SeqN').text()!=null},
+					pn:$('#pn').text()},
 						function(pn){
 							$('#pn').text(pn);
+							addButton();
 				});
 			});
+			function addButton(){
+				if($('#pn').text().indexOf('_')<0 && $('#pn').text().indexOf('ERR')<0){
+					if(!$('#sbmtPN')[0]){
+						$('<button></button>').attr('id', 'sbmtPN').attr('type', 'submit').text('Add Part Number').addClass('submit form-control btn btn-info').appendTo($('#addPNForm'));
+					}
+				}else{
+					if($('#sbmtPN')[0]){
+						$('#sbmtPN').remove();
+					}
+				}
+			}
 		/*]]>*/
 		</script>
+	</th:block>
+	<th:block th:fragment="empty-block">
 	</th:block>
 </body>
 </html>

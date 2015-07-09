@@ -1,5 +1,7 @@
 package irt.web.entities.component.repositories;
 
+import java.util.List;
+
 import irt.web.entities.component.ComponentEntity;
 
 import org.springframework.data.domain.Page;
@@ -15,4 +17,8 @@ public interface ComponentsRepository  extends JpaRepository<ComponentEntity, Lo
 
 	@Query(value="SELECT part_number(:partNamber);", nativeQuery=true)
 	public String partNumberWithDashes(@Param("partNamber") String partNamber);
+
+	public List<ComponentEntity> findByPartNumberStartingWith(String firstLetters);
+	public ComponentEntity findFirstByPartNumberStartingWith(String startWith);
+	public ComponentEntity findFirstByManufPartNumber(String mfrPN);
 }

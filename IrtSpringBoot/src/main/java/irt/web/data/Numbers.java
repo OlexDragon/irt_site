@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 public class Numbers {
 
 	private static final Logger logger = LogManager.getLogger();
-
 	public static String numberToExponential(String toConvert, int size){
 
 		if(toConvert==null || (toConvert = toConvert.trim().toUpperCase().replaceFirst("^0+(?!$)", "")).isEmpty() || !toConvert.matches(".*\\d+.*"))
@@ -14,9 +13,15 @@ public class Numbers {
 
 		else{
 			if(toConvert.matches("[0-9]+")){
-				toConvert = integerToExponential(toConvert, size);
+				try{
+					toConvert = integerToExponential(toConvert, size);
+				}catch(NumberFormatException ex){
+					logger.catching(ex);
+					toConvert = size == 4 ? "ERR1" : "ERROR";
+				}
 			}else{
-				toConvert = getNumberWithStringToExponential(toConvert, size);
+				toConvert = size == 4 ? "ERR2" : "ERR_2";
+//				toConvert = getNumberWithStringToExponential(toConvert, size);
 			}
 				
 		}
@@ -55,13 +60,23 @@ public class Numbers {
 	}
 
 	public static String stringFormat(String toConvert, int size, int exp) {
-		return String.format("%1$-"+ (size-2) +"s", toConvert).replaceAll(" ", "0") + 'E' + exp;
+		return stringFormat(toConvert, size-2, '0', true) + 'E' + exp;
+	}
+
+	public static String stringFormat(String toConvert, int size, Character charToAdd, boolean atTheEnd) {
+
+		String format = "%1$";
+		if(atTheEnd)
+			format += "-";
+		format += size +"s";
+
+		return String.format(format, toConvert).replaceAll(" ", charToAdd.toString());
 	}
 
 	private static String getNumberWithStringToExponential(String toConvert, int size) {
 		if(toConvert.contains("E")){
 			String[] split = toConvert.split("E");
 		}
-		return null;
+		return "DNOT";
 	}
 }

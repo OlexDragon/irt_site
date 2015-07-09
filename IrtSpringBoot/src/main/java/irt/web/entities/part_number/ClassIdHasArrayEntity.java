@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package irt.web.entities.all;
+package irt.web.entities.part_number;
 
-import irt.web.entities.part_number.HtmlOptionEntity;
-import irt.web.entities.part_number.SecondAndThirdDigitEntity;
+import irt.web.entities.all.ArrayEntity;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,6 +14,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -42,7 +42,7 @@ public class ClassIdHasArrayEntity implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "class_id")
-    private Integer classId;
+    private Long classId;
 
     @Basic(optional = false)
     @NotNull
@@ -50,32 +50,35 @@ public class ClassIdHasArrayEntity implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "hasArrayEntity")
+    @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "hasArrayEntity", fetch = FetchType.LAZY)
     private SecondAndThirdDigitEntity secondAndThirdDigitEntity;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "hasArrayEntity")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "hasArrayEntity", fetch = FetchType.LAZY)
     private List<ArrayEntity> arrayEntityList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "hasArrayEntity")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "hasArrayEntity", fetch = FetchType.LAZY)
     private List<HtmlOptionEntity> htmOptionsList;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "hasArrayEntity", fetch = FetchType.LAZY)
+    private SequentialNumberEntity sequentialNamberEntity;
 
     public ClassIdHasArrayEntity() {
     }
 
-    public ClassIdHasArrayEntity(Integer classId) {
+    public ClassIdHasArrayEntity(Long classId) {
         this.classId = classId;
     }
 
-    public ClassIdHasArrayEntity(Integer classId, String name) {
+    public ClassIdHasArrayEntity(Long classId, String name) {
         this.classId = classId;
         this.name = name;
     }
 
-    public Integer getClassId() {
+    public Long getClassId() {
         return classId;
     }
 
-    public void setClassId(Integer classId) {
+    public void setClassId(Long classId) {
         this.classId = classId;
     }
 
@@ -132,6 +135,14 @@ public class ClassIdHasArrayEntity implements Serializable {
 
     public void setHtmOptionsList(List<HtmlOptionEntity> htmOptionsList) {
         this.htmOptionsList = htmOptionsList;
+    }
+
+    public SequentialNumberEntity getSequentialNamberEntity() {
+        return sequentialNamberEntity;
+    }
+
+    public void setSequentialNamberEntity(SequentialNumberEntity sequentialNamberEntity) {
+        this.sequentialNamberEntity = sequentialNamberEntity;
     }
 
     @Override

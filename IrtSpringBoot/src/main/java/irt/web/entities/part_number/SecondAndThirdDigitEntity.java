@@ -5,7 +5,6 @@
  */
 package irt.web.entities.part_number;
 
-import irt.web.entities.all.ClassIdHasArrayEntity;
 import irt.web.workers.beans.interfaces.ValueText;
 
 import java.io.Serializable;
@@ -50,7 +49,7 @@ public class SecondAndThirdDigitEntity implements Serializable, ValueText {
     private FirstDigitsEntity firstDigitsEntity;
 
     @JoinColumn(name = "class_id", referencedColumnName = "class_id")
-    @OneToOne(optional = true, fetch=FetchType.EAGER)
+    @OneToOne(optional = true, fetch=FetchType.LAZY)
     @NotFound(action = NotFoundAction.IGNORE)
     private ClassIdHasArrayEntity hasArrayEntity;
 

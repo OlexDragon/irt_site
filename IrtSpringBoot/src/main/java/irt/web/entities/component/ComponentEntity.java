@@ -251,18 +251,18 @@ public class ComponentEntity implements Serializable {
     @Override
     public String toString() {
         return "\n\n\tComponentEntity{" + "\n\t\tid=" + id +
-        		",\n\t\tpartNumber=" + partNumber +
-        		",\n\t\tmfrPartNumber=" + manufPartNumber +
-        		",\n\t\tdescription=" + description +
+        		",partNumber=" + partNumber +
+        		",tmfrPartNumber=" + manufPartNumber +
+        		",description=" + description +
         		",\n\t\tmanufacture=" + manufacture +
         		",\n\t\tcomponentValue=" + componentValue +
-        		",\n\t\tvoltage=" + voltage +
-        		",\n\t\tpartType=" + partType +
-        		",\n\t\tschematicLetter=" + schematicLetter +
-        		",\n\t\tschematicPart=" + schematicPart +
-        		",\n\t\tfootprint=" + footprint +
+        		",\n\tvoltage=" + voltage +
+        		",partType=" + partType +
+        		",schematicLetter=" + schematicLetter +
+        		",schematicPart=" + schematicPart +
+        		",footprint=" + footprint +
         		",\n\t\tlocation=" + location +
-        		",\n\t\tqty=" + qty +
+        		",\n\tqty=" + qty +
         		",\n\t\tlink=" + link +
         		"\n\t\tmovementDetailsEntities=" + movementDetailsEntities + "}";
     }
