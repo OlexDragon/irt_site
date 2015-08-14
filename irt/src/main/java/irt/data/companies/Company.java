@@ -5,6 +5,8 @@ import irt.work.ComboBoxField;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 public class Company implements ComboBoxField{
 
 	public static final byte COMPANY	= -1;
@@ -63,6 +65,7 @@ public class Company implements ComboBoxField{
 		id = companyId;
 	}
 
+	@JsonIgnore
 	public void set(String companyName, String seller_name, String e_mail,String telephone, String fax, String addtess,int type, boolean isActive) {
 		setName(seller_name);
 		setCompanyName(companyName);
@@ -74,6 +77,7 @@ public class Company implements ComboBoxField{
 		setAddress(addtess);
 	}
 
+	@JsonIgnore
 	public String	setEMail(){
 		eMail = newEMail;
 		newEMail = null;
@@ -92,6 +96,7 @@ public class Company implements ComboBoxField{
 		return newEMail!=null ? newEMail : eMail!=null	? eMail		: "";
 	}
 
+	@JsonIgnore
 	public String setName(){
 		name = newName;
 		newName = null;
@@ -105,6 +110,7 @@ public class Company implements ComboBoxField{
 		return newName!=null ? newName : name!=null	? name : "";
 	}
 
+	@JsonIgnore
 	public String	setCompanyName(){
 		companyName = newCompanyName;
 		newCompanyName = null;
@@ -119,6 +125,7 @@ public class Company implements ComboBoxField{
 		return newCompanyName!=null ? newCompanyName : companyName!=null ? companyName : "";
 	}
 
+	@JsonIgnore
 	public boolean	setActive(){
 		isActive = isNewActive;
 		return isActive;
@@ -136,6 +143,7 @@ public class Company implements ComboBoxField{
 		return this.id = id;
 	}
 
+	@JsonIgnore
 	public boolean isSet()	 { return  getName()!=null && getCompanyName()!=null  && getEMail()!=null;}
 
 	public void setType(int type) {
@@ -161,15 +169,18 @@ public class Company implements ComboBoxField{
 	}
 
 	@Override
+	@JsonIgnore
 	public String getValue() {
 		return ""+id;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getText() {
 		return getCompanyName();
 	}
 
+	@JsonIgnore
 	public String setFax() {
 		fax = newFax;
 		newFax = null;
@@ -184,6 +195,7 @@ public class Company implements ComboBoxField{
 		}
 	}
 
+	@JsonIgnore
 	public boolean isNewFax() {
 		return newFax!=null;
 	}
@@ -202,18 +214,22 @@ public class Company implements ComboBoxField{
 		return newAddress==null ? address!=null ? address : "" : newAddress;
 	}
 
+	@JsonIgnore
 	public boolean isInsertFax(){
 		return newFax!=null && fax==null;
 	}
 
+	@JsonIgnore
 	public boolean isInsertAddress(){
 		return newAddress!=null && address==null;
 	}
 
+	@JsonIgnore
 	public boolean isUpdateFax(){
 		return newFax!=null && fax!=null ;
 	}
 
+	@JsonIgnore
 	public boolean isUpdateAddress(){
 		return newAddress!=null && address!=null;
 	}
@@ -222,6 +238,7 @@ public class Company implements ComboBoxField{
 		return newTelephone==null ? telephone!=null ? telephone : "" : newTelephone;
 	}
 
+	@JsonIgnore
 	public String setTelephone() {
 		telephone = newTelephone;
 		newTelephone = null;
@@ -236,10 +253,12 @@ public class Company implements ComboBoxField{
 		}
 	}
 
+	@JsonIgnore
 	public boolean isInsertTelephone(){
 		return newTelephone!=null && telephone==null;
 	}
 
+	@JsonIgnore
 	public boolean isUpdateTelephone(){
 		return newTelephone!=null && telephone!=null;
 	}
@@ -249,14 +268,17 @@ public class Company implements ComboBoxField{
 			newAddress = address;
 	}
 
+	@JsonIgnore
 	public String getWhereTelephone() {
 		return " WHERE `id_companies`="+id+" and`telephone`='"+telephone+"'";
 	}
 
+	@JsonIgnore
 	public String getWhereFax() {
 		return " WHERE `id_companies`="+id+" and`fax`='"+fax+"'";
 	}
 
+	@JsonIgnore
 	public String getWhereAddress() {
 		return " WHERE `id_companies`="+id+" and`address`='"+address+"'";
 	}
@@ -266,30 +288,37 @@ public class Company implements ComboBoxField{
 		isNewActive = isActive;
 	}
 
+	@JsonIgnore
 	public boolean isNewFields() {
 		return newName!=null || newCompanyName!=null || newEMail!=null || isActive!=isNewActive;
 	}
 
+	@JsonIgnore
 	public boolean isNewName() {
 		return newName!=null;
 	}
 
+	@JsonIgnore
 	public boolean isNewCompanyName() {
 		return newCompanyName!=null;
 	}
 
+	@JsonIgnore
 	public boolean isNewEMail() {
 		return newEMail!=null;
 	}
 
+	@JsonIgnore
 	public boolean isNewActive() {
 		return isActive!=isNewActive;
 	}
 
+	@JsonIgnore
 	public boolean isNewTelephone() {
 		return newTelephone!=null;
 	}
 
+	@JsonIgnore
 	public boolean isNewAddress() {
 		return newAddress!=null;
 	}

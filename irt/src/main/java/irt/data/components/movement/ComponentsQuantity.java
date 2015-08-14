@@ -6,11 +6,16 @@ import irt.data.components.movement.interfaces.ComponentQuantity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 public class ComponentsQuantity {
 
+	@JsonProperty("cmpsQ")
 	List<ComponentQuantity> componentsQuantity = new ArrayList<>();
 
+	@JsonIgnore
 	public String getWhereClause(String string) {
 		String whereClause = "";
 		if(!componentsQuantity.isEmpty())
@@ -30,6 +35,7 @@ public class ComponentsQuantity {
 		return componentsQuantity;
 	}
 
+	@JsonIgnore
 	public ComponentToMove[] getComponentsToMove() {
 		ComponentToMove[] ctm = new ComponentToMove[componentsQuantity.size()];
 		return componentsQuantity.toArray(ctm);
@@ -53,10 +59,12 @@ public class ComponentsQuantity {
 		return wasAdded;
 	}
 
+	@JsonIgnore
 	public boolean isEmpty() {
 		return componentsQuantity.isEmpty();
 	}
 
+	@JsonIgnore
 	public ComponentQuantity get(int index) {
 		return componentsQuantity.size()>index ? componentsQuantity.get(index) : null;
 	}

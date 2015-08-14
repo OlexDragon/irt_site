@@ -85,24 +85,34 @@ public class Row {
 	public void setClassName	(String className	) { this.className = className;	}
 	public void setFieldClassName	(int fieldIndex, String className) { getField(fieldIndex).setClassName(className);	}
 
+	public void setShow(List<Boolean> show) {
+		this.show = show;
+	}
+
 	@Override
 	public String toString() {
-		String returnStr = "<tr "+(!getClassName().isEmpty() ? "class=\""+getClassName()+"\" " : "")+">";
+		StringBuilder returnStr = new StringBuilder();
+		returnStr.append("<tr ");
+		if(!getClassName().isEmpty())
+			returnStr.append("class=\""+getClassName()+"\" ");
+		returnStr.append(">");
 
 		if (rowNumber>=0) {
-			returnStr += "<td>"
-					+ ((rowNumber != 0) ? rowNumber : "")
-					+ "</td>";
+			returnStr.append("<td>");
+			if(rowNumber != 0)
+				returnStr.append(rowNumber);
+			returnStr.append("</td>");
 		}
 
 		for (int i = 0; i<show.size() || i<row.size(); i++) 
 			if(show==null || show.size()<=i || show.get(i))
-				returnStr += row!=null && row.size()>i ? row.get(i) : "<td></td>";
+				if(row!=null && row.size()>i)
+					returnStr.append(row.get(i));
+				else
+					returnStr.append("<td></td>");
 
-		return returnStr + "</tr>";
-	}
+		returnStr.append("</tr>");
 
-	public void setShow(List<Boolean> show) {
-		this.show = show;
+		return returnStr.toString();
 	}
 }

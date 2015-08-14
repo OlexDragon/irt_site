@@ -44,10 +44,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 public class ComponentDAO extends DataAccessObject {
 
-	public static final int QTY_CANSEL = 0;
-	public static final int QTY_ADD 	= 1;
-	public static final int QTY_SUBTACT = 2;
-	public static final int QTY_SET 	= 3;
+	public enum Action{
+		QTY_CANSEL,
+		QTY_ADD,
+		QTY_SUBTACT,
+		QTY_SET
+	}
 
 //    private Logger logger = Logger.getLogger(this.getClass());
 	private static final String componnentsTableQuery = 
@@ -956,7 +958,7 @@ public class ComponentDAO extends DataAccessObject {
 		return components;
 	}
 
-	public Component getComponent(int componentId) {
+	public Component getComponent(long componentId) {
 
 		Component component = null;
 
@@ -973,7 +975,7 @@ public class ComponentDAO extends DataAccessObject {
 	return component;
 	}
 
-	public Component getComponent(Statement statement, int componentId) throws SQLException, CloneNotSupportedException {
+	public Component getComponent(Statement statement, long componentId) throws SQLException, CloneNotSupportedException {
 
 		String query = "SELECT*FROM`irt`.`components`" + "WHERE`id`="+componentId;
 		ResultSet resultSet = statement.executeQuery(query);
@@ -999,7 +1001,7 @@ public class ComponentDAO extends DataAccessObject {
 		return executeUpdate("UPDATE`irt`.`components`SET`qty`="+ctm.getStockQuantity()+" WHERE`id`="+ctm.getId())>0;
 	}
 
-	public boolean setQuantity(int componentId, int qty, int operation) {
+	public boolean setQuantity(int componentId, int qty, Action operation) {
 		String qtyStr;
 
 		switch(operation){
@@ -1009,11 +1011,14 @@ public class ComponentDAO extends DataAccessObject {
 		case QTY_SUBTACT:
 			qtyStr = "if(`qty`IS NULL OR`qty`<"+qty+","+0+",`qty`-"+qty+")";
 			break;
+		case QTY_SET:
+			qtyStr = ""+(qty>0 ? qty : 0);
+			break;
 		default:
-			qtyStr = ""+qty;
+			return false;
 		}
 		String query = "UPDATE`irt`.`components`SET`qty`="+qtyStr+" WHERE`id`='"+componentId+"'";
-//		irt.work.Error.setErrorMessage(query);
+
 		return executeUpdate(query)>0;
 	}
 

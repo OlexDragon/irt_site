@@ -15,6 +15,7 @@ public class CookiesWorker {
 	private static final Logger logger = LogManager.getLogger();
 
 	public static String getCookieValue(HttpServletRequest request, String startWith) {
+		logger.entry(startWith);
 
 		String value = null;
 
@@ -22,14 +23,14 @@ public class CookiesWorker {
 		if(!cookiesStartWith.isEmpty())
 			value = cookiesStartWith.last().getValue();
 
-		return value ;
+		return logger.exit(value);
 	}
 
 	public static void addCookie(HttpServletRequest request, HttpServletResponse response, String name, Object value, int cookieMaxAge) {
 
 		removeCookiesStartWith(request, response, name);
 
-		logger.entry(name, value);
+		logger.trace("\n\tname\t{},\n\tvalue\t{}",name, value);
 
 		Cookie c = new Cookie(name+System.currentTimeMillis(), value.toString());
 		c.setMaxAge(cookieMaxAge);//in seconds
@@ -37,7 +38,7 @@ public class CookiesWorker {
 	}
 
 	public static void removeCookiesStartWith(HttpServletRequest request, HttpServletResponse response, String startWith) {
-		logger.entry(startWith);
+		logger.trace("\n\tstartWith\t{}", startWith);
 
 		for(Cookie c:getCookiesStartWith(request, startWith)){
 			c.setValue(null);
@@ -64,6 +65,6 @@ public class CookiesWorker {
 					cookiesSet.add(c);
 				}
 
-		return cookiesSet ;
+		return logger.exit(cookiesSet);
 	}
 }

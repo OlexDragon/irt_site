@@ -14,6 +14,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class UserBean {
 	
@@ -42,13 +44,21 @@ public class UserBean {
 	public static final int DATABASE		= 8388608;
 
 	private int	id;
+	@JsonProperty("un")
 	private String username;
+	@JsonProperty("p")
     private String password;
+	@JsonProperty("fn")
     private String firstName;
+	@JsonProperty("ln")
     private String lastName;
+	@JsonProperty("prm")
     private int permission;
+	@JsonProperty("ext")
     private String extension;
+	@JsonProperty("em")
     private String eMail;
+	@JsonProperty("nu")
 	private boolean needUpdate;
 
     public UserBean() {
@@ -101,6 +111,7 @@ public class UserBean {
 		return permission;
 	}
 
+	@JsonIgnore
 	public void setUserBean(String cookie) {
 		if (cookie != null && !cookie.isEmpty()) {
 			String[] userDatas = cookie.split(",");
@@ -113,6 +124,7 @@ public class UserBean {
 		}
 	}
 
+	@JsonIgnore
 	public static UserBean getUser(HttpServletRequest httpServletRequest){
 		Cookie[] cookies = httpServletRequest.getCookies();
 		UserBean user = new UserBean();
@@ -125,6 +137,7 @@ public class UserBean {
 		return user;
 	}
 
+	@JsonIgnore
 	public void setUserBean(ResultSet resultSet) throws SQLException, GeneralSecurityException, IOException {
 
 		int id = resultSet.getInt("id");
@@ -235,6 +248,7 @@ public class UserBean {
 		this(userId, null, null, null);
 	}
 
+	@JsonIgnore
 	private void set(String[] userData) {
 		if (userData != null && userData.length == 2) {
 			String s = userData[1];
@@ -266,11 +280,13 @@ public class UserBean {
 		}
 	}
 
+	@JsonIgnore
 	public String getFullName() {
 		String fullName = getFirstName()+" "+getLastName();
 		return fullName.equals(" ") ? getUsername() : fullName;
 	}
 
+	@JsonIgnore
 	public String getUpdates(UserBean userBean,boolean isAdmin) throws GeneralSecurityException, IOException, SQLException {
 		String fieldsToUpdate = "";
 
@@ -321,6 +337,7 @@ public class UserBean {
 		return fieldsToUpdate;
 	}
 
+	@JsonIgnore
 	public String getPassword(boolean encrypt) throws GeneralSecurityException, IOException {
 		String returnStr = null;
 	
@@ -330,6 +347,7 @@ public class UserBean {
 		return returnStr;
 	}
 
+	@JsonIgnore
 	public String getValues() throws GeneralSecurityException, IOException {
 		return "'"+getUsername()+"','"
 				+ getPassword(true)+"',"
@@ -353,25 +371,41 @@ public class UserBean {
 	public void seteMail(String eMail)			{ this.eMail = eMail;			} 
 	public void setPermission(int permission)	{ this.permission = permission;	}
 
+	@JsonIgnore
 	public boolean isAdmin()		{ return (permission & ADMIN)!=0;}
+	@JsonIgnore
 	public boolean isValid()		{ return id!=0 && permission!=0 			|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isSchematicPart(){ return (permission & SCHEMATIC_PART)!=0 	|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isSchematicLetter(){ return (permission & SCHEMATIC_LETTER)!=0 || (permission & ADMIN)!=0;}
+	@JsonIgnore
 	public boolean isUserEdit()		{ return (permission & USER_EDIT)!=0 		|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isUser()			{ return (permission & USER)!=0 			|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isEditing()		{ return (permission & EDITING)!=0 			|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isAlt()			{ return (permission & ALT_PART_NUMBER)!=0 	|| (permission & ADMIN)!=0;	}
 
+	@JsonIgnore
 	public boolean isEditCost()		{ return (permission & EDIT_COST)!=0 		|| (permission & ADMIN)!=0;}
+	@JsonIgnore
 	public boolean isSellers()		{ return (permission & SELLERS)!=0 			|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isStock()		{ return (permission & STOCK)!=0 			|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isEditCompanies(){ return (permission & EDIT_COMPANIES)!=0 	|| (permission & ADMIN)!=0;	}
 
+	@JsonIgnore
 	public boolean isDatabase() 	{ return (permission & DATABASE)!=0 		|| (permission & ADMIN)!=0;	}
 
+	@JsonIgnore
 	public boolean isDeviceType()	{ return (permission & DEVICE_TYPE)!=0 		|| (permission & ADMIN)!=0;	}
+	@JsonIgnore
 	public boolean isDeviceTypeUpdate(){return(permission& DEVICE_TYPE_UPDATE)!=0 || (permission & ADMIN)!=0;}
 
+	@JsonIgnore
 	public boolean isWorkOrder()	{return(permission & WORK_ORDER)!=0 		|| (permission & ADMIN)!=0;	}
 
 	// Encryption and description ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

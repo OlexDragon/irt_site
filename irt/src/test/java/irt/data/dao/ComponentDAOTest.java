@@ -37,7 +37,7 @@ public class ComponentDAOTest {
 	public void test() {
 
 		WorkOrder workOrder = new WorkOrder();
-		workOrder.add(new Long[]{ (long) 1, (long) 2, (long) 3, (long) 4, (long) 5, (long) 6, (long) 7, (long) 8, (long) 9});
+		workOrder.add(new Integer[]{ (int) 1, (int) 2, (int) 3, (int) 4, (int) 5, (int) 6, (int) 7, (int) 8, (int) 9});
 
 		Component[] components = componentDAO.getComponents(workOrder.getIdsArray(), null);
 

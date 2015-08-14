@@ -93,13 +93,20 @@ public class Table {
 	@Override
 	public String toString() {
 
-		String returnStr = title!=null ? title.toString() : "";
-		returnStr += "<table "+(!getClassName().isEmpty() ? "class=\""+getClassName()+"\"" : "")+" >";
+		StringBuilder returnStr = new StringBuilder();
+		if(title!=null)
+			returnStr.append(title.toString());
+
+		returnStr.append("<table ");
+		if(!getClassName().isEmpty())
+			returnStr.append("class=\""+getClassName()+"\"");
+		returnStr.append(" >");
 		
 		for(Row row:rows)
-			returnStr += row;
+			returnStr.append(row);
+		returnStr.append("</table>");
 		
-		return returnStr+"</table>";
+		return returnStr.toString();
 	}
 
 	public void setRowCount(boolean isCount) {

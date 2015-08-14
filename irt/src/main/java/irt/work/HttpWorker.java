@@ -7,28 +7,28 @@ import javax.servlet.http.HttpServletRequest;
 
 public class HttpWorker {
 
-	public static Long[] getIds(HttpServletRequest request) {
+	public static Integer[] getIds(HttpServletRequest request) {
 		String componentsIdsStr = request.getParameter("ids");
-		List<Long> componentsIds = new ArrayList<>();
+		List<Integer> componentsIds = new ArrayList<>();
 
 		if(componentsIdsStr!=null)
 		for (String s : componentsIdsStr.split(",")) {
-			Long componentId = getComponentId(s);
+			Integer componentId = getComponentId(s);
 			if (componentId != null)
 				componentsIds.add(componentId);
 		}
 
-		return componentsIds.isEmpty() ? null : componentsIds.toArray(new Long[componentsIds.size()]);
+		return componentsIds.isEmpty() ? null : componentsIds.toArray(new Integer[componentsIds.size()]);
 	}
 
-	public static Long getId(HttpServletRequest request) {
+	public static Integer getId(HttpServletRequest request) {
 		return getComponentId(request.getParameter("id"));
 	}
 
-	private static Long getComponentId(String componentIdStr) {
-		Long componentId = null;
+	private static Integer getComponentId(String componentIdStr) {
+		Integer componentId = null;
 		if(componentIdStr!=null && !(componentIdStr = componentIdStr.replaceAll("\\D", "")).isEmpty())
-			componentId = Long.parseLong(componentIdStr);
+			componentId = Integer.parseInt(componentIdStr);
 		return componentId;
 	}
 }

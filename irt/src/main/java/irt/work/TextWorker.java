@@ -297,8 +297,8 @@ public class TextWorker {
 		return classId;
 	}
 
-	public static int toInt(String valueStr) {
-		int returnInt = 0;
+	public static Integer toInt(String valueStr) {
+		Integer returnInt = null;
 		
 		if( valueStr != null && !valueStr.isEmpty()){
 

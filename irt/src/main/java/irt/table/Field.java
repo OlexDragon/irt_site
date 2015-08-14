@@ -46,11 +46,6 @@ public class Field {
 		return getValue()==null || getValue().isEmpty();
 	}
 
-	@Override
-	public String toString() {
-		return "<td" +(className!=null && !className.isEmpty() ? " class=\""+className+"\"" : "")+">" + getValue() + "</td>";
-	}
-
 	public void setClassName(String className) {
 		this.className = className;
 	}
@@ -82,5 +77,10 @@ public class Field {
 			result = 0;
 
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "<td" +(className!=null && !className.isEmpty() ? " class=\""+className+"\"" : "")+">" + getValue() + "</td>";
 	}
 }
