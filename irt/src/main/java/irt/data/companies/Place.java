@@ -5,6 +5,9 @@ public class Place {
     int id;
     String name;
 
+    public Place() {
+    }
+
     public Place(int id, String name) {
         this.id = id;
         this.name = name;

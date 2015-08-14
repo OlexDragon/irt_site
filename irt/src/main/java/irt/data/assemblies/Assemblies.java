@@ -47,6 +47,7 @@ public class Assemblies extends Component {
 		super.setMenu();
 		if(classIdStr==null || !classIdStr.equals(getClassId())){
 			classIdStr = getClassId();
+			topMenu = new MenuDAO().getTopComponentsMenu("assemblied");
 		}
 	}
 

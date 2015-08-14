@@ -1,10 +1,14 @@
 package irt.data.components.movement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import irt.data.components.movement.interfaces.ComponentQuantity;
 
 
 public class ComponentQty implements ComponentQuantity{
 	int id;
+	@JsonProperty("qty")
 	int quantity;
 
 	public ComponentQty(int componentId, int qty) {
@@ -13,6 +17,11 @@ public class ComponentQty implements ComponentQuantity{
 	}
 
 	public int getId() { return id;	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+	@JsonIgnore
 	public int getStockQuantity() 	{ return quantity;		}
 
 	public void settId	(int componentId) 	{ this.id	= componentId;	}
@@ -33,11 +42,13 @@ public class ComponentQty implements ComponentQuantity{
 	}
 
 	@Override
+	@JsonIgnore
 	public String getColor() {
 		return null;
 	}
 
 	@Override
+	@JsonIgnore
 	public int getQuantityToMove() {
 		return quantity;
 	}
@@ -45,15 +56,5 @@ public class ComponentQty implements ComponentQuantity{
 	@Override
 	public String toString() {
 		return "ComponentQty [componentId=" + id + ", quantity="+ quantity + "]";
-	}
-
-	@Override
-	public int getSubtractQuantity() {
-		return 0;
-	}
-
-	@Override
-	public int getSumQuantity() {
-		return 0;
 	}
 }

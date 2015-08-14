@@ -7,6 +7,4 @@ public interface ComponentQuantity {
 	public void addQuantity(int qty);
 	public String getColor();
 	public int getQuantityToMove();
-	public int getSubtractQuantity();
-	public int getSumQuantity();
 }

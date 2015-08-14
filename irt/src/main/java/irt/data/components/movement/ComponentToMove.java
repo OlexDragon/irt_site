@@ -1,16 +1,25 @@
 package irt.data.components.movement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import irt.data.components.Component;
 import irt.data.components.movement.interfaces.ComponentQuantity;
 
 
 public class ComponentToMove implements ComponentQuantity{
 
 	private int id = -1;
+	@JsonProperty("pn")
 	private String partNumber;
 	private String mfrPN;
+	@JsonProperty("dscr")
 	private String description;
+	@JsonProperty("sQty")
 	private int stockQuantity;
+	@JsonProperty("qtyToM")
 	private	int	quantityToMove;
+	@JsonProperty("lctn")
 	private String location;
 
 	private String		color;
@@ -29,6 +38,16 @@ public class ComponentToMove implements ComponentQuantity{
 		id = componentId;
 	}
 
+	public ComponentToMove(Component component) {
+		id = component.getId();
+		partNumber = component.getPartNumberF();
+		mfrPN = component.getMfrPN();
+		description = component.getDescription();
+		stockQuantity = component.getQuantity();
+		location = component.getLocation();
+	}
+
+	@JsonIgnore
 	public boolean setQuantityToMove(int quantityToMove, boolean addToStock) {
 		boolean wasSet = false;
 
@@ -51,7 +70,7 @@ public class ComponentToMove implements ComponentQuantity{
 	public String	getColor()			{ return color!=null ? color : "";	}
 	public String	getPartNumber()		{ return partNumber!=null ? partNumber : "";		}
 	public String	getDescription()	{ return description!=null ? description : "";		}
-	public String	getManufPartNumber(){ return mfrPN!=null ? mfrPN : "";	}
+	public String	getMfrPN()			{ return mfrPN!=null ? mfrPN : "";	}
 	public String	getLocation()		{ return location!=null ? location : "";		}
 	@Override
 	public int getId()				{ return id;	}
@@ -59,6 +78,15 @@ public class ComponentToMove implements ComponentQuantity{
 	public int getStockQuantity()		{ return stockQuantity;	}
 	@Override
 	public int getQuantityToMove()	{ return quantityToMove;	}
+
+	/**
+	 * Use only for Json
+	 * @param quantityToMove
+	 */
+	@Deprecated
+	public void setQuantityToMove(int quantityToMove) {
+		this.quantityToMove = quantityToMove;
+	}
 
 	public void setColor(String color) { this.color = color;	}
 
@@ -75,16 +103,6 @@ public class ComponentToMove implements ComponentQuantity{
 	@Override
 	public void addQuantity(int qty) {
 		this.quantityToMove += qty;
-	}
-
-	@Override
-	public int getSubtractQuantity() {
-		return stockQuantity - quantityToMove;
-	}
-
-	@Override
-	public int getSumQuantity() {
-		return stockQuantity + quantityToMove;
 	}
 
 	public void setStockQuantity(int stockQuantity) {

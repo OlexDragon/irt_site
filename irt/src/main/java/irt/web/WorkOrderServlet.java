@@ -130,13 +130,13 @@ public class WorkOrderServlet extends HttpServlet {
 	}
 
 	private boolean setIds(HttpServletRequest request, WorkOrder workOrder) {
-		Long id = HttpWorker.getId(request);
+		Integer id = HttpWorker.getId(request);
 		boolean haveToSaveWO = false;
 		if(id!=null){
 			workOrder.add(id);
 			haveToSaveWO = true;
 		}else{
-			Long[] ids = HttpWorker.getIds(request);
+			Integer[] ids = HttpWorker.getIds(request);
 			if(ids!=null){
 				workOrder.add(ids);
 				haveToSaveWO = true;

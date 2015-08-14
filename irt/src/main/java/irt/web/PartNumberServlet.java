@@ -196,6 +196,7 @@ public class PartNumberServlet extends HttpServlet {
 			break;
 		case "submit_add_link":
 			if(userBean.getID()>0){
+				componentToCookies(request, response, component);
 				if(userBean.isEditing()){
 					response.sendRedirect("add-link?id="+component.getId());
 					return;
@@ -206,21 +207,27 @@ public class PartNumberServlet extends HttpServlet {
 				return;
 			}
 		case "submit-bom":
+			componentToCookies(request, response, component);
 			response.sendRedirect("product_structure?pn="+component.getPartNumber()+"&bom=true");
 			return;
 		case "submit-pdf":
+			componentToCookies(request, response, component);
 			response.sendRedirect("product_structure?pn="+component.getPartNumber()+"&pdf=true&bom=true");
 			return;
 		case "submit-excel":
+			componentToCookies(request, response, component);
 			response.sendRedirect("product_structure?pn="+component.getPartNumber()+"&excel=true&bom=true");
 			return;
 		case "submit-where":
+			componentToCookies(request, response, component);
 			response.sendRedirect("product_structure?pn="+component.getPartNumber()+"&bom=false");
 			return;
 		case "submit-alt":
+			componentToCookies(request, response, component);
 			response.sendRedirect("alt-mfr-pns");
 			return;
 		case "submit-purchase":
+			componentToCookies(request, response, component);
 			response.sendRedirect("purchase");
 			return;
 		case "submit-add-to-purchase":

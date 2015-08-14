@@ -3,8 +3,10 @@ package irt.data.workorder;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -68,18 +70,25 @@ public class WorkOrder {
 			this.creationTime = Timestamp.valueOf(creationTime);
 	}
 
-	public void add(Long componentsId) {
-		logger.entry(componentsId);
-		componentsIds.add(componentsId);
+	public void add(Integer id) {
+		logger.entry(id);
+		componentsIds.add(id.longValue());
 	}
 
-	public void add(Long[] componentsIds) {
+	public void add(Integer[] componentsIds) {
 		logger.entry((Object[])componentsIds);
-		this.componentsIds.addAll(Arrays.asList(componentsIds));
+		this.componentsIds.addAll(toLongList(componentsIds));
 	}
 
-	public Iterator<Long> getIdsIterator(){
-		return componentsIds.iterator();
+//	public Iterator<Integer> getIdsIterator(){
+//		return componentsIds.iterator();
+//	}
+
+	private List<Long> toLongList(Integer[] componentsIds){
+		List<Long> l = new ArrayList<>();
+		for(Integer i:componentsIds)
+			l.add(i.longValue());
+		return l;
 	}
 
 	public Long[] getIdsArray(){
@@ -111,7 +120,7 @@ public class WorkOrder {
 					workOrder  = new WorkOrder();
 					for (String s : str.split(","))
 						if (!(s = s.replaceAll("\\D", "")).isEmpty())
-							workOrder.add(Long.parseLong(s));
+							workOrder.add(Integer.parseInt(s));
 
 					//Name
 					setStringValue("name=", ", description=", workOrderStr, workOrder, WorkOrder.class.getDeclaredMethod("setName", String.class));

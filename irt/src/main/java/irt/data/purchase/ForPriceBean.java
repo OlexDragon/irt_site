@@ -4,12 +4,16 @@ import java.math.BigDecimal;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class ForPriceBean {
 
 	private final Logger logger = LogManager.getLogger();
+	@JsonProperty("fu")
 	private int forUnits;
+	@JsonProperty("p")
 	private BigDecimal price;
+	@JsonProperty("np")
 	private BigDecimal newPrice;
 
 	public int getForUnits() {

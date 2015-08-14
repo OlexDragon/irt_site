@@ -202,7 +202,7 @@ public class Purchase {
 								stock = alternativeComponents[index].getStockQuantity();
 								sf.setValue(""+stock);
 								lf.setValue(alternativeComponents[index].getLocation());
-								mf.setValue(alternativeComponents[index].getManufPartNumber());
+								mf.setValue(alternativeComponents[index].getMfrPN());
 								tf.setValue(""+(activePage==PAGE_PURCHASE ? stock<need ? need-stock : 0 : stock>need ? need : stock));
 								if(kf!=null){
 									kf.setValue(""+(kit = new KitDAO().getQuantity(kitId, componentId)-kit));

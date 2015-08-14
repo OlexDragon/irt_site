@@ -6,11 +6,14 @@ import java.io.Writer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Error {
 
 	private static Logger logger = LogManager.getLogger();
 
+	@JsonProperty("err")
 	private String errorMessage;
 
 	public String getErrorMessage() {
@@ -30,10 +33,12 @@ public class Error {
 				this.errorMessage += "<br />" + errorMessage;
 	}
 
+	@JsonIgnore
 	public boolean isError() {
 		return logger.exit(errorMessage != null);
 	}
 
+	@JsonIgnore
 	public void setErrorMessage(String errorMessage, String htmlClassName) {
 		logger.entry(errorMessage, htmlClassName);
 
@@ -41,6 +46,7 @@ public class Error {
 				+ errorMessage + "</span>");
 	}
 
+	@JsonIgnore
 	public String getStackTrace(Throwable aThrowable) {
 
 		final Writer result = new StringWriter();
@@ -48,5 +54,10 @@ public class Error {
 		aThrowable.printStackTrace(printWriter);
 
 		return result.toString();
+	}
+
+	@Override
+	public String toString() {
+		return "Error [errorMessage=" + errorMessage + "]";
 	}
 }

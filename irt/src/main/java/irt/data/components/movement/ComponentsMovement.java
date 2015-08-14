@@ -1,11 +1,13 @@
 package irt.data.components.movement;
 
+import irt.data.Error;
 import irt.data.HTMLWork;
 import irt.data.companies.Company;
 import irt.data.companies.Place;
 import irt.data.components.movement.interfaces.ComponentQuantity;
 import irt.data.dao.CompanyDAO;
 import irt.data.dao.ComponentDAO;
+import irt.data.dao.ComponentDAO.Action;
 import irt.data.dao.ComponentsMovementDAO;
 import irt.data.dao.KitDAO;
 import irt.data.dao.MenuDAO;
@@ -27,6 +29,11 @@ import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 public class ComponentsMovement {
 	public static final int CREATING = 0;
 	public static final int CLOSED	 = 1;
@@ -35,25 +42,45 @@ public class ComponentsMovement {
 	public static final int EDIT	 = 3;
 	public static final int MOVING	 = 4; //moving details was not created yet
 
+	private final Logger logger = LogManager.getLogger();
+
 	private int 					id;
+	@JsonProperty("wh")
 	private UserBean 				who;
+	@JsonProperty("fr")
 	private Place 					from;
+	@JsonProperty("fd")
 	private Company 				fromDetail;
+	@JsonProperty("pl")
 	private Place 					to;
+	@JsonProperty("cmp")
 	private Company 				toDetail;
+	@JsonProperty("dscr")
 	private String					description;
+	@JsonProperty("dt")
 	private Date 					date;
+	@JsonProperty("st")
 	private int						status;
 
+	@JsonProperty("dts")
 	private ComponentsQuantity		details;
+	@JsonProperty("pls")
 	private List<Place>				places;
 
+	@JsonProperty("er")
 	private boolean 				error;
+	@JsonProperty("cmsFr")
 	private List<Company> 			companiesFrom;
+	@JsonProperty("cmsT")
 	private List<Company> 			companiesTo;
+	@JsonProperty("sa")
 	private boolean 				isShowAll;
+	@JsonProperty("ho")
 	private String 					historyOf;
-	private irt.data.Error			errorMessage = new irt.data.Error();
+	@JsonProperty("em")
+	private Error			errorMessage = new Error();
+
+	private final ComponentsMovementDAO componentsMovementDAO = new ComponentsMovementDAO();
 
 	public ComponentsMovement() {
 		details = new ComponentsQuantity();
@@ -88,11 +115,26 @@ public class ComponentsMovement {
 			switch(link){
 			case PartNumberServlet.HTTP_ADDRESS:
 			case SellersServlet.HTTP_ADDRESS:
-				p = componentsMovement.getPlace(1);//"Stock"
+				p = componentsMovement.getPlace(Company.STOCK);//"Stock"
 			}
 		}
 
 		return p;
+	}
+
+	public static Byte getPlaceId(String link) {
+		Byte id = null;
+
+		if(link!=null){
+
+			switch(link){
+			case PartNumberServlet.HTTP_ADDRESS:
+			case SellersServlet.HTTP_ADDRESS:
+				id = Company.STOCK;//"Stock"
+			}
+		}
+
+		return id;
 	}
 
 	public List<Place> getPlaces() {
@@ -103,20 +145,20 @@ public class ComponentsMovement {
 		this.places = places;
 	}
 
-	public boolean add(ComponentToMove componentToMove) {
+	public Boolean add(ComponentToMove componentToMove) {
 
-		boolean isMoved = false;
+		Boolean added = null;
 
 		if(componentToMove!=null){
 			if(componentToMove.getStockQuantity()>0 && componentToMove.getQuantityToMove()>0 || from==null || from.getId()==Company.TYPE_VENDOR){
-				if(isMoved = details.add(componentToMove)){
-					errorMessage.setErrorMessage("The component "+componentToMove.getPartNumber()+" added to the moving list.", "cBlue");
+				if(added = details.add(componentToMove)){
+					//errorMessage.setErrorMessage("The component "+componentToMove.getPartNumber()+" added to the moving list.", "cBlue");
 				}else
 					errorMessage.setErrorMessage("The component "+componentToMove.getPartNumber()+" already exist in the moving list. <small>(E002)</small>");
 			}else
 				errorMessage.setErrorMessage(componentToMove.getPartNumber()+" was not moved. The component quantity is 0. <small>(E003)</small>");
 		}
-		return isMoved;
+		return added;
 	}
 
 	public boolean add(String pn, String httpAddress) {
@@ -154,6 +196,7 @@ public class ComponentsMovement {
 			add(l, link);
 	}
 
+	@JsonIgnore
 	public String getTable(){
 		String tableStr = "";
 
@@ -163,7 +206,7 @@ public class ComponentsMovement {
 			for (ComponentToMove ctm : details.getComponentsToMove()) {
 				int componentId = ctm.getId();
 				table.add(new Row(new String[]{	ctm.getPartNumber(),
-											ctm.getManufPartNumber(),
+											ctm.getMfrPN(),
 											ctm.getDescription(),
 											ctm.getLocation(),
 											"<input class=\"c3em"+ctm.getColor()+"\" id=\"qty"+componentId+"\" name=\"qty"+componentId+"\" value=\""+ctm.getQuantityToMove()+"\" />"}));
@@ -185,6 +228,7 @@ public class ComponentsMovement {
 		return tableStr;
 	}
 
+	@JsonIgnore
 	public Place getPlace(String placeName) {
 		Place place = null;
 
@@ -196,6 +240,7 @@ public class ComponentsMovement {
 		return place;
 	}
 
+	@JsonIgnore
 	public Place getPlace(int placeId) {
 		Place place = null;
 
@@ -207,6 +252,7 @@ public class ComponentsMovement {
 		return place;
 	}
 
+	@JsonIgnore
 	public String getPlacesHTML(Place place, String name){
 		String html = "<select id=\""+name+"\" name=\""+name+"\" onchange=\"oneClick('submit')\">"
 						+"<option>Select</option>";
@@ -223,6 +269,7 @@ public class ComponentsMovement {
 		return html + "</select>";
 	}
 
+	@JsonIgnore
 	public String getDetailsHTML(Place place, Company detail, String name){
 		List<Company> companies = null;
 
@@ -267,6 +314,7 @@ public class ComponentsMovement {
 		return html + "</select>";
 	}
 
+	@JsonIgnore
 	public void setFrom(String placeIdStr) {
 
 		if (from==null && placeIdStr != null && !(placeIdStr.replaceAll("[^\\d]", "")).isEmpty()){
@@ -274,20 +322,28 @@ public class ComponentsMovement {
 		}
 	}
 
+	@JsonIgnore
 	public void setFrom(int placeId) {
 
 			from = getPlace(placeId);
 			companiesFrom = null;
 	}
 
+	@JsonIgnore
 	public void setTo(String placeIdStr) {
 
 		if (to==null && placeIdStr != null && !(placeIdStr.replaceAll("[^\\d]", "")).isEmpty()){
-			to = getPlace(Byte.parseByte(placeIdStr));
-			companiesTo = null;
+			byte parseByte = Byte.parseByte(placeIdStr);
+			setTo(parseByte);
 		}
 	}
 
+	public void setTo(int placeId) {
+		to = getPlace(placeId);
+		companiesTo = null;
+	}
+
+	@JsonIgnore
 	public void setToDetail(String companyIdStr) {
 
 		if(companiesTo!=null && companyIdStr!=null && !(companyIdStr = companyIdStr.replaceAll("[^\\d]", "")).isEmpty()){
@@ -317,6 +373,7 @@ public class ComponentsMovement {
 		}
 	}
 
+	@JsonIgnore
 	public void setFromDetail(String companyIdStr) {
 		if(companyIdStr!=null && !(companyIdStr = companyIdStr.replaceAll("[^\\d]", "")).isEmpty()){
 			int companyId = Integer.parseInt(companyIdStr);
@@ -329,8 +386,8 @@ public class ComponentsMovement {
 
 		if(isFromToChecked()){
 			description = request.getParameter(ComponentsMovementServlet.TXT_DESCRIPTION);
-			if(setQuantityToMove(request) || from.getId()==Company.KIT)
-				move(); 
+//			if(setQuantityToMove(request) || from.getId()==Company.KIT)
+			move(); 
 		}else{
 			errorMessage.setErrorMessage("All fields must be selected. <small>(E006)</small>");
 			error = true;
@@ -339,6 +396,7 @@ public class ComponentsMovement {
 		return !error;
 	}
 
+	@JsonIgnore
 	public boolean setQuantityToMove(HttpServletRequest request) {
 		error = false;
 		ComponentsQuantity htmlFields = HTMLWork.getHtmlFields(request,"qty");
@@ -354,68 +412,112 @@ public class ComponentsMovement {
 
 	private boolean move() { //userId who make movement
 
-		switch(getStatus()){
+		switch(status){
 		case CREATING:
 			switch (to.getId()){
-			case Company.ASSEMBLED:
-				switch(from.getId()){
-				case Company.STOCK:
-					if(new ComponentsMovementDAO().moveFromStockToAssembled(this, who.getID())<=0)
-						errorMessage.setErrorMessage("Input Error. <small>(E007)</small>");
-					break;
-				case Company.TYPE_CM:
-					if(new ComponentsMovementDAO().moveFromSuplierToAssembled(this)<=0)
-						errorMessage.setErrorMessage("Input Error. <small>(E008)</small>");
-					break;
-				case Company.TYPE_VENDOR:
-					if(new ComponentsMovementDAO().moveFromVendor(this, who.getID())<=0)
-						errorMessage.setErrorMessage("Input Error. <small>(E009)</small>");
-				}
+			case Company.TYPE_CM:
+				logger.trace("\n\t{}", "Company.TYPE_CM");
+				moveToCompany();
 				break;
-
-			case Company.KIT:
-				setStatus(MOVING);
-				if(!new KitDAO().moveFromStock(this))
-					errorMessage.setErrorMessage("Input Error. <small>(E010)</small>");
+			case Company.TYPE_VENDOR:
+				logger.trace("\n\t{}", "Company.TYPE_VENDOR");
+				errorMessage.setErrorMessage("Coming soon");
 				break;
-
-			case Company.BULK:
-				setStatus(MOVING);
-				if(new ComponentsMovementDAO().moveToBaulk(this)<=0)
-					errorMessage.setErrorMessage("Input Error. <small>(E011)</small>");
-				break;
-
-			default:
-				setStatus(MOVING);
-				switch(from.getId()){
-				case Company.KIT:
-					if(new ComponentsMovementDAO().moveFromKIT(this)<=0)
-						errorMessage.setErrorMessage("Input Error. <small>(E012)</small>");
-					break;
-
-				case Company.TYPE_VENDOR:
-					if ((new ComponentsMovementDAO().createComponentsMovement(this, ComponentDAO.QTY_ADD)) <= 0) {
-						errorMessage.setErrorMessage("Input Error. <small>(E013)</small>");
-						error = true;
-					}
-					break;
-
-				default:
-					int option;
-					if(to.getId()==Company.STOCK)
-						option = ComponentDAO.QTY_ADD;
-					else
-						option = ComponentDAO.QTY_SUBTACT;
-					if ((new ComponentsMovementDAO().createComponentsMovement(this, option)) <= 0) {
-						errorMessage.setErrorMessage("Input Error. <small>(E014)</small>");
-						error = true;
-					}
-				}
+			case Company.STOCK:
+				logger.trace("\n\t{}", "Company.TYPE_CM");
+				moveToStock();
+//TODO			case Company.ASSEMBLED:
+//				logger.trace("\n\t{}", "Company.ASSEMBLED");
+//				switch(from.getId()){
+//				case Company.STOCK:
+//					logger.trace("\n\t\t{}", "Company.STOCK");
+//					if(new ComponentsMovementDAO().moveFromStockToAssembled(this, who.getID())<=0)
+//						errorMessage.setErrorMessage("Input Error. <small>(E007)</small>");
+//					break;
+//				case Company.TYPE_CM:
+//					logger.trace("\n\t\t{}", "Company.TYPE_CM");
+//					if(new ComponentsMovementDAO().moveFromSuplierToAssembled(this)<=0)
+//						errorMessage.setErrorMessage("Input Error. <small>(E008)</small>");
+//					break;
+//				case Company.TYPE_VENDOR:
+//					logger.trace("\n\t\t{}", "Company.TYPE_VENDOR");
+//					if(new ComponentsMovementDAO().moveFromVendor(this, who.getID())<=0)
+//						errorMessage.setErrorMessage("Input Error. <small>(E009)</small>");
+//				}
+//				break;
+//
+//			case Company.KIT:
+//				logger.trace("\n\t{}", "Company.KIT");
+//				setStatus(MOVING);
+//				if(!new KitDAO().moveFromStock(this))
+//					errorMessage.setErrorMessage("Input Error. <small>(E010)</small>");
+//				break;
+//
+//			case Company.BULK:
+//				logger.trace("\n\t{}", "Company.BULK");
+//				setStatus(MOVING);
+//				if(new ComponentsMovementDAO().moveToBaulk(this)<=0)
+//					errorMessage.setErrorMessage("Input Error. <small>(E011)</small>");
+//				break;
+//
+//			default:
+//				logger.trace("\n\t{}", "default:");
+//				setStatus(MOVING);
+//				switch(from.getId()){
+//				case Company.KIT:
+//					logger.trace("\n\t\t{}", "Company.KIT");
+//					if(new ComponentsMovementDAO().moveFromKIT(this)<=0)
+//						errorMessage.setErrorMessage("Input Error. <small>(E012)</small>");
+//					break;
+//
+//				case Company.TYPE_VENDOR:
+//					logger.trace("\n\t\t{}", "Company.TYPE_VENDOR");
+//					if ((new ComponentsMovementDAO().createComponentsMovement(this, ComponentDAO.QTY_ADD)) <= 0) {
+//						errorMessage.setErrorMessage("Input Error. <small>(E013)</small>");
+//						error = true;
+//					}
+//					break;
+//
+//				default:
+//					logger.trace("\n\t\t{}", "default:");
+//					int option;
+//					if(to.getId()==Company.STOCK)
+//						option = ComponentDAO.QTY_ADD;
+//					else
+//						option = ComponentDAO.QTY_SUBTACT;
+//					if ((new ComponentsMovementDAO().createComponentsMovement(this, option)) <= 0) {
+//						errorMessage.setErrorMessage("Input Error. <small>(E014)</small>");
+//						error = true;
+//					}
+//				}
 			}
 		}
 
 		return !error;
 	}
+
+	private void moveToStock() {
+		switch(from.getId()){
+		case Company.TYPE_CM:
+			logger.trace("\n\t{}", "Company.TYPE_CM");
+			componentsMovementDAO.moveComponents(this, Action.QTY_ADD);
+			break;
+		default:
+			errorMessage.setErrorMessage("Coming soon.(cs2)");
+		}
+	}
+
+	private void moveToCompany() {
+		switch(from.getId()){
+		case Company.STOCK:
+			logger.trace("\n\t{}", "Company.STOCK");
+			componentsMovementDAO.moveComponents(this, Action.QTY_SUBTACT);
+			break;
+		default:
+			errorMessage.setErrorMessage("Coming soon.(cs1)");
+		}
+	}
+
 
 	public void moveComponent(ComponentDAO componentDAO, ComponentsMovementDAO movementDAO, int movementId, ComponentToMove ctm) {
 
@@ -429,6 +531,7 @@ public class ComponentsMovement {
 			error = true;
 	}
 
+	@JsonIgnore
 	private void setQuantityToMove(ComponentsQuantity htmlFields) {
 
 		List<ComponentQuantity> componentsQuantity = htmlFields.getComponentsQuantity();
@@ -483,6 +586,7 @@ public class ComponentsMovement {
 	}
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	@JsonIgnore
 	public boolean isFromToChecked() {
 		return	from		!=	null	&&
 				to			!=	null	&&
@@ -545,14 +649,6 @@ public class ComponentsMovement {
 				&& from.getId()>0 ;
 	}
 
-	@Override
-	public String toString() {
-		return "ComponentsMovement [id=" + id + ", who=" + who + ", from="
-				+ from + ", fromDetail=" + fromDetail + ", to=" + to
-				+ ", toDetail=" + toDetail + ", description=" + description
-				+ ", date=" + date + ", status=" + status + "]";
-	}
-
 	public boolean isShowAll() {
 		return isShowAll;
 	}
@@ -569,6 +665,7 @@ public class ComponentsMovement {
 		return details!=null ? details.contains(componentId) : false;
 	}
 
+	@JsonIgnore
 	public void getComponentsKit() {
 		details = new KitDAO().getComponentsQuantity(toDetail.getId());
 	}
@@ -584,11 +681,43 @@ public class ComponentsMovement {
 	}
 
 	public void addQuantity(int componentId, String qtyDescription, int oldQty, int qty, int userId, int from, int fromDetail, int to, int toDetail) {
-		if(new ComponentDAO().setQuantity(componentId, qty, ComponentDAO.QTY_ADD))
+		if(new ComponentDAO().setQuantity(componentId, qty, Action.QTY_ADD))
 			 new ComponentsMovementDAO().insertMovementHistory(userId, from, fromDetail, to, toDetail, qtyDescription, componentId, oldQty, qty);
 	}
 
 	public irt.data.Error getErrorMessage() {
 		return errorMessage;
+	}
+
+	@Override
+	public String toString() {
+		return "ComponentsMovement [id=" + id + ", who=" + who + ", from="
+				+ from + ", fromDetail=" + fromDetail + ", to=" + to
+				+ ", toDetail=" + toDetail + ", description=" + description
+				+ ", date=" + date + ", status=" + status + ", details="
+				+ details + ", places=" + places + ", error=" + error
+				+ ", companiesFrom=" + companiesFrom + ", companiesTo="
+				+ companiesTo + ", isShowAll=" + isShowAll + ", historyOf="
+				+ historyOf + ", errorMessage=" + errorMessage + "]";
+	}
+
+	public boolean isError() {
+		return error;
+	}
+
+	public void setError(boolean error) {
+		this.error = error;
+	}
+
+	public void setFromDetail(Company fromDetail) {
+		this.fromDetail = fromDetail;
+	}
+
+	public void setToDetail(Company toDetail) {
+		this.toDetail = toDetail;
+	}
+
+	public void setErrorMessage(irt.data.Error errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 }
