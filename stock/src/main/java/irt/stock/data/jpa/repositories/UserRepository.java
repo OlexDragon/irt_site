@@ -1,0 +1,13 @@
+package irt.stock.data.jpa.repositories;
+
+import java.util.Optional;
+
+import org.springframework.data.repository.CrudRepository;
+
+import irt.stock.data.jpa.beans.User;
+
+public interface UserRepository extends CrudRepository<User, Long> {
+
+	Optional<User> findById(Long id);
+	Optional<User> findByUsername(String username);
+}
