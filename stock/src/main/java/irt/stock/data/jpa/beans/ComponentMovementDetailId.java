@@ -8,6 +8,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Embeddable
 public class ComponentMovementDetailId implements Serializable{
 	private static final long serialVersionUID = 4855489947388797625L;
@@ -25,6 +27,7 @@ public class ComponentMovementDetailId implements Serializable{
 	@JoinColumn(name="idMovement")
 	private ComponentMovement componentMovement;
 
+	@JsonIgnore
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="idComponents")
 	private Component component;

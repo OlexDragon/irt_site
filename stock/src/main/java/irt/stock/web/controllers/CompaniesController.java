@@ -21,4 +21,9 @@ public class CompaniesController {
 	public List<Company> getVendors(){
 		return companyRepository.findByType(CompanyType.VENDOR);
 	}
+
+	@RequestMapping("co_mfr")
+	public List<Company> getCoManufactures(){
+		return companyRepository.findByType(CompanyType.CO_MANUFACTURER);
+	}
 }

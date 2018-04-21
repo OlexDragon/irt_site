@@ -9,6 +9,8 @@ import static org.junit.Assert.assertThat;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matchers;
@@ -29,6 +31,7 @@ import irt.stock.data.jpa.beans.Manufacture;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 public class CostRepositoryTest {
 	private final static Logger logger = LogManager.getLogger();
 
@@ -51,11 +54,13 @@ public class CostRepositoryTest {
 		company = companyRepository.save(new Company(null, "companyName", CompanyType.VENDOR));
 		cost[0] = costRepository.save(new Cost(component, alternative, company, 10L, new BigDecimal("1234.4321"), Currency.CAD, null, null));
 		cost[1] = costRepository.save(new Cost(component, null, company, 10L, new BigDecimal("8367.7347378"), Currency.CAD, null, null));
+		logger.info("{}",(Object[])cost);
 	}
 
 	@Test
 	public void test() {
-		final List<Cost> list = costRepository.findByIdComponentId(component.getId());
+		logger.info("\n\n\t ***** Start Test ***** \n\n");
+		final List<Cost> list = costRepository.findByIdIdComponents(component.getId());
 		logger.info(list);
 
 		assertFalse(list.isEmpty());
@@ -76,6 +81,7 @@ public class CostRepositoryTest {
 
 			assertNotNull(c.getChangeDate());
 		}
+		logger.info("\n\n\t ^^^^^^^ Test ends ^^^^^^^ \n\n");
 	}
 
 }

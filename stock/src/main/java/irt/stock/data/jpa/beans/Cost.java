@@ -2,18 +2,26 @@ package irt.stock.data.jpa.beans;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Digits;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -21,11 +29,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class Cost {
 	protected Cost() { }
 	public Cost(Component component, ComponentAlternative alternative, Company company, Long forQty, BigDecimal cost, Currency currency, OrderType orderType, String orderNumber) {
-		this.id = new CostId(component, alternative, company, forQty);
+		this.id = new CostId(component.getId(), Optional.ofNullable(alternative).map(ComponentAlternative::getId).filter(id->id != null).orElse(0L), company.getId(), forQty);
 		this.cost = cost;
 		this.currency = currency;
 		this.orderType = orderType;
 		this.orderNumber = orderNumber;
+		this.company = company;
 	}
 
 	@EmbeddedId
@@ -43,23 +52,35 @@ public class Cost {
 	@JsonFormat(pattern="dd.MMM.yy")
 	public Date changeDate;
 
+	@ManyToOne(fetch=FetchType.EAGER)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name="idComponentsAlternative", insertable=false, updatable=false, foreignKey=@ForeignKey(value = ConstraintMode.NO_CONSTRAINT), nullable=true)
+	private ComponentAlternative alternative;
+
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="idCompanies", insertable=false, updatable=false)
+	private Company company;
+
 	public CostId 				getId() 			{ return id; }
 	public BigDecimal 			getCost() 			{ return cost; }
 	public Currency 			getCurrency() 		{ return currency; }
-	public ComponentAlternative getAlternative() 	{ return id.getComponentsAlternative(); }
-	public Company 				getCompany() 		{ return id.getCompany(); }
+	public ComponentAlternative getAlternative() 	{ return alternative; }
+	public Company 				getCompany() 		{ return company; }
 	public Date 				getChangeDate() 	{ return changeDate; }
 	public String 				getOrderNumber() 	{ return orderNumber; }
 	public OrderType 			getOrderType() 		{ return orderType; }
+	public Long 				getForQty() 		{ return id.getForQty(); }
 
 	@PrePersist
 	protected void onCreate() {
-		changeDate = new Date();
+		if(getChangeDate()==null)
+			changeDate = new Date();
 	}
 
 	@PreUpdate
 	protected void onUpdate() {
-		changeDate = new Date();
+		if(getChangeDate()==null)
+			changeDate = new Date();
 	}
 	  
 	@Override

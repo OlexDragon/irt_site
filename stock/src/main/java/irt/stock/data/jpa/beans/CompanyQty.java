@@ -1,5 +1,7 @@
 package irt.stock.data.jpa.beans;
 
+import java.util.Optional;
+
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,21 +14,25 @@ import javax.persistence.Table;
 public class CompanyQty {
 
 	protected CompanyQty() {}
-	public CompanyQty(Long companyId, Long idComponent, int qty) {
+	public CompanyQty(Long companyId, Long idComponent, long qty) {
 		this.id = new CompanyQtyId(companyId, idComponent);
 		this.qty = qty;
 	}
 
 	@EmbeddedId private CompanyQtyId id;
-	private int qty;
+	private long qty;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name = "idCompanies", insertable=false, updatable=false)
 	private Company company;
 
 	public CompanyQtyId getId() { return id; }
-	public int getQty() 		{ return qty; }
+	public long getQty() 		{ return qty; }
 	public Company getCompany() { return company; }
+
+	public void addQty(long add) {
+		qty = Optional.ofNullable(qty).map(q->q + add).filter(q->q>=0).orElse(add>0 ? add : 0);
+	}
 
 	@Override
 	public int hashCode() {

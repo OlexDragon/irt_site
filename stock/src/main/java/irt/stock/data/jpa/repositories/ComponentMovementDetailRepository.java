@@ -9,5 +9,5 @@ import irt.stock.data.jpa.beans.ComponentMovementDetailId;
 
 public interface ComponentMovementDetailRepository extends CrudRepository<ComponentMovementDetail, ComponentMovementDetailId> {
 
-	List<ComponentMovementDetail> findByIdComponentId(long componentId);
+	List<ComponentMovementDetail> findByIdComponentIdOrderByIdComponentMovementDateTimeDesc(long componentId);
 }

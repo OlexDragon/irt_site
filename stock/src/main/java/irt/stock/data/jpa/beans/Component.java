@@ -49,7 +49,7 @@ public class Component implements PartNumber{
 	@JoinColumn(name = "idComponents", nullable=true)
 	private List<ComponentAlternative> alternativeComponents;
 
-	@OneToMany(cascade=CascadeType.ALL)
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@JoinColumn(name = "idComponents", nullable=true)
 	private List<Cost> costs;
@@ -69,9 +69,20 @@ public class Component implements PartNumber{
 	public void setAlternatives(List<ComponentAlternative> alternativeComponents) {
 		this.alternativeComponents = alternativeComponents;
 	}
+	public boolean setManufPartNumber(String manufPartNumber) {
+
+		final String mpn = getManufPartNumber();
+
+		if(mpn==null || mpn.equals("NULL") || mpn.trim().isEmpty()) {
+			this.manufPartNumber = manufPartNumber;
+			return true;
+		}
+
+		return false;
+	}
 
 	public void addQty(long add) {
-		qty = Optional.ofNullable(qty).map(q->q + add).orElse(add);
+		qty = Optional.ofNullable(qty).map(q->q + add).filter(q->q>=0).orElse(add>0 ? add : 0);
 	}
 
 	@Override
