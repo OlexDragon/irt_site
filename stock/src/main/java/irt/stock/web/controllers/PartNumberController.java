@@ -18,16 +18,29 @@ import irt.stock.web.PartNumber;
 public class PartNumberController {
 
 	@Autowired private PartNumberRepository partNumberRepository;
-
 	@Autowired private ComponentRepository componentRepository;
 
 	@RequestMapping
 	public List<? extends PartNumber> postPartNambers(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
-		return partNumberRepository.findByPartNumberContaining(desiredPN);
+		desiredPN = desiredPN.replaceAll("[^A-Za-z0-9]", "");
+		return partNumberRepository.findByPartNumberContainingOrderByPartNumber(desiredPN);
 	}
 
 	@RequestMapping("details")
 	public Optional<Component> postPartNamber(@RequestParam("pnId")Long pnId){
-		return componentRepository.findById(pnId);
+		return componentRepository
+				.findById(pnId)
+				.map(c->{
+					final String partNumber = c.getPartNumber();
+
+					if(c.getManufPartNumber()==null && partNumber.startsWith("M")) {
+						c.setManufPartNumber(partNumber);
+
+						if(c.setManufPartNumber(partNumber)) 
+							return componentRepository.save(c);
+					}
+
+					return c;
+				});
 	}
 }

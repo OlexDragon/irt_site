@@ -26,15 +26,17 @@ public class UserRepositoryTest {
 	@Autowired
 	private UserRepository repository;
 
+	private User user;
+
 	@Before
 	public void before() {
-		repository.save(new User( 1L, "username", "password", "firstName", "lastName", 7777777L, "extension", "email"));
+		user = repository.save(new User( null, "username", "password", "firstName", "lastName", 7777777L, "extension", "email"));
 	}
 
 	@Test
 	public void test() {
 
-		final Optional<User> oUser = repository.findById(1L);
+		final Optional<User> oUser = repository.findById(user.getId());
 
 		logger.info(oUser);
 
@@ -44,6 +46,6 @@ public class UserRepositoryTest {
 		final Long id = user.getId();
 
 		assertNotNull(id);
-		assertEquals(new Long(1), id);
+		assertEquals(this.user.getId(), id);
 	}
 }

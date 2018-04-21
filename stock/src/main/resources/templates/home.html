@@ -40,7 +40,7 @@
 				</div>
 				<div class="row p-2">
 					<select id="pns_out" name="pns_out" class="form-control w-100" multiple="multiple" size="15" style="overflow-y: auto;">
-						<option class="font-weight-bold text-secondary" sec:authorize="isAuthenticated()" th:each="pn : ${partNumbers}" th:value="${pn.id}" th:text="${pn.partNumber}" />
+						<option class="font-weight-bold text-secondary" sec:authorize="isAuthenticated()" th:each="pn : ${partNumbers}" th:value="${pn.id}" th:text="${pn.partNumber}" >Part Number</option>
 					</select>
 				</div>
 			</div>
@@ -50,16 +50,7 @@
 			<div class="col-sm-10 bg-light">
 				<h2 id="infoPN" class="bg-success rounded text-center" th:text="''">000-AB0337-SM002</h2>
 				<blockquote class="blockquote border">
-					<nav>
- 						 <div class="nav nav-tabs" id="nav-tab" role="tablist">
- 							<a class="nav-item nav-link active" id="info-tab" data-toggle="tab" href="#nav-info" role="tab" aria-controls="nav-info" aria-selected="true">Info</a>
-							<a class="nav-item nav-link" id="edit-tab" data-toggle="tab" href="#nav-edit" role="tab" aria-controls="edite-tab" aria-selected="false">Edit</a>
-							<a class="nav-item nav-link" id="hystory-tab" data-toggle="tab" href="#nav-history" role="tab" aria-controls="nav-history" aria-selected="false">History</a>
-						</div>
-					</nav>
-					<div class="tab-content" id="nav-tabContent">
  <!-- part number info -->
- 						<div id="nav-info" class="tab-pane fade show active" role="tabpanel" aria-labelledby="info-tab">
 							<dl class="row">
 								<dt class="col-sm-3" >Description</dt><dd class="col-sm-9" id="infoDescription">A description</dd>
 								<dt class="col-sm-3" >Mfr Part Number</dt><dd class="col-sm-9" id="infoMfrPN">Manufacturer part number</dd>
@@ -77,100 +68,215 @@
 									</dl>
 								</dd>
 							</dl>
-						</div>
- <!-- Edit part  -->
-  						<div class="tab-pane fade" id="nav-edit" role="tabpanel" aria-labelledby="edite-tab">
- 							<table class="table table-striped">
-								<caption style="caption-side: top">Component Cost</caption>
-								<thead>
-									<tr>
-										<th scope="col">Mfr PN</th>
-										<th scope="col">Vendor</th>
-										<th scope="col">For Qty</th>
-										<th scope="col">Price</th>
-										<th scope="col">Currency</th>
-										<th scope="col">Action</th>
-									</tr>
-								</thead>
-								<tbody id="editCost">
-								<!--/* -->
-									<tr>
-										<th>MGA-30889-BLKG</th>
-										<td>ARROW ELECTRONICS</td>
-										<td>100.00</td>
-										<td>USD</td>
-										<td><input type="button" value="new button"/></td>
-									</tr>
-									<tr>
-										<th>MGA-30889-BLKG</th>
-										<td>ARROW ELECTRONICS</td>
-										<td>100.00</td>
-										<td>USD</td>
-										<td><input type="button" value="new button"/></td>
-									</tr>
-									<tr>
-										<th>MGA-30889-BLKG</th>
-										<td>ARROW ELECTRONICS</td>
-										<td>100.00</td>
-										<td>USD</td>
-										<td><input type="button" value="new button"/></td>
-									</tr>
-								<!-- */-->
-								</tbody>
-							</table>
-  						</div>
- <!-- part history -->
- 						<div class="tab-pane fade" id="nav-history" role="tabpanel" aria-labelledby="hystory-tab">...</div>
-					</div>
 				</blockquote>
 			</div>
 		</div>
+		<div class="container-fluid">
 		<div class="row">
-							<table class="table table-striped">
-								<caption style="caption-side: top">Component Cost</caption>
-								<thead>
-									<tr>
-										<th scope="col">Mfr PN</th>
-										<th scope="col">Vendor</th>
-										<th scope="col">For Qty</th>
-										<th scope="col">Price</th>
-										<th scope="col">Currency</th>
-										<th scope="col">PO / Inv.</th>
-										<th scope="col">Change Date</th>
-									</tr>
-								</thead>
-								<tbody id="infoCost">
-								<!--/* -->
-									<tr>
-										<td scope="row">1</td>
-										<th>MGA-30889-BLKG</th>
-										<td>ARROW ELECTRONICS</td>
-										<td>100.00</td>
-										<td>USD</td>
-										<td>PO 1187</td>
-										<td>06.Apr.18</td>
-									</tr>
-									<tr>
-										<td scope="row">2</td>
-										<th>MGA-30889-BLKG</th>
-										<td>ARROW ELECTRONICS</td>
-										<td>100.00</td>
-										<td>USD</td>
-										<td>Inv.24125</td>
-										<td>06.Apr.18</td>
-									</tr>
-									<tr>
-										<td scope="row">3</td>
-										<th>MGA-30889-BLKG</th>
-										<td>ARROW ELECTRONICS</td>
-										<td>100.00</td>
-										<td>USD</td>
-										<td>Inv.24125</td>
-										<td>06.Apr.18</td>
-									</tr>
-								<!-- */-->
-								</tbody>
-							</table>
+			<nav>
+ 				 <div class="nav nav-tabs" id="nav-tab" role="tablist">
+ 					<a id="info-tab" class="nav-item nav-link active" data-toggle="tab" href="#nav-info" role="tab" aria-controls="nav-info" aria-selected="true">Info</a>
+					<a id="edit-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-edit" role="tab" aria-controls="edite-tab" aria-selected="false">Edit</a>
+					<a id="price-hystory-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-price-history" role="tab" aria-controls="nav-price-history" aria-selected="false">Price History</a>
+					<a id="component-hystory-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-component-history" role="tab" aria-controls="nav-component-history" aria-selected="false">Component History</a>
+					<button id="toCoMfrBtn" type="button" class="btn btn-outline-primary d-none hiddenBtn ml-2">TO CO MFR</button>
+					<button id="bulkBtn" type="button" class="btn btn-outline-primary d-none hiddenBtn ml-2">TO BULK</button>
+					<button id="toStockBtn" type="button" class="btn btn-outline-success d-none hiddenBtn ml-2">TO STOCK</button>
+				</div>
+			</nav>
+		</div>
+		<div class="row">
+			<div id="nav-tabContent" class="tab-content">
+ <!-- Info  -->
+ 				<div id="nav-info" class="tab-pane fade show active" role="tabpanel" aria-labelledby="info-tab">
+					<table class="table table-striped">
+						<caption>Component Cost</caption>
+						<thead>
+							<tr>
+								<th scope="col">Mfr PN</th>
+								<th scope="col">Vendor</th>
+								<th scope="col">For Qty</th>
+								<th scope="col">Price</th>
+								<th scope="col">Currency</th>
+								<th scope="col">PO / Inv.</th>
+								<th scope="col">Change Date</th>
+							</tr>
+						</thead>
+						<tbody id="infoCost">
+						<!--/* -->
+							<tr>
+								<td scope="row">1</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>PO 1187</td>
+								<td>06.Apr.18</td>
+							</tr>
+							<tr>
+								<td scope="row">2</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>Inv.24125</td>
+								<td>06.Apr.18</td>
+							</tr>
+							<tr>
+								<td scope="row">3</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>Inv.24125</td>
+								<td>06.Apr.18</td>
+							</tr>
+						<!-- */-->
+						</tbody>
+					</table>
+				</div>
+<!-- Edit part  -->
+				<div id="nav-edit" class="tab-pane fade" role="tabpanel" aria-labelledby="edite-tab">
+					<table class="table table-striped">
+						<caption>Component Cost</caption>
+						<thead>
+							<tr>
+								<th scope="col">Mfr PN</th>
+								<th scope="col">Vendor</th>
+								<th scope="col">For Qty</th>
+								<th scope="col">Price</th>
+								<th scope="col">Currency</th>
+								<th scope="col">Action</th>
+							</tr>
+						</thead>
+						<tbody id="editCost">
+							<!--/* -->
+							<tr>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td><input type="button" value="new button" /></td>
+							</tr>
+							<tr>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td><input type="button" value="new button" /></td>
+							</tr>
+							<tr>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td><input type="button" value="new button" /></td>
+							</tr>
+							<!-- */-->
+						</tbody>
+					</table>
+				</div>
+<!-- price history -->
+ 				<div id="nav-price-history" class="tab-pane fade" role="tabpanel" aria-labelledby="price-hystory-tab">
+					<table class="table table-striped">
+						<caption>Price history</caption>
+						<thead>
+							<tr>
+								<th scope="col">Mfr PN</th>
+								<th scope="col">Vendor</th>
+								<th scope="col">For Qty</th>
+								<th scope="col">Price</th>
+								<th scope="col">Currency</th>
+								<th scope="col">PO / Inv.</th>
+								<th scope="col">Date</th>
+							</tr>
+						</thead>
+						<tbody id="costHistory">
+						<!--/* -->
+							<tr>
+								<td scope="row">1</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>PO 1187</td>
+								<td>06.Apr.18</td>
+							</tr>
+							<tr>
+								<td scope="row">2</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>Inv.24125</td>
+								<td>06.Apr.18</td>
+							</tr>
+							<tr>
+								<td scope="row">3</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>Inv.24125</td>
+								<td>06.Apr.18</td>
+							</tr>
+						<!-- */-->
+						</tbody>
+					</table>
+				</div>
+		<!-- component history -->
+ 				<div id="nav-component-history" class="tab-pane fade" role="tabpanel" aria-labelledby="conponent-hystory-tab">
+ 					<table class="table table-striped">
+						<caption>Price history</caption>
+						<thead>
+							<tr>
+								<th scope="col">Date</th>
+								<th scope="col">By</th>
+								<th scope="col">From</th>
+								<th scope="col">Detail</th>
+								<th scope="col">To</th>
+								<th scope="col">Detail</th>
+								<th scope="col">Description</th>
+								<th scope="col">Been</th>
+								<th scope="col">Added</th>
+								<th scope="col">Sum</th>
+							</tr>
+						</thead>
+						<tbody id="componentHistory">
+						<!--/* -->
+							<tr>
+								<td scope="row">1</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>PO 1187</td>
+								<td>06.Apr.18</td>
+							</tr>
+							<tr>
+								<td scope="row">2</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>Inv.24125</td>
+								<td>06.Apr.18</td>
+							</tr>
+							<tr>
+								<td scope="row">3</td>
+								<th>MGA-30889-BLKG</th>
+								<td>ARROW ELECTRONICS</td>
+								<td>100.00</td>
+								<td>USD</td>
+								<td>Inv.24125</td>
+								<td>06.Apr.18</td>
+							</tr>
+						<!-- */-->
+						</tbody>
+					</table>
+ 				</div>
+			</div>
+		</div>
 		</div>
 	</div>
 
@@ -179,12 +285,12 @@
 		<div class="modal-dialog" role="document">
 
     		<!-- Modal content-->
-    		<div class="modal-content">
+    		<div class="modal-content" th:replace="modal_save_price::save_price_content">
       			<div class="modal-header">
          			<h4 id="costTitleLabel" class="modal-title">Save cost.</h4>
         			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       			</div>
-      			<div class="modal-body" th:replace="modal_save_price::content">
+      			<div class="modal-body">
  							<dl class="row">
 								<dt class="col-sm-3" >Mfr PN</dt><dd id="saveMfrPN" class="col-sm-9" >Manufacturer part number</dd>
 								<dt class="col-sm-3" >Vendor</dt><dd id="saveVendor" class="col-sm-9" >Vendor</dd>
@@ -194,15 +300,16 @@
       			</div>
      			<div class="modal-footer">
      				<select id="selectDivider" class="form-control"></select>
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-secondary form-control" data-dismiss="modal">Cancel</button>
 					<form id="savePriceForm" th:action="@{/component/price}" method="POST">
-						<button id="savePriceBtn" type="submit" class="btn btn-primary">Save</button>
+						<button name="savePriceBtn" type="submit" class="btn btn-outline-primary form-control">Save Price</button>
+						<button name="addToStockBtn" type="submit" class="btn btn-outline-success form-control">Add to stock</button>
 					</form>
       			</div>
     		</div>
   		</div>
 	</div>
-	<div class="ajax-loader"><!-- waiting spinner --></div>
+<!-- 	<div class="ajax-loader">waiting spinner</div> -->
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 <script sec:authorize="isAuthenticated()" src="../static/js/irt.js" th:src="@{/js/irt.js}" type="text/javascript"></script>

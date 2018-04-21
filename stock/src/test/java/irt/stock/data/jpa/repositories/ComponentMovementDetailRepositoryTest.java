@@ -63,7 +63,7 @@ public class ComponentMovementDetailRepositoryTest {
 	public void test() {
 		logger.info("Start test");
 
-		final List<ComponentMovementDetail> list = componentMovementDetailRepository.findByIdComponentId(component.getId());
+		final List<ComponentMovementDetail> list = componentMovementDetailRepository.findByIdComponentIdOrderByIdComponentMovementDateTimeDesc(component.getId());
 
 		logger.info(list);
 

@@ -13,14 +13,14 @@
 		<div class="modal-dialog" role="document">
 
     		<!-- Modal content-->
-    		<div class="modal-content">
+    		<div class="modal-content" th:fragment="save_price_content">
       			<div class="modal-header">
          			<h4 id="costTitleLabel" class="modal-title">Save cost.</h4>
         			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       			</div>
  
  
-      			<div class="modal-body" th:fragment="content">
+      			<div class="modal-body">
  							<dl class="row">
 								<dt class="col-sm-4" >Mfr PN</dt><dd id="saveMfrPN" class="col-sm-8" >Manufacturer part number</dd>
 								<dt class="col-sm-4" >Vendor</dt><dd id="saveVendor" class="col-sm-8" >Vendor</dd>
@@ -32,10 +32,21 @@
  
 
      			<div class="modal-footer">
-     				<select id="selectDivider" class="form-control"></select>
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<form id="savePriceForm" th:action="@{/component/price}" method="POST">
-						<button id="savePriceBtn" type="submit" class="btn btn-primary">Save</button>
+					<form id="savePriceForm" class="inline-form" th:action="@{/component/price}" method="POST">
+					<div class="input-group">
+     					<select id="selectDivider" class="form-control mr-2">
+						<!--/* -->
+						<option>option #1</option>
+						<option>option #2</option>
+						<option>option #3</option>
+						<option>option #4</option>
+						<option>option #5</option>
+						<!-- */-->
+     					</select>
+ 						<button id="savePriceBtn" type="submit" class="btn btn-outline-primary mr-2">Save Price</button>
+						<button id="addToStockBtn" type="submit" class="btn btn-outline-success mr-2">Add to Stock</button>
+						<input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cancel" />
+					</div>
 					</form>
       			</div>
     		</div>

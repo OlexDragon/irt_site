@@ -42,7 +42,7 @@ public class HomeController {
 	public String home(@CookieValue(name="desiredPN", defaultValue="") String desiredPN, Model model) {
 
 		model.addAttribute("desiredPN", desiredPN);
-		final List<? extends PartNumber> partNumbers = partNumberRepository.findByPartNumberContaining(desiredPN);
+		final List<? extends PartNumber> partNumbers = partNumberRepository.findByPartNumberContainingOrderByPartNumber(desiredPN);
 		model.addAttribute("partNumbers", partNumbers);
 
 		return "home";

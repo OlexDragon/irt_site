@@ -63,6 +63,8 @@ public class Company {
 		TYPE2,	//TODO
 		TYPE3,	//TODO
 		CO_MANUFACTURER,
-		VENDOR
+		VENDOR,
+		KIT,
+		BULK
 	}
 }

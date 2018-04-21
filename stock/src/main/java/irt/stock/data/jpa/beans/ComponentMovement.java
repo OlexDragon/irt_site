@@ -12,6 +12,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import irt.stock.data.jpa.beans.Company.CompanyType;
 
@@ -40,16 +47,20 @@ public class ComponentMovement {
 	private CompanyType to;
 	private String description;
 	private int status = 2;
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern="dd.MMM.yy")
 	private Date dateTime;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="who")
 	private User user;
 	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="from_detail")
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name="from_detail", nullable=true)
 	private Company fromCompany;
 	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="to_detail")
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name="to_detail", nullable=true)
 	private Company toCompany;
 
 	public Long 		getId() 		{ return id; }
