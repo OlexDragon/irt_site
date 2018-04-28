@@ -1,5 +1,12 @@
-$body = $("body");
-var componentId = Cookies.get("stockComponentId");
+var componentId;
+var pnsOut = $('#pns_out');
+if(pnsOut[0].length==1)
+	componentId = pnsOut[0][0].value;
+else
+	componentId = Cookies.get("stockComponentId");
+if(componentId)
+	selectComponent();
+
 var stockQty = 0;
 var companyQties;
 // Get vendor
@@ -7,11 +14,17 @@ var vendors;
 $.get("/companies/vendors")
 .done(function(data){
 	vendors = data;
+})
+.fail(function(error) {
+	alert(error.responseText);
 });
 var coManufactures;
 $.get("/companies/co_mfr")
 .done(function(data){
 	coManufactures = data;
+})
+.fail(function(error) {
+	alert(error.responseText);
 });
 // Part number input listener
 timer = 0;
@@ -23,17 +36,12 @@ $("#pn_input").on('input', function() {
 });
 
 // On select part number
-$('#pns_out').change(function() {
+pnsOut.change(function() {
 
-	$('#bulkBtn').addClass('d-none');
+	$('#toBulkBtn').addClass('d-none');
 	componentId = $(this).val()[0];
 	Cookies.set("stockComponentId", componentId, { expires: 7 });
 	fillFields();
-	if($('#price-hystory-tab').hasClass( 'active' ))
-		fillPriceHistoryTab();
-	else if($('#component-hystory-tab').hasClass( 'active' ))
-		fillComponentHistoryTab();
-
 });
 
 //On select PO or Invoice
@@ -91,325 +99,19 @@ var submitButton;
 $('button:submit').click(function(){
 	submitButton = this.id;
 });
+
 //move to bulk modal
-$('#bulkBtn').click(function(){
+$('#toBulkBtn').click(function(){ $('#modalLoad').load('/modal/to_bulk/' + componentId); });
 
-	var input = $('<input>', {id : 'qtyToBulk', class : 'form-control', type : 'number'});
-	var description = $('<input>', {id : 'descriptionBulk', class : 'form-control', type : 'text'});
-
-	var buttonMove = $('<button>', {type : 'button', class : 'btn btn-outline-primary', 'data-dismiss' : 'modal', text : 'Move to BULK'}).prop('disabled', true);
-
-	$('<div>', { id : 'bulkModal', class : 'modal fade', tabindex : '-1', role : 'dialog', 'aria-labelledby' : 'exampleModalLabel', 'aria-hidden' : 'true'})
-	.appendTo('body')
-	.append($('<div>', {class : "modal-dialog", role : 'document'})
-			.append($('<div>', {class : 'modal-content'})
-					.append($('<div>', {class : 'modal-header'})
-							.append($('<h5>', {class : 'modal-title', text : 'Move to BULK'}))
-							.append($('<button>', {type : 'button', class : 'close', 'data-dismiss' : 'modal', 'aria-label' : "Close"})
-									.append($('<span aria-hidden="true">&times;</span>'))
-							)
-					)
-					.append($('<div>', {class : 'modal-body'})
-							.append($('<h6>', {text : 'Move the ' + $('#infoPN').text() + ' to the bulk.'}))
-							.append($('<div>', {class : 'input-group mb-2'})
-									.append($('<div>', {class : 'input-group-prepend'})
-											.append($('<label>', {class : 'input-group-text', 'for' : 'qtyToBulk', text : 'Qty to move:'}))
-									)
-									.append(input
-											// Disable/Enable 'Move to BULK' button
-											.on('input', function(){
-
-												// Can not move more than there is in the stock
-												if(this.value > stockQty){
-													this.value = stockQty;
-													$(this).addClass('text-danger');
-												}else
-													$(this).removeClass('text-danger');
-
-												if(this.value && description.val() && this.value>0)
-													buttonMove.prop('disabled', false);
-												else
-													buttonMove.prop('disabled', true);
-											})
-									)
-							)
-							.append($('<div>', {class : 'input-group'})
-									.append($('<div>', {class : 'input-group-prepend'})
-											.append($('<label>', {class : 'input-group-text', 'for' : 'qtyToBulk', text : 'Description'}))
-									)
-									.append(description
-											// Disable/Enable 'Move to BULK' button
-											.on('input', function(){
-												if(this.value && input.val()>0)
-													buttonMove.prop('disabled', false);
-												else
-													buttonMove.prop('disabled', true);
-											})
-									)
-							)
-					)
-					.append($('<div>', {class : 'modal-footer'})
-							.append($('<button>', {type : 'button', class : 'btn btn-secondary', 'data-dismiss' : 'modal', text : 'Close'}))
-							.append(buttonMove
-									//Move to Bulk
-									.click(function(){
-
-										var _csrf = $( "input[name='_csrf']" ).val();
-										var action = '/component/bulk';
-										var qty = input.val();
-										var descriptionVal = description.val();
-
-										$.post( action, {_csrf : _csrf, qty : qty, componentId : componentId, description : descriptionVal})
-										.done(function(){
-											fillFields();
-										})
-										.fail(function(error) {
-											var responseText = error.responseText
-											alert(responseText);
-										})
-										
-									})
-							)
-					)
-			)
-	).modal('show')
-	.on('hidden.bs.modal', function (e) {
-		$(this).remove();
-	});
-});
 //move to co manufacture
-$('#toCoMfrBtn').click(function(){
+$('#toCoMfrBtn').click(function(){ $('#modalLoad').load('/modal/to_co_mfr/' + componentId); });
 
-	var selectCoMfr = $('<select>', {id : 'coMfr', class : 'form-control'}).append($('<option>', {text : 'Select the CO Manufacture'}));
-	$(coManufactures).each(function(){
-		selectCoMfr.append($('<option>', {value : this.id, text : this.companyName}));
-	});
-	var inputQty = $('<input>', {id : 'qtyToCoMfr', class : 'form-control', type : 'number'});
-	var description = $('<input>', {id : 'descriptionBulk', class : 'form-control', type : 'text'});
-
-	var buttonMove = $('<button>', {type : 'button', class : 'btn btn-outline-primary', 'data-dismiss' : 'modal', text : 'Move to CO Manufacture'}).prop('disabled', true);
-
-	$('<div>', { id : 'bulkModal', class : 'modal fade', tabindex : '-1', role : 'dialog', 'aria-labelledby' : 'exampleModalLabel', 'aria-hidden' : 'true'})
-	.appendTo('body')
-	.append($('<div>', {class : "modal-dialog", role : 'document'})
-			.append($('<div>', {class : 'modal-content'})
-					.append($('<div>', {class : 'modal-header'})
-							.append($('<h5>', {class : 'modal-title', text : 'Move to CO Manufacture'}))
-							.append($('<button>', {type : 'button', class : 'close', 'data-dismiss' : 'modal', 'aria-label' : "Close"})
-									.append($('<span aria-hidden="true">&times;</span>'))
-							)
-					)
-					.append($('<div>', {class : 'modal-body'})
-							.append($('<h6>', {text : 'Move the ' + $('#infoPN').text() + ' to:'}))
-							.append(selectCoMfr
-									// CO Manufactures
-									.change(function(){
-
-										var coM =  $('#coMfr option:selected').val();
-
-										if(coM && description.val() && inputQty.val()>0)
-											buttonMove.prop('disabled', false);
-										else
-											buttonMove.prop('disabled', true);
-									})
-							)
-							.append($('<div>', {class : 'input-group mt-2'})
-									.append($('<div>', {class : 'input-group-prepend'})
-											.append($('<label>', {class : 'input-group-text', 'for' : 'qtyToBulk', text : 'Qty to move:'}))
-									)
-									.append(inputQty
-											// Disable/Enable 'Move to BULK' button
-											.on('input', function(){
-
-												// Can not move more than there is in the stock
-												if(this.value > stockQty){
-													this.value = stockQty;
-													$(this).addClass('text-danger');
-												}else
-													$(this).removeClass('text-danger');
-
-												var coM =  $('#coMfr option:selected').val();
-
-												if(coM && description.val() && this.value>0)
-													buttonMove.prop('disabled', false);
-												else
-													buttonMove.prop('disabled', true);
-											})
-									)
-							)
-							.append($('<div>', {class : 'input-group mt-2'})
-									.append($('<div>', {class : 'input-group-prepend'})
-											.append($('<label>', {class : 'input-group-text', 'for' : 'qtyToBulk', text : 'Description'}))
-									)
-									.append(description
-											// Disable/Enable 'Move to BULK' button
-											.on('input', function(){
-
-												var coM =  $('#coMfr option:selected').val();
-
-												if(coM && description.val() && inputQty.val()>0)
-													buttonMove.prop('disabled', false);
-												else
-													buttonMove.prop('disabled', true);
-											})
-									)
-							)
-					)
-					.append($('<div>', {class : 'modal-footer'})
-							.append($('<button>', {type : 'button', class : 'btn btn-secondary', 'data-dismiss' : 'modal', text : 'Close'}))
-							.append(buttonMove
-									//Move to Bulk
-									.click(function(){
-
-										var _csrf = $( "input[name='_csrf']" ).val();
-										var action = '/component/to_co_mfr';
-										var qty = inputQty.val();
-										var coMfr = $('#coMfr option:selected').val();
-										var descriptionVal = description.val();
-
-										$.post( action, {_csrf : _csrf, qty : qty, componentId : componentId, companyId : coMfr, description : descriptionVal})
-										.done(function(){
-											fillFields();
-										})
-										.fail(function(error) {
-											var responseText = error.responseText
-											alert(responseText);
-										})
-										
-									})
-							)
-					)
-			)
-	).modal('show')
-	.on('hidden.bs.modal', function (e) {
-		$(this).remove();
-	});
-});
 //move from co manufacture to STOCK
-$('#toStockBtn').click(function(){
+$('#toStockBtn').click(function(){ $('#modalLoad').load('/modal/to_stock/' + componentId); });
 
-	var cq;
+$('#toAssenbly').click(function(){
 
-	var selectCoMfr = $('<select>', {id : 'coMfr', class : 'form-control'});
-	var inputQty = $('<input>', {id : 'qtyToCoMfr', class : 'form-control', type : 'number'}).prop('disabled', true);
-	var description = $('<input>', {id : 'descriptionBulk', class : 'form-control', type : 'text'});
-	var buttonMove = $('<button>', {type : 'button', class : 'btn btn-outline-primary', 'data-dismiss' : 'modal', text : 'Move from CO Manufacture'}).prop('disabled', true);
-
-	var coMfrs = companyQties.filter(function(cq){return cq.qty>0 });
-	if(coMfrs.length>1){
-		selectCoMfr.append($('<option>', {value : '', text : 'Select the CO Manufacture'}));
-		inputQty.prop('disabled', true);
-	}else{
-		inputQty.prop('disabled', false);
-		cq = coMfrs[0];
-	}
-
-	$(coMfrs).each(function(){
-		selectCoMfr.append($('<option>', {value : this.company.id, text : this.company.companyName}));
-	});
-
-
-	$('<div>', { id : 'bulkModal', class : 'modal fade', tabindex : '-1', role : 'dialog', 'aria-labelledby' : 'exampleModalLabel', 'aria-hidden' : 'true'})
-	.appendTo('body')
-	.append($('<div>', {class : "modal-dialog", role : 'document'})
-			.append($('<div>', {class : 'modal-content'})
-					.append($('<div>', {class : 'modal-header'})
-							.append($('<h5>', {class : 'modal-title', text : 'Move from CO Manufacture to the Stock'}))
-							.append($('<button>', {type : 'button', class : 'close', 'data-dismiss' : 'modal', 'aria-label' : "Close"})
-									.append($('<span aria-hidden="true">&times;</span>'))
-							)
-					)
-					.append($('<div>', {class : 'modal-body'})
-							.append($('<h6>', {text : 'Move the ' + $('#infoPN').text() + ' from:'}))
-							.append(selectCoMfr
-									// CO Manufactures
-									.change(function(){
-
-										var coMfrId =  $('#coMfr option:selected').val();
-										cq = companyQties.find(function(o){return o.company.id == coMfrId});
-										if(cq)
-											inputQty.prop('disabled', false);
-										else
-											inputQty.prop('disabled', true);
-
-										if(coMfrId && description.val() && inputQty.val()>0)
-											buttonMove.prop('disabled', false);
-										else
-											buttonMove.prop('disabled', true);
-									})
-							)
-							.append($('<div>', {class : 'input-group mt-2'})
-									.append($('<div>', {class : 'input-group-prepend'})
-											.append($('<label>', {class : 'input-group-text', 'for' : 'qtyToBulk', text : 'Qty to move:'}))
-									)
-									.append(inputQty
-											// Disable/Enable 'Move to BULK' button
-											.on('input', function(){
-
-												// Can not move more than there is in the CO Manufacture
-												coMfrQty = cq.qty;
-												if(this.value > coMfrQty){
-													this.value = coMfrQty;
-													$(this).addClass('text-danger');
-												}else
-													$(this).removeClass('text-danger');
-
-												var coMfrId =  $('#coMfr option:selected').val();
-
-												if(coMfrId && description.val() && this.value>0)
-													buttonMove.prop('disabled', false);
-												else
-													buttonMove.prop('disabled', true);
-											})
-									)
-							)
-							.append($('<div>', {class : 'input-group mt-2'})
-									.append($('<div>', {class : 'input-group-prepend'})
-											.append($('<label>', {class : 'input-group-text', 'for' : 'qtyToBulk', text : 'Description'}))
-									)
-									.append(description
-											// Disable/Enable 'Move to BULK' button
-											.on('input', function(){
-
-												var coMfrId =  $('#coMfr option:selected').val();
-
-												if(coMfrId && description.val() && inputQty.val()>0)
-													buttonMove.prop('disabled', false);
-												else
-													buttonMove.prop('disabled', true);
-											})
-									)
-							)
-					)
-					.append($('<div>', {class : 'modal-footer'})
-							.append($('<button>', {type : 'button', class : 'btn btn-secondary', 'data-dismiss' : 'modal', text : 'Close'}))
-							.append(buttonMove
-									//Move to Bulk
-									.click(function(){
-
-										var _csrf = $( "input[name='_csrf']" ).val();
-										var action = '/component/from_co_mfr';
-										var qty = inputQty.val();
-										var coMfr = $('#coMfr option:selected').val();
-										var descriptionVal = description.val();
-
-										$.post( action, {_csrf : _csrf, qty : qty, componentId : componentId, companyId : coMfr, description : descriptionVal})
-										.done(function(){
-											fillFields();
-										})
-										.fail(function(error) {
-											var responseText = error.responseText
-											alert(responseText);
-										})
-										
-									})
-							)
-					)
-			)
-	).modal('show')
-	.on('hidden.bs.modal', function (e) {
-		$(this).remove();
-	});
+	$('#modalLoad').load('/modal/to_assembly/' + componentId);
 });
 function partNumberAddDashes(pn){
 
@@ -440,23 +142,53 @@ function partNumberAddDashes(pn){
 	return pn;
 }
 function fillFields(){
+	if(componentId)
 	$.get("/pn/details", {pnId : componentId})
 	.done(function(data) {
 
-	//Bulk and 'TO CO MFR' buttons
-		stockQty = data.qty ? data.qty : 0;
+		//fill selected tabs
+		if($('#price-hystory-tab').hasClass( 'active' ))
+			fillPriceHistoryTab();
+		else if($('#component-hystory-tab').hasClass( 'active' ))
+			fillComponentHistoryTab();
+
+		//Bulk and 'TO CO MFR' buttons
+		stockQty = data ? data.qty : 0;
 		if(stockQty>0)
 			$('.hiddenBtn').removeClass('d-none');
 		else
 			$('.hiddenBtn').addClass('d-none');
 
 	//'TO STOCK' buttons
-		companyQties = data.companyQties;
-		var maxQty = Math.max.apply( Math, data.companyQties.map(function(o){return o.qty;}));
-		if(maxQty>0)
-			$('#toStockBtn').removeClass('d-none');
-		else
+		var maxQt
+		if(data){
+			companyQties = data.companyQties ? data.companyQties : 0;
+			maxQty = data.companyQties ? Math.max.apply( Math, data.companyQties.map(function(o){return o.qty;})) : 0;
+		}else{
+			maxQty = 0;
+		}
+		if(maxQty>0){
+			//'TO PCA' button
+			if(data.partNumber.indexOf('PCB')==0){
+				var _csrf = $( "input[name='_csrf']" ).val();
+				$('#toStockBtn').removeClass('d-none');
+				$.post('/bom/exists/' + componentId, {_csrf : _csrf})
+				.done(function(data){
+					if(data)
+						$('#toAssenbly').removeClass('d-none');
+					else
+						$('#toAssenbly').addClass('d-none');
+				})
+				.fail(function(error) {
+					location.reload(true);
+//					alert(error.responseText);
+				});
+			}else
+				$('#toAssenbly').addClass('d-none');
+		}else{
 			$('#toStockBtn').addClass('d-none');
+			$('#toAssenbly').addClass('d-none');
+		}
 
 		$('#infoPN').text(partNumberAddDashes(data.partNumber)).prop('title', 'component ID: ' + componentId);
 		$('#infoDescription').text(data.description ? data.description : "N/A");
@@ -476,7 +208,8 @@ function fillFields(){
 		$(data.companyQties).each(function(){
 			$('#infoQty').append($('<dt>', { 
 				class : 'col-sm-4',
-		        text : this.company.companyName
+		        text : this.company.companyName,
+		        title : 'company ID: '+ this.company.id
 		    }))
 		    .append($('<dd>', { 
 				class : 'col-sm-8',
@@ -529,7 +262,7 @@ function fillFields(){
 			$('#infoCost')
 			.append($('<tr>'))
 		    .append($('<th>', { text : this.alternative ? this.alternative.altMfrPartNumber : data.manufPartNumber }))
-		    .append($('<td>', { text : this.company.companyName }))
+		    .append($('<td>', { text : this.company ? this.company.companyName : 'N/A' }))
 		    .append($('<td>', { text : this.id.forQty }))
 		    .append($('<td>', { text : this.cost }))
 		    .append($('<td>', { text : this.currency ? this.currency : 'N/A'}))
@@ -539,15 +272,19 @@ function fillFields(){
 			$('#editCost')
 			.append($('<tr>'))
 			.append($('<th>', { text : this.alternative ? this.alternative.altMfrPartNumber : data.manufPartNumber }))
-		    .append($('<td>', { text : this.company.companyName }))
+		    .append($('<td>', { text : this.company ? this.company.companyName : 'N/A' }))
 			.append($('<td>', { text : this.id.forQty }))
 			.append($('<td>', { text : this.cost }))
 			.append($('<td>', { text : this.currency ? this.currency : 'N/A' }))
 			.append($('<td>')
-					.append($('<form>', {class : 'deleteCostForm', method : 'POST', action : ('/component/cost/delete/' + componentId + '/' + (this.alternative ? this.alternative.id : 0) + '/' + this.company.id + '/' + this.id.forQty)})
-							.append($('<button>',{type : 'submit', text : 'Delete', class : 'btn-sm btn-outline-warning', style : 'cursor:pointer' }))));
+					.append($('<form>', {
+						class : 'deleteCostForm',
+						method : 'POST',
+						action : ('/component/cost/delete/' + componentId + '/' + (this.alternative ? this.alternative.id : 0) + '/' + (this.company ? this.company.id : 0)+ '/' + this.id.forQty)
+					})
+					.append($('<button>',{type : 'submit', text : 'Delete', class : 'btn-sm btn-outline-warning'}))));
 		});
-		//Delete Cost 
+//Delete Cost 
 		$('.deleteCostForm').submit(function(event){
 			event.preventDefault();
 
@@ -591,13 +328,13 @@ function fillFields(){
 			
 	});
 
-		$('#selectDivider')	.change(function() { buttonSaveEnable(); });//On select quantity change ( 'selectDivider' )
-		$(selectVendors) 	.change(function(){ buttonSetEnable(); });
-		$(selectCurrency)	.change(function(){ buttonSetEnable(); });
+		$('#selectDivider')	.change(buttonSaveEnable);//On select quantity change ( 'selectDivider' )
+		$(selectVendors) 	.change(buttonSetEnable);
+		$(selectCurrency)	.change(buttonSetEnable);
 
-		$('#savePO').on('input', function(){ buttonSaveEnable(); });//On input PO or Invoice change ( 'selectDivider' )
-		forQty	 	.on('input', function(){ buttonSetEnable(); });
-		price	 	.on('input', function(){ buttonSetEnable(); });
+		$('#savePO').on('input', buttonSaveEnable);//On input PO or Invoice change ( 'selectDivider' )
+		forQty	 	.on('input', buttonSetEnable);
+		price	 	.on('input', buttonSetEnable);
 
 		buttonSet.click(function(){
 			$('#saveMfrPN').text($('#selectMfrPN option:selected').text());
@@ -622,7 +359,6 @@ function fillFields(){
 	.fail(function(error) {
 		alert(error.responseText);
 	});
-
 }
 function fillPriceHistoryTab(){
 	if(componentId)
@@ -654,19 +390,18 @@ function fillComponentHistoryTab(){
 			$(data).each(function(){
 
 				var quantity = this.qty;
+				var to = this.id.componentMovement.to;
 				var from = this.id.componentMovement.from;
 
-				if(from=='STOCK')
+				if(from=='STOCK' || to=='ASSEMBLED')
 					quantity*=-1;
 
 				componentHistory
 				.append($('<tr>'))
-			    .append($('<th>', { text : this.id.componentMovement.dateTime }))
+			    .append($('<th>', { text : this.id.componentMovement.dateTime, title : 'movement ID: ' + this.id.componentMovement.id }))
 			    .append($('<td>', { text : this.id.componentMovement.user.username }))
-			    .append($('<td>', { text : from }))
-			    .append($('<td>', { text : this.id.componentMovement.fromCompany ? this.id.componentMovement.fromCompany.companyName : '' }))
-			    .append($('<td>', { text : this.id.componentMovement.to }))
-			    .append($('<td>', { text : this.id.componentMovement.toCompany ? this.id.componentMovement.toCompany.companyName : '' }))
+			    .append($('<td>', { text : this.id.componentMovement.fromCompany ? this.id.componentMovement.fromCompany.companyName : from, title : from }))
+			    .append($('<td>', { text : this.id.componentMovement.toCompany ? this.id.componentMovement.toCompany.companyName : to, title : to }))
 			    .append($('<td>', { text : this.id.componentMovement.description }))
 			    .append($('<td>', { text : this.oldQty }))
 			    .append($('<td>', { text : quantity }))
@@ -686,16 +421,20 @@ function buttonSetEnable(){
 
 	if( vendorId && forQty>0){
 
-		if(currency && price>0){
+		if(currency || price>0){
 			setPrice.val('Set');
 			$('#selectDivider').prop('disabled', false);
-		}
-		else{
+
+			if(currency && price>0)
+				setPrice.prop('disabled', false);
+			else
+				setPrice.prop('disabled', true);
+
+		}else{
 			setPrice.val('Add');
+			setPrice.prop('disabled', false);
 			$('#selectDivider').prop('disabled', true);
 		}
-
-		setPrice.prop('disabled', false);
 	}else
 		setPrice.prop('disabled', true);
 }
@@ -706,12 +445,19 @@ function buttonSaveEnable(){
 
 	if(poNumber){
 
-		if(disabled || divider<=0)
+		if(disabled){
+			$('#addToStockBtn').prop('disabled', false);
 			$('#savePriceBtn').prop('disabled', true);
-		else
-			$('#savePriceBtn').prop('disabled', false);
+		}else{
+			if(divider<=0){
+				$('#savePriceBtn').prop('disabled', true);
+				$('#addToStockBtn').prop('disabled', true);
+			}else{
+				$('#savePriceBtn').prop('disabled', false);
+				$('#addToStockBtn').prop('disabled', false);
+			}
+		}
 
-		$('#addToStockBtn').prop('disabled', false);
 	}else{
 		$('#addToStockBtn').prop('disabled', true);
 		$('#savePriceBtn').prop('disabled', true);
@@ -736,28 +482,38 @@ function getAction(){
 //}
 function selectComponent(){
 	$('#pns_out option[value="' + componentId + '"]').prop('selected', true);
+	fillFields();
 }
 //Search part numbers containing 'str'
 function partNumbers(str){
 	$.get("/pn", {desiredPN: str})
-		.done(function(data) {
+		.done(function(pns) {
 
 			Cookies.set("desiredPN", str, { expires: 7 });
-			$('#pns_out').empty();
+			pnsOut.empty();
 
-			$.each( data, function(key, partNumber) {
+			if(pns){
+				$.each( pns, function(key, partNumber) {
 
-				$('#pns_out').append($('<option>', { 
-			        value: partNumber.id,
-			        text : partNumberAddDashes(partNumber.partNumber)
-			    }));
-			});
-			selectComponent();
+					pnsOut.append($('<option>', { 
+						value: partNumber.id,
+						text : partNumberAddDashes(partNumber.partNumber)
+					}));
+				});
+
+				if(pns.length==1){
+					var pn = pns[0];
+					componentId = pn.id;
+				}
+
+				selectComponent();
+			}
 		})
 		.fail(function(error) {
 			alert(error.responseText);
 		});
 }
+//$body = $("body");
 //loading spinning circle
 //$(document).on({
 //    ajaxStart: function() { $body.addClass("loading");    },

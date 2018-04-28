@@ -97,7 +97,7 @@ public class ComponentController {
 							final Company stock = companyRepository.findByType(CompanyType.STOCK).get(0);
 							if(action==ComponentAction.ALL || action==ComponentAction.ADD_TO_CTOCK) {
 
-								final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(null, up.getUser(), froMCompany, stock, orderType + " " + orderNumber, date));
+								final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(up.getUser(), froMCompany, stock, orderType + " " + orderNumber, date));
 								componentMovementDetailRepository.save(new ComponentMovementDetail(cMovement, component, forQty, component.getQty()));
 
 								component.addQty(forQty);
@@ -147,7 +147,7 @@ public class ComponentController {
 						final Company stock = companyRepository.findByType(CompanyType.STOCK).get(0);
 						final Date date = new Date();
 
-						final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(null, up.getUser(), stock, bulk, description, date));
+						final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(up.getUser(), stock, bulk, description, date));
 						componentMovementDetailRepository.save(new ComponentMovementDetail(cMovement, component, qty, component.getQty()));
 
 						component.addQty(qty * -1);
@@ -189,7 +189,7 @@ public class ComponentController {
 
 							companyQtyRepository.save(companyQty);
 
-							final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(null, up.getUser(), stock, co, description, date));
+							final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(up.getUser(), stock, co, description, date));
 							componentMovementDetailRepository.save(new ComponentMovementDetail(cMovement, component, qty, component.getQty()));
 
 							component.addQty(qty * -1);
@@ -201,8 +201,8 @@ public class ComponentController {
 		return new Response("Done");
 	}
 
-	@PostMapping("from_co_mfr")
-	public Response moveFromCoMfr(@RequestParam Long componentId, @RequestParam Long qty, @RequestParam Long companyId, @RequestParam String description) {
+	@PostMapping("to_stock")
+	public Response moveToStock(@RequestParam Long componentId, @RequestParam Long qty, @RequestParam Long companyId, @RequestParam String description) {
 
 		Optional
 				.of( SecurityContextHolder.getContext().getAuthentication())
@@ -224,7 +224,7 @@ public class ComponentController {
 								cq.addQty(qty*-1);
 								companyQtyRepository.save(cq);
 
-								final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(null, up.getUser(), co, stock, description, date));
+								final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(up.getUser(), co, stock, description, date));
 								componentMovementDetailRepository.save(new ComponentMovementDetail(cMovement, component, qty, component.getQty()));
 
 								component.addQty(qty);

@@ -52,10 +52,10 @@ public class ComponentRepositoryTest {
 
 	@Before
 	public void before() {
-		company = companyRepository.save(new Company(null, "Company Name", CompanyType.VENDOR));
+		company = companyRepository.save(new Company("Company Name", CompanyType.VENDOR));
 		manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
 
-		component = componentRepository.save(new Component(null, "partNumber", manufacture));
+		component = componentRepository.save(new Component("partNumber", manufacture));
 
 		alternative = new ComponentAlternative(null, component.getId(), null, manufacture, null);
 		List<ComponentAlternative> list = new ArrayList<>();

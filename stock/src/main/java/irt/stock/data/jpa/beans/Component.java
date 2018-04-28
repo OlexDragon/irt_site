@@ -6,8 +6,6 @@ import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -15,25 +13,20 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-
-import irt.stock.web.PartNumber;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name="components")
-public class Component implements PartNumber{
+public class Component extends PartNumberSuperclass{
 
 	protected Component() {}
-	public Component(Long id, String partNumber, Manufacture manufacture) {
-		this.id = id;
-		this.partNumber = partNumber;
+	public Component(String partNumber, Manufacture manufacture) {
+		super(partNumber, null);
 		this.manufacture = manufacture;
 	}
 
-	@Id @GeneratedValue
-	private Long id;
-	private String partNumber;
 	private String description;
-	private String manufPartNumber;
 	private Long qty;
 
 	@ManyToOne
@@ -51,15 +44,11 @@ public class Component implements PartNumber{
 
 	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.FALSE)
+	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "idComponents", nullable=true)
 	private List<Cost> costs;
 
-	@Override
-	public Long getId() { return id; }
-	@Override
-	public String getPartNumber() { return partNumber; }
 	public String getDescription() { return description; }
-	public String getManufPartNumber() { return manufPartNumber; }
 	public Long getQty() { return qty; }
 	public List<CompanyQty> getCompanyQties() { return companyQties; }
 	public Manufacture getManufacture() { return manufacture; }
@@ -69,47 +58,16 @@ public class Component implements PartNumber{
 	public void setAlternatives(List<ComponentAlternative> alternativeComponents) {
 		this.alternativeComponents = alternativeComponents;
 	}
-	public boolean setManufPartNumber(String manufPartNumber) {
-
-		final String mpn = getManufPartNumber();
-
-		if(mpn==null || mpn.equals("NULL") || mpn.trim().isEmpty()) {
-			this.manufPartNumber = manufPartNumber;
-			return true;
-		}
-
-		return false;
-	}
 
 	public void addQty(long add) {
 		qty = Optional.ofNullable(qty).map(q->q + add).filter(q->q>=0).orElse(add>0 ? add : 0);
 	}
 
 	@Override
-	public int hashCode() {
-		return 31 + ((id == null) ? 0 : id.hashCode());
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Component other = (Component) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-	@Override
 	public String toString() {
-		return "Component [id=" + id + ", partNumber=" + partNumber + ", description=" + description
-				+ ", manufPartNumber=" + manufPartNumber + ", qty=" + qty + ", manufacture=" + manufacture
-				+ ", companyQty=" + companyQties + "]";
+		return "Component [description=" + description + ", qty=" + qty + ", manufacture=" + manufacture
+				+ ", companyQties=" + companyQties + ", alternativeComponents=" + alternativeComponents + ", costs="
+				+ costs + ", getId()=" + getId() + ", getPartNumber()=" + getPartNumber() + ", getManufPartNumber()="
+				+ getManufPartNumber() + "]";
 	}
 }

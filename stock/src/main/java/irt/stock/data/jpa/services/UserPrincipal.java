@@ -20,7 +20,7 @@ public class UserPrincipal implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return UserRules.getAuthorities(user.getPermission());
+		return UserRoles.getAuthorities(user.getPermission());
 	}
 
 	@Override

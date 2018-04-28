@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public enum UserRules implements GrantedAuthority{
+public enum UserRoles implements GrantedAuthority{
 
 	WORK_ORDER			(512),
 	DEVICE_TYPE_UPDATE	(1024),
@@ -24,9 +24,9 @@ public enum UserRules implements GrantedAuthority{
 	SELLERS				(4194304),
 	DATABASE			(8388608);
 
-	private long permission;
+	private final long permission;
 
-	private UserRules(long permission) {
+	private UserRoles(long permission) {
 		this.permission = permission;
 	}
 
@@ -38,5 +38,9 @@ public enum UserRules implements GrantedAuthority{
 	public static Collection<? extends GrantedAuthority> getAuthorities(long permissions) {
 
 		return Arrays.stream(values()).filter(ur->(ur.permission&permissions)!=0).collect(Collectors.toList());
+	}
+
+	public long getPermission() {
+		return permission;
 	}
 }

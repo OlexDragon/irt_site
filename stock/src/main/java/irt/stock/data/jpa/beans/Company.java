@@ -14,8 +14,7 @@ import javax.persistence.Table;
 public class Company {
 
 	protected Company() { }
-	public Company(Long id, String companyName, CompanyType companyType) {
-		this.id = id;
+	public Company(String companyName, CompanyType companyType) {
 		this.companyName = companyName;
 		this.type = companyType;
 	}
@@ -61,7 +60,7 @@ public class Company {
 		TYPE0,	//TODO
 		STOCK,
 		TYPE2,	//TODO
-		TYPE3,	//TODO
+		ASSEMBLED,
 		CO_MANUFACTURER,
 		VENDOR,
 		KIT,

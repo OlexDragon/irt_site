@@ -17,8 +17,7 @@ import irt.stock.data.jpa.beans.Manufacture;
 @SpringBootTest
 public class ManufactureRepositoryTest {
 
-	@Autowired
-	private ManufactureRepository manufactureRepository;
+	@Autowired private ManufactureRepository manufactureRepository;
 
 	@Before
 	public void before() {

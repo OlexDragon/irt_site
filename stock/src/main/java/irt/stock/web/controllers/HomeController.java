@@ -24,8 +24,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import irt.stock.data.jpa.beans.PartNumber;
 import irt.stock.data.jpa.repositories.PartNumberRepository;
-import irt.stock.web.PartNumber;
 
 @Controller
 public class HomeController {
@@ -41,8 +41,10 @@ public class HomeController {
 	@GetMapping("/")
 	public String home(@CookieValue(name="desiredPN", defaultValue="") String desiredPN, Model model) {
 
+		desiredPN = desiredPN.replaceAll("[^A-Za-z0-9_%]", "");
+
 		model.addAttribute("desiredPN", desiredPN);
-		final List<? extends PartNumber> partNumbers = partNumberRepository.findByPartNumberContainingOrderByPartNumber(desiredPN);
+		final List<? extends PartNumber> partNumbers = partNumberRepository.findByPartNumberContainingOrManufPartNumberContainingOrderByPartNumber(desiredPN, desiredPN);
 		model.addAttribute("partNumbers", partNumbers);
 
 		return "home";

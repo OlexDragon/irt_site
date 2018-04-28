@@ -25,7 +25,11 @@
     </Appenders>
 
     <Loggers>
-        <Root level="error">
+
+<!-- 		<logger name="irt.stock.web.controllers.PartNumberController" level="debug" /> -->
+<!-- 		<logger name="irt.stock.web.controllers.BomController" level="debug" /> -->
+
+        <Root level="info">
             <AppenderRef ref="ConsoleAppender" />
 			<AppenderRef ref="LogFile" />
         </Root>

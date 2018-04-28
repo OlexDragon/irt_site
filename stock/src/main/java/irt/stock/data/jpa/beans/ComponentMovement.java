@@ -26,8 +26,7 @@ import irt.stock.data.jpa.beans.Company.CompanyType;
 @Table(name="movement")
 public class ComponentMovement {
 	protected ComponentMovement() { }
-	public ComponentMovement(Long id, User user, Company fromCompany, Company toCompany, String description, Date dateTime) {
-		this.id = id;
+	public ComponentMovement(User user, Company fromCompany, Company toCompany, String description, Date dateTime) {
 		this.user = user;
 		from = fromCompany.getType();
 		this.fromCompany = fromCompany;

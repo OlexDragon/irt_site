@@ -37,10 +37,10 @@ public class ComponentMovementRepositoryTest {
 
 	@Before
 	public void before() {
-		user = userRepository.save(new User(null, "username", "password", "firstName", "lastName", 16777200L, "extension", "email"));
-		fromCompany = companyRepository.save(new Company(null, "companyName", CompanyType.VENDOR));
-		toCompany = companyRepository.save(new Company(null, "companyName", CompanyType.VENDOR));
-		final ComponentMovement entity = new ComponentMovement(null, user, fromCompany, toCompany, "String description", new Date());
+		user = userRepository.save(new User("username", "password", "firstName", "lastName", 16777200L, "extension", "email"));
+		fromCompany = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
+		toCompany = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
+		final ComponentMovement entity = new ComponentMovement(user, fromCompany, toCompany, "String description", new Date());
 		logger.debug(entity);
 		componentMovement = componentMovementRepository.save(entity);
 	}
