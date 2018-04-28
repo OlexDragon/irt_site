@@ -47,11 +47,11 @@ public class ComponentMovementDetailRepositoryTest {
 
 	@Before
 	public void before() {
-		User user = userRepository.save(new User(null, "username", "password", "firstName", "lastName", 16777200L, "extension", "email"));
-		Company company = companyRepository.save(new Company(null, "companyName", CompanyType.VENDOR));
+		User user = userRepository.save(new User("username", "password", "firstName", "lastName", 16777200L, "extension", "email"));
+		Company company = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
 		final Manufacture manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
-		component = componentRepository.save(new Component(null, "partNumber", manufacture));
-		movement = componentMovementRepository.save(new ComponentMovement(null, user, company, company, "description", new Date()));
+		component = componentRepository.save(new Component("partNumber", manufacture));
+		movement = componentMovementRepository.save(new ComponentMovement(user, company, company, "description", new Date()));
 
 		componentMovementDetail = new ComponentMovementDetail(movement, component, 25L, null);
 		logger.error(componentMovementDetail);

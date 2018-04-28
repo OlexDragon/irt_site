@@ -30,7 +30,7 @@ public class UserRepositoryTest {
 
 	@Before
 	public void before() {
-		user = repository.save(new User( null, "username", "password", "firstName", "lastName", 7777777L, "extension", "email"));
+		user = repository.save(new User( "username", "password", "firstName", "lastName", 7777777L, "extension", "email"));
 	}
 
 	@Test

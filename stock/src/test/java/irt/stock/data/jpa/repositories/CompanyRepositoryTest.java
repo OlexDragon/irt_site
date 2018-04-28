@@ -28,8 +28,8 @@ public class CompanyRepositoryTest {
 
 	@Before
 	public void before() {
-		company = companyRepository.save(new Company(null, "name", CompanyType.VENDOR));
-		companyRepository.save(new Company(null, "CO MANUFACTURER", CompanyType.CO_MANUFACTURER));
+		company = companyRepository.save(new Company( "name", CompanyType.VENDOR));
+		companyRepository.save(new Company("CO MANUFACTURER", CompanyType.CO_MANUFACTURER));
 	}
 
 	@Test

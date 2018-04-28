@@ -3,12 +3,10 @@ package irt.stock.data.jpa.repositories;
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 
-import irt.stock.data.jpa.beans.PartNumberImpl;
+import irt.stock.data.jpa.beans.PartNumber;
 
-public interface PartNumberRepository extends CrudRepository<PartNumberImpl, Long> {
+public interface PartNumberRepository extends CrudRepository<PartNumber, Long> {
 
-//		@Query(value="SELECT id, part_number(part_number) as part_number FROM components WHERE part_number LIKE concat('%', :#{#desiredPN}, '%') ORDER BY part_number", nativeQuery=true)
-	List<PartNumberImpl> findByPartNumberContainingOrderByPartNumber(@Param("desiredPN") String desiredPN);
+	List<PartNumber> findByPartNumberContainingOrManufPartNumberContainingOrderByPartNumber(String desiredPN, String mfrPn);
 }

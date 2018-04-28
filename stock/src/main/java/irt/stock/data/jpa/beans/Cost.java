@@ -58,7 +58,8 @@ public class Cost {
 	private ComponentAlternative alternative;
 
 	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="idCompanies", insertable=false, updatable=false)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name="idCompanies", insertable=false, updatable=false, nullable=true)
 	private Company company;
 
 	public CostId 				getId() 			{ return id; }

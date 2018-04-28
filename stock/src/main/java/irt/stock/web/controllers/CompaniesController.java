@@ -14,8 +14,7 @@ import irt.stock.data.jpa.repositories.CompanyRepository;
 @RequestMapping("/companies")
 public class CompaniesController {
 
-	@Autowired
-	private CompanyRepository companyRepository;
+	@Autowired private CompanyRepository companyRepository;
 
 	@RequestMapping("vendors")
 	public List<Company> getVendors(){

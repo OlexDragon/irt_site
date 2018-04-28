@@ -43,8 +43,8 @@ public class CostHistoryRepositoryTest {
 	@Before
 	public void before() {
 		Manufacture manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
-		component = componentRepository.save(new Component(null, "partNumber", manufacture));
-		Company company = companyRepository.save(new Company(null, "Company Name", CompanyType.VENDOR));
+		component = componentRepository.save(new Component("partNumber", manufacture));
+		Company company = companyRepository.save(new Company("Company Name", CompanyType.VENDOR));
 
 		Cost cost = costRepository.save(new Cost(component, null, company, 10L, new BigDecimal("123.321"), Currency.CAD, OrderType.INV, "1387897"));
 		costHistoryList.add(costHistoryRepository.save(new CostHistory(cost)));

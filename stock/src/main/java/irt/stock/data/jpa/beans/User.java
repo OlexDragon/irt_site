@@ -20,9 +20,8 @@ public class User {
 	private String eMail;
 
 	protected User(){}
-	public User(Long id, String username, String password, String firstName, String lastName, Long permission, String extension, String email) {
+	public User(String username, String password, String firstName, String lastName, Long permission, String extension, String email) {
 
-		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.firstname = firstName;
