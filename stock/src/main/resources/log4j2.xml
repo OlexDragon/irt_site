@@ -26,6 +26,7 @@
 
     <Loggers>
 
+<!-- 		<logger name="irt.stock.web.controllers.ComponentController" level="all" /> -->
 <!-- 		<logger name="irt.stock.web.controllers.PartNumberController" level="debug" /> -->
 <!-- 		<logger name="irt.stock.web.controllers.BomController" level="debug" /> -->
 

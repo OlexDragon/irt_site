@@ -109,10 +109,12 @@ $('#toCoMfrBtn').click(function(){ $('#modalLoad').load('/modal/to_co_mfr/' + co
 //move from co manufacture to STOCK
 $('#toStockBtn').click(function(){ $('#modalLoad').load('/modal/to_stock/' + componentId); });
 
-$('#toAssenbly').click(function(){
+//Move all BOM component from MFR to PCA
+$('#toAssenbly').click(function(){ $('#modalLoad').load('/modal/to_assembly/' + componentId); });
 
-	$('#modalLoad').load('/modal/to_assembly/' + componentId);
-});
+//Move all BOM component from MFR to PCA
+$('#mfrToBulk').click(function(){ $('#modalLoad').load('/modal/mfr_to_bulk/' + componentId); });
+
 function partNumberAddDashes(pn){
 
 	if (typeof pn === 'string' || pn instanceof String){
@@ -171,7 +173,7 @@ function fillFields(){
 			//'TO PCA' button
 			if(data.partNumber.indexOf('PCB')==0){
 				var _csrf = $( "input[name='_csrf']" ).val();
-				$('#toStockBtn').removeClass('d-none');
+				$('.from-mfr').removeClass('d-none');
 				$.post('/bom/exists/' + componentId, {_csrf : _csrf})
 				.done(function(data){
 					if(data)
@@ -186,7 +188,7 @@ function fillFields(){
 			}else
 				$('#toAssenbly').addClass('d-none');
 		}else{
-			$('#toStockBtn').addClass('d-none');
+			$('.from-mfr').addClass('d-none');
 			$('#toAssenbly').addClass('d-none');
 		}
 
@@ -393,7 +395,7 @@ function fillComponentHistoryTab(){
 				var to = this.id.componentMovement.to;
 				var from = this.id.componentMovement.from;
 
-				if(from=='STOCK' || to=='ASSEMBLED')
+				if(from=='STOCK' || to=='ASSEMBLED' || to=='BULK')
 					quantity*=-1;
 
 				componentHistory

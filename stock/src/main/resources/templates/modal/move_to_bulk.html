@@ -25,7 +25,7 @@
 </head>
 <body>
 
-	<!-- Modal dialog for move component from STOCK to CO MANUFACTURE -->
+	<!-- Modal dialog for move component from STOCK to BULK -->
 
 	<div id="modalMessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Move to Bulk" aria-hidden="true" th:fragment="moveToBulk">
 		<div class="modal-dialog" role="document">
@@ -67,6 +67,57 @@
 		</script>
 	</div>
 
+	<!-- Modal dialog for move component from MFR to BULK -->
+
+	<div id="modalMessageFromMfr" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Move to Bulk" aria-hidden="true" th:fragment="moveMfrToBulk">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Move from Mfr to BULK</h5>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<h6 th:inline="text">Move the [[${component.partNumber}]] from:</h6>
+					<select id="coMfr" class="form-control mb-2">
+						<option value="">Select the CO Manufacture</option>
+						<option value="{ &quot;id&quot;: 14, &quot;qty&quot;: 63 }" th:value="'{&quot;id&quot;:' + ${cq.company.id} + ',&quot;qty&quot;:' + ${cq.qty} + '}'" th:text="${cq.company.companyName}" th:each="cq : ${companyQties}">SMT</option>
+						<th:block th:remove="all">
+							<option value="{ &quot;id&quot;: 1, &quot;qty&quot;: 25}">M.E.A..Tec</option>
+							<option value="{ &quot;id&quot;: 4, &quot;qty&quot;: 17}">SMT-ASSY</option>
+						</th:block>
+					</select>
+					<div class="input-group mb-2">
+						<div class="input-group-prepend">
+							<label class="input-group-text" for="qtyToBulk">Qty to move:</label>
+						</div>
+						<input id="qtyMfrToBulk" class="form-control" type="number" disabled="disabled">
+					</div>
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<label class="input-group-text" for="qtyToBulk">Description</label>
+						</div>
+						<input id="descriptionMfrToBulk" class="form-control" type="text">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button id="confirmBtnFromMfr" type="button" class="btn btn-outline-primary" data-dismiss="modal" disabled="disabled">Move to Stock</button>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+			/*<![CDATA[*/
+				var stockQty = /*[[${component.qty}]]*/ 17;
+				$('#modalMessageFromMfr').modal('show').on('hidden.bs.modal', function(e) { $(this).remove(); });
+				/*[+ $.getScript( '/js/move_mfr_to_bulk.js'); +]*/
+			/*]]>*/
+		</script>
+	</div>
+
 	<script src="../../static/js/move_to_bulk.js" type="text/javascript"></script>
+	<script src="../../static/js/move_mfr_to_bulk.js" type="text/javascript"></script>
 </body>
 </html>

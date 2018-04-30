@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +46,7 @@ import irt.stock.data.jpa.services.UserPrincipal;
 @RequestMapping("/component")
 @Transactional
 public class ComponentController {
+	private final static Logger logger = LogManager.getLogger();
 
 	@Autowired private CostRepository costRepository;
 	@Autowired private CostHistoryRepository costHistoryRepository;
@@ -148,10 +151,52 @@ public class ComponentController {
 						final Date date = new Date();
 
 						final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(up.getUser(), stock, bulk, description, date));
-						componentMovementDetailRepository.save(new ComponentMovementDetail(cMovement, component, qty, component.getQty()));
+						final Long oldQty = component.getQty();
 
-						component.addQty(qty * -1);
+						Long qtyToMove = Optional.of(qty).filter(q->q<=oldQty).orElse(oldQty);
+
+						componentMovementDetailRepository.save(new ComponentMovementDetail(cMovement, component, qtyToMove, oldQty));
+
+						component.addQty(qtyToMove * -1);
 						componentRepository.save(component);
+					});
+
+				});
+		return new Response("Done");
+	}
+
+	@PostMapping("mfr_to_bulk")
+	public Response moveFromMfrToBulk(@RequestParam Long componentId, @RequestParam Long qty, @RequestParam String description, @RequestParam Long coMfr) {
+		logger.entry(componentId, qty, description, coMfr);
+
+		Optional
+				.of( SecurityContextHolder.getContext().getAuthentication())
+				.filter(authentication->!(authentication instanceof AnonymousAuthenticationToken))
+				.map(authentication->(UserPrincipal)authentication.getPrincipal())
+				.ifPresent(up->{
+					logger.info("{}, componentId: {}, qty: {}, description: {}, coMfr ID: {}", componentId, qty, description, coMfr);
+
+					componentRepository.findById(componentId)
+					.ifPresent(component->{
+						logger.debug(component);
+
+						component.getCompanyQties().parallelStream().filter(cq->cq.getId().getIdCompanies()==coMfr).findAny()
+						.ifPresent(cq->{
+							logger.debug(cq);
+							
+							final Company bulk = companyRepository.findByType(CompanyType.BULK).get(0);
+							final Company mfr = cq.getCompany();
+
+							final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(up.getUser(), mfr, bulk, description, new Date()));
+							final long oldQty = cq.getQty();
+
+							Long qtyToMove = Optional.of(qty).filter(q->q<=oldQty).orElse(oldQty);
+
+							componentMovementDetailRepository.save(new ComponentMovementDetail(cMovement, component, qtyToMove, oldQty));
+
+							cq.addQty(qtyToMove * -1);
+							companyQtyRepository.save(cq);
+						});
 					});
 
 				});

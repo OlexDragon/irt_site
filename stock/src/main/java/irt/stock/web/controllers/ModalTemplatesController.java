@@ -41,6 +41,15 @@ public class ModalTemplatesController {
 		return "modal/move_to_bulk :: moveToBulk";
 	}
 
+	@GetMapping("mfr_to_bulk/{componentId}")
+	public String getMoveFromMfrToBulk(@PathVariable Long componentId, Model model){
+
+		final Component component = componentRepository.findById(componentId).get();
+		model.addAttribute("component", component);
+		model.addAttribute("companyQties", component.getCompanyQties().stream().filter(cq->cq.getQty()>0).toArray(CompanyQty[]::new));
+		return "modal/move_to_bulk :: moveMfrToBulk";
+	}
+
 	@GetMapping("to_stock/{componentId}")
 	public String getMoveToStock(@PathVariable Long componentId, Model model){
 

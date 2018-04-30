@@ -19,7 +19,7 @@ $('#qtyToBulk').on('input', function(){
 $('#confirmBtn').click(function(){
 
 	
-	var action = '/component/bulk';
+	var action = '/component/bulk/';
 	var _csrf = $( "input[name='_csrf']" ).val();
 	var qty = $('#qtyToBulk').val();
 	var descriptionVal = $('#descriptionToBulk').val();
