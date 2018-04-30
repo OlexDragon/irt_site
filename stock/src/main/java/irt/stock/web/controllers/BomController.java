@@ -54,14 +54,13 @@ public class BomController {
 
 	@PostMapping("to_assembly/{pcaId}/{companyId}/{qty}")
 	public Boolean movePcbToPca(@PathVariable Long pcaId, @PathVariable Long companyId, @PathVariable Long qty) {
-		logger.debug("PCA ID={}, company ID: {}, quantity: {}",  pcaId, companyId, qty);
 
 		Optional
 				.of( SecurityContextHolder.getContext().getAuthentication())
 				.filter(authentication->!(authentication instanceof AnonymousAuthenticationToken))
 				.map(authentication->(UserPrincipal)authentication.getPrincipal())
 				.ifPresent(up->{
-					logger.info(up);
+					logger.info("{}, pcaId: {}, companyId: {}, qty: {}", up, pcaId, companyId, qty);
 
 					final User user = up.getUser();
 
@@ -70,7 +69,6 @@ public class BomController {
 					if(!bomComponents.isEmpty()){
 
 						bomComponents.stream().forEach(bomComponent -> {
-							logger.debug(bomComponent);
 
 							final Component component = bomComponent.getComponent();
 							final Long id = component.getId();
@@ -81,7 +79,6 @@ public class BomController {
 							companyQtyRepository.findByIdIdCompaniesAndIdIdComponents(companyId, id)
 							.filter(cq->Optional.ofNullable(cq.getQty()).orElse(0L)>0)
 							.ifPresent(cq -> {
-										logger.debug(cq);
 
 										final Company company = cq.getCompany();
 										final Company assembled = companyRepository.findByType(CompanyType.ASSEMBLED).get(0);
@@ -91,7 +88,6 @@ public class BomController {
 										final ComponentMovement cMovement = componentMovementRepository.save(new ComponentMovement(user, company, assembled, description, new Date()));
 
 										final ComponentMovementDetail movementDetail = componentMovementDetailRepository .save(new ComponentMovementDetail(cMovement, component, qtyToRemove, oldQty));
-										logger.debug(movementDetail);
 
 										cq.addQty(qtyToRemove * -1);
 
