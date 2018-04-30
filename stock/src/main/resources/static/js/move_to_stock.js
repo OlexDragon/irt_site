@@ -57,8 +57,8 @@ function enableButtun() {
 
 	var coMfr = $('#coMfr option:selected').val();
 	var description = $('#descriptionToStock').val();
-	var qtyToStock = $('#qtyToStock').val();
 	var inputQty = $('#qtyToStock');
+	var qtyToStock = inputQty.val();
 
 	if(coMfr){
 		inputQty.prop('disabled', false);
