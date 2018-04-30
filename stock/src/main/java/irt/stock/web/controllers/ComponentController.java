@@ -74,6 +74,8 @@ public class ComponentController {
 				.filter(authentication->!(authentication instanceof AnonymousAuthenticationToken))
 				.map(authentication->(UserPrincipal)authentication.getPrincipal())
 				.ifPresent(up->{
+					logger.info("up, componentId: {}, alternativeId: {}, vendorId: {}, forQty: {}, price: {}, currency: {}, orderType: {}, orderNumber: {}, action: {}",
+							componentId, alternativeId, vendorId, forQty, price, currency, orderType, orderNumber, action);
 
 					componentRepository.findById(componentId)
 					.ifPresent(component->{
@@ -142,6 +144,7 @@ public class ComponentController {
 				.filter(authentication->!(authentication instanceof AnonymousAuthenticationToken))
 				.map(authentication->(UserPrincipal)authentication.getPrincipal())
 				.ifPresent(up->{
+					logger.info("{}, componentId: {}, qty: {}, description: {}", componentId, qty, description);
 
 					componentRepository.findById(componentId)
 					.ifPresent(component->{
@@ -211,6 +214,7 @@ public class ComponentController {
 				.filter(authentication->!(authentication instanceof AnonymousAuthenticationToken))
 				.map(authentication->(UserPrincipal)authentication.getPrincipal())
 				.ifPresent(up->{
+					logger.info("{}, componentId: {}, qty: {}, description: {}, companyId: {}", componentId, qty, description, companyId);
 
 					componentRepository.findById(componentId)
 					.ifPresent(component->{
@@ -254,6 +258,7 @@ public class ComponentController {
 				.filter(authentication->!(authentication instanceof AnonymousAuthenticationToken))
 				.map(authentication->(UserPrincipal)authentication.getPrincipal())
 				.ifPresent(up->{
+					logger.info("{}, componentId: {}, qty: {}, description: {}, companyId: {}", componentId, qty, description, companyId);
 
 					componentRepository.findById(componentId)
 					.ifPresent(component->{
