@@ -1,4 +1,4 @@
-package irt.stock.web.controllers;
+package irt.stock.rest;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import irt.stock.data.jpa.repositories.CompanyRepository;
 
 @RestController
 @RequestMapping("/companies")
-public class CompaniesController {
+public class CompaniesRestController {
 
 	@Autowired private CompanyRepository companyRepository;
 

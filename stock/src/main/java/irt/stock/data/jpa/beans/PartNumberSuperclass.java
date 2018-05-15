@@ -42,6 +42,10 @@ public class PartNumberSuperclass{
 		return false;
 	}
 
+	public void clearManufPartNumber() {
+		manufPartNumber = null;
+	}
+
 	@Override
 	public int hashCode() {
 		return 31 + ((id == null) ? 0 : id.hashCode());

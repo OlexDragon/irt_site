@@ -29,9 +29,8 @@ $('#confirmBtn').click(function(){
 		fillFields();
 	})
 	.fail(function(error) {
-		var responseText = error.responseText
-		alert(responseText);
-	})
+		alert(error.responseText);
+	});
 })
 
 function enableButtun() {

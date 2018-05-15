@@ -15,6 +15,7 @@ public class BomComponent {
 	public BomComponent(Long topId, Component component, BomReference reference) {
 		id = new BomComponentId(topId, component.getId());
 		this.reference = reference;
+		this.component = component;
 	}
 
 	@EmbeddedId private BomComponentId id;
@@ -35,4 +36,11 @@ public class BomComponent {
 	public PartNumber getTopPartNumber() { return topPartNumber; }
 	public Component getComponent() { return component; }
 	public BomReference getReference() { return reference; }
+
+	public void setReference(BomReference reference) { this.reference = reference; }
+
+	@Override
+	public String toString() {
+		return "BomComponent [id=" + id + ", component=" + component + ", reference=" + reference + "]";
+	}
 }

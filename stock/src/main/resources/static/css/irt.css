@@ -26,3 +26,9 @@ body.loading .ajax-loader {
    modal element will be visible */
     display: block;
 }
+
+select > option:hover{
+	 background-color: #ffff80;
+    background-image: none;
+	
+}

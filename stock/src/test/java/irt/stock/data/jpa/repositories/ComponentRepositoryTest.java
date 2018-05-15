@@ -111,4 +111,14 @@ public class ComponentRepositoryTest {
 		assertFalse(costs.isEmpty());
 		assertEquals(cost, costs.get(0));
 	}
+
+
+	@Test
+	public void finfByPartNumberTest() {
+		final Optional<Component> oComponent = componentRepository.findByPartNumber(component.getPartNumber());
+		assertTrue(oComponent.isPresent());
+		final Component get = oComponent.get();
+		assertEquals(component, get);
+	}
+
 }

@@ -7,9 +7,10 @@ $('#qtyMfrToBulk').on('input', function(){
 	if(this.value){
 
 		var val = parseInt(this.value);
+		var max = parseInt($(this).prop('max'));
 
-		if(val > stockQty){	// stockQty -> from 'move_to_bulk.html' file
-			this.value = stockQty;
+		if(val > max){	
+			this.value = max;
 			$(this).addClass('text-danger');
 		}else
 			$(this).removeClass('text-danger');
@@ -23,7 +24,7 @@ $('#coMfr').change(function(){
 	if(val){
 		var obj = JSON.parse(val);
 		var maxVal = obj.qty;
-		var input = $('#qtyMfrToStock').prop('max', maxVal);
+		var input = $('#qtyMfrToBulk').prop('max', maxVal);
 		var val = parseInt(input.val());
 
 		if(val > maxVal)
