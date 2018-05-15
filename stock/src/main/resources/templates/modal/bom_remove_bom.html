@@ -34,6 +34,9 @@
 			$('#modalMessage').on('hidden.bs.modal', function(e) { $(this).remove(); });
 			$('#deleteBom').click(function(){
 
+				if(!confirm('Are you sure?'))
+					return;
+
 				var _csrf = $( "input[name='_csrf']" ).val();
 
 				//pcaId from pca_details.html
