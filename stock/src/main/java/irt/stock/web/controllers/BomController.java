@@ -38,7 +38,9 @@ public class BomController {
 
 		model.addAttribute("desiredPN", desiredPN);
 
-		if(!desiredPN.startsWith("PCA"))
+		if(desiredPN.startsWith("PCA"))
+			desiredPN = desiredPN + "%";
+		else
 			desiredPN = "PCA%" + desiredPN + "%";
 
 		final List<? extends PartNumber> partNumbers = partNumberRepository.findByPartNumberLikeOrderByPartNumber(desiredPN);

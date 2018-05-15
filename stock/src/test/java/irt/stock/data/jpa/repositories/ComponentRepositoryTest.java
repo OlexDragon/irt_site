@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -121,4 +122,9 @@ public class ComponentRepositoryTest {
 		assertEquals(component, get);
 	}
 
+	@After
+	public void after(){
+		costRepository.deleteAll();
+		componentRepository.deleteAll();
+	}
 }
