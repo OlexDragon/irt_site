@@ -1,10 +1,8 @@
-package irt.stock.web.controllers;
+package irt.stock.rest;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,17 +15,23 @@ import irt.stock.data.jpa.repositories.PartNumberRepository;
 
 @RestController
 @RequestMapping("/pn")
-public class PartNumberController {
-	private final static Logger logger = LogManager.getLogger();
+public class PartNumberRestController {
 
 	@Autowired private PartNumberRepository partNumberRepository;
 	@Autowired private ComponentRepository componentRepository;
 
 	@RequestMapping
 	public List<? extends PartNumber> postPartNambers(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
-		desiredPN = desiredPN.replaceAll("[^A-Za-z0-9_%]", "");
-		logger.debug("desiredPN='{}'", desiredPN);
+
+		desiredPN = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
 		return partNumberRepository.findByPartNumberContainingOrManufPartNumberContainingOrderByPartNumber(desiredPN, desiredPN);
+	}
+
+	@RequestMapping("like")
+	public List<? extends PartNumber> postPartNambersLike(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
+
+		desiredPN = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
+		return partNumberRepository.findByPartNumberLikeOrderByPartNumber(desiredPN);
 	}
 
 	@RequestMapping("details")

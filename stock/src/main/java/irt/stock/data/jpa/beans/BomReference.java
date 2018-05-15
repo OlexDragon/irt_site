@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.persistence.Column;
@@ -24,7 +27,7 @@ public class BomReference {
 
 	@Id @GeneratedValue
 	private Long id;
-	@Column(name="ref")
+	@Column(name="ref", unique=true, nullable=false, length=500)
 	private String references;
 
 	public Long getId() { return id; }
@@ -32,6 +35,37 @@ public class BomReference {
 
 	public long getQty() {
 
+		Map<Boolean, List<String>> map = serarateDashAndSpace(references);
+		
+		long count = map.get(false).size();
+
+		count += map.get(true).stream().map(s->s.split("-")).mapToInt(split->Integer.parseInt(split[1]) - Integer.parseInt(split[0]) + 1).sum();
+
+		return count;
+	}
+
+	public Set<Integer> referencesToSet() {
+
+		final IntStream concat = referenceToIntStream(references);
+
+		return concat.boxed().collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	public IntStream referenceToIntStream() {
+		return referenceToIntStream(references);
+	}
+
+	public static IntStream referenceToIntStream(String references) {
+		Map<Boolean, List<String>> map = serarateDashAndSpace(references);
+		final IntStream bySpace = map.get(false).parallelStream().mapToInt(Integer::parseInt);
+		final IntStream byDash = map.get(true).parallelStream().map(s->s.split("-")).flatMapToInt(split->IntStream.range(Integer.parseInt(split[0]), Integer.parseInt(split[1]) + 1));
+		return IntStream.concat(bySpace, byDash);
+	}
+
+	/**
+	 * @return Map where true - with dashes; false - with spaces
+	 */
+	public static Map<Boolean, List<String>> serarateDashAndSpace(String references) {
 		Map<Boolean, List<String>> map = Optional
 										.ofNullable(references)
 										.map(r->r.split(" "))
@@ -39,12 +73,7 @@ public class BomReference {
 										.orElse(Stream.empty())
 										.filter(ref->!ref.trim().isEmpty())
 										.collect(Collectors.partitioningBy(s->s.contains("-")));
-		
-		long count = map.get(false).size();
-
-		count += map.get(true).stream().map(s->s.split("-")).mapToLong(split->Integer.parseInt(split[1]) - Integer.parseInt(split[0]) + 1).sum();
-
-		return count;
+		return map;
 	}
 
 	@Override

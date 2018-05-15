@@ -26,9 +26,10 @@
 
     <Loggers>
 
-<!-- 		<logger name="irt.stock.web.controllers.ComponentController" level="all" /> -->
-<!-- 		<logger name="irt.stock.web.controllers.PartNumberController" level="debug" /> -->
-<!-- 		<logger name="irt.stock.web.controllers.BomController" level="debug" /> -->
+<!-- 		<logger name="irt.stock.rest.ComponentRestController" level="all" /> -->
+<!-- 		<logger name="irt.stock.rest.PartNumberRestController" level="debug" /> -->
+		<logger name="irt.stock.rest.BomRestController" level="all" />
+		<logger name="irt.stock.web.controllers.BomController" level="all" />
 
         <Root level="info">
             <AppenderRef ref="ConsoleAppender" />

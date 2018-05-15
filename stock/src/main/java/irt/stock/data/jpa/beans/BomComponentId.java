@@ -15,11 +15,18 @@ public class BomComponentId implements Serializable{
 		this.componentId = componentId;
 	}
 
-	@Column(name="id_top_comp")
-	private Long topComponentId;
-	@Column(name="id_components")
-	private Long componentId;
+	@Column(name="id_top_comp") 	private Long topComponentId;
+	@Column(name="id_components") 	private Long componentId;
 
 	public Long getTopComponentId() { return topComponentId; }
 	public Long getComponentId() { return componentId; }
+
+	public void setComponentId(Long componentId) {
+		this.componentId = componentId;
+	}
+
+	@Override
+	public String toString() {
+		return "BomComponentId [topComponentId=" + topComponentId + ", componentId=" + componentId + "]";
+	}
 }

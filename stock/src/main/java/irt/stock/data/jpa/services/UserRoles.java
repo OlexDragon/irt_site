@@ -22,7 +22,8 @@ public enum UserRoles implements GrantedAuthority{
 	ADMIN				(1048576),
 	EDITING				(2097152),
 	SELLERS				(4194304),
-	DATABASE			(8388608);
+	DATABASE			(8388608),
+	EDIT_BOM			(16777216);
 
 	private final long permission;
 

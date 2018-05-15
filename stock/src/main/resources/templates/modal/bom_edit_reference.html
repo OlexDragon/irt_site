@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body>
+
+	<!-- Confirm Set Modal -->
+	<div id="modalMessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="costTitleLabel" style="display: block; padding-right: 17px;"  th:fragment="edit_reference">
+		<div class="modal-dialog" role="document">
+
+    		<!-- Modal content-->
+    		<div class="modal-content">
+      			<div class="modal-header">
+         			<h4 id="costTitleLabel" class="modal-title">Edit BOM references.</h4>
+        			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      			</div>
+ 
+      			<div class="modal-body">
+      				<p th:inline="text">Edit BOM references of component  ID: [[${component.id}]], part number: [[${component.partNumber}]].</p>
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<div class="input-group-text">References:</div>
+						</div>
+						<input id="references" type="text" class="form-control" placeholder="1 2 15 16 123" pattern="[0-9 ]" required="required">
+					</div>
+				</div>
+ 
+
+     			<div class="modal-footer">
+						<button id="saveReferencesBtn" type="submit" class="btn btn-outline-success mr-2" disabled>Save References</button>
+						<input type="button" class="btn btn-secondary" data-dismiss="modal" value="Cancel" />
+     			</div>
+		<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+			$('#modalMessage').modal('show');
+			$('#modalMessage').on('hidden.bs.modal', function(e) { $(this).remove(); });
+			$('#references').keypress(function(e){ if(e.charCode==32 || e.charCode>=48 && e.charCode<57) return; e.preventDefault(); });
+			$('#references').on('input', enableSubmitButton);
+			function enableSubmitButton(){
+				if($('#references').val())
+					$('#saveReferencesBtn').prop('disabled', false);
+				else
+					$('#saveReferencesBtn').prop('disabled', true);
+			}
+			$('#saveReferencesBtn').click(function(){
+
+				var comp_id = [[${component.id}]];
+				var references = $('#references').val();
+				var _csrf = $( "input[name='_csrf']" ).val();
+
+				//pcaId from pca_details.html
+				$.post('/bom/edit/' + pcaId, {_csrf : _csrf, componentId : comp_id, references : references})
+				.done(function(response){
+
+					var $buttonClose = $('<button>', {type : 'button', class : 'close', 'data-dismiss' : 'alert', 'aria-label' : 'Close'});
+					var $span = $('<span>', {'aria-hidden' : 'true', html : '&times;'});
+					
+
+					if(response){
+						var $mainDiv = $('<div>', {id : 'alert_message', class : 'alert alert-success alert-dismissible fade show', role : 'alert'});
+						var $title = $('<h4>', {class : 'alert-heading', text : 'Well done!'});
+						var $content =$('<p>', {text : 'The component '+ (comp_id ? 'with ID ' + comp_id : parpart_number )  + ' added to the BOM.'});
+
+						$('#bomDetails')
+						.prepend(
+								$mainDiv
+								.append($title)
+								.append($content)
+								.append($buttonClose.append($span)));
+						$mainDiv.on('closed.bs.alert', function () { location.reload(); });
+					}else{
+						var $maimDiv = $('<div>', {class : 'alert alert-warning alert-dismissible fade show', role : 'alert'});
+						var $title = $('<h4>', {class : 'alert-heading', text : 'Warning.'});
+						var $content = $('<p>', {text : 'The component '+ (comp_id ? 'with ID ' + comp_id : parpart_number )  + ' can not be added to the BOM.'});
+
+						$('#bomDetails')
+						.prepend(
+								$maimDiv
+								.append($title)
+								.append($content)
+								.append($buttonClose.append($span)));
+					}
+					$('#modalMessage').modal('hide');
+				})
+				.fail(function(error) {
+					alert(error.responseText);
+					//$('#modalMessage').modal('hide');
+					location.reload();
+				});
+			});
+		/*]]>*/
+   				//# sourceURL=bom_editReferences.js
+		</script>
+    		</div>
+  		</div>
+	</div>
+
+</body>
+</html>

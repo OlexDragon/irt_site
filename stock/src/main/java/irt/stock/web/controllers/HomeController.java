@@ -30,8 +30,7 @@ import irt.stock.data.jpa.repositories.PartNumberRepository;
 @Controller
 public class HomeController {
 
-	@Autowired
-	private PartNumberRepository partNumberRepository;
+	@Autowired private PartNumberRepository partNumberRepository;
 
 	@GetMapping("/login")
 	public String login() {
@@ -41,7 +40,7 @@ public class HomeController {
 	@GetMapping("/")
 	public String home(@CookieValue(name="desiredPN", defaultValue="") String desiredPN, Model model) {
 
-		desiredPN = desiredPN.replaceAll("[^A-Za-z0-9_%]", "");
+		desiredPN = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
 
 		model.addAttribute("desiredPN", desiredPN);
 		final List<? extends PartNumber> partNumbers = partNumberRepository.findByPartNumberContainingOrManufPartNumberContainingOrderByPartNumber(desiredPN, desiredPN);

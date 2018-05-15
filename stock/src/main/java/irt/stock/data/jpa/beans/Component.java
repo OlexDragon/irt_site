@@ -27,6 +27,7 @@ public class Component extends PartNumberSuperclass{
 	}
 
 	private String description;
+	private String schematicLetter;
 	private Long qty;
 
 	@ManyToOne
@@ -54,6 +55,7 @@ public class Component extends PartNumberSuperclass{
 	public Manufacture getManufacture() { return manufacture; }
 	public List<ComponentAlternative> getAlternatives() { return alternativeComponents; }
 	public List<Cost> getCosts() { return costs; }
+	public String getSchematicLetter() { return schematicLetter; }
 
 	public void setAlternatives(List<ComponentAlternative> alternativeComponents) {
 		this.alternativeComponents = alternativeComponents;
@@ -65,9 +67,8 @@ public class Component extends PartNumberSuperclass{
 
 	@Override
 	public String toString() {
-		return "Component [description=" + description + ", qty=" + qty + ", manufacture=" + manufacture
-				+ ", companyQties=" + companyQties + ", alternativeComponents=" + alternativeComponents + ", costs="
-				+ costs + ", getId()=" + getId() + ", getPartNumber()=" + getPartNumber() + ", getManufPartNumber()="
-				+ getManufPartNumber() + "]";
+		return "Component [description=" + description + ", schematicLetter=" + schematicLetter + ", qty=" + qty
+				+ ", manufacture=" + manufacture + ", companyQties=" + companyQties + ", alternativeComponents="
+				+ alternativeComponents + ", costs=" + costs + "]";
 	}
 }
