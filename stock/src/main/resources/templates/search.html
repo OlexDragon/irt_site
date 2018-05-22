@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3" lang="en">
+    <head>
+        <title>IRT SEARCH</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+<link rel="stylesheet" href="/css/irt.css" >
+<style type="text/css"> .table_head{ cursor: pointer; } </style>
+</head>
+    <body>
+<!--/* HEADER will be replaced */-->
+	<header th:replace="login::header">
+	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+		<a class="navbar-brand" href="http://irttechnologies:8080/irt/">IRT Technologies</a>
+			<a class="navbar-brand" href="http://irttechnologies:8080/irt/">IRT Technologies</a>
+			<button class="navbar-toggler" aria-expanded="false" aria-controls="navbarCollapse" aria-label="Toggle navigation" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+         		 <span class="navbar-toggler-icon"></span>
+       		</button>
+      	<div class="collapse navbar-collapse" id="navbarMainMenu">
+          	<ul class="navbar-nav mr-auto">
+          		<li class="nav-item">
+    				<a class="nav-link active" href="#">BOM</a>
+  				</li>
+          	</ul>
+			<form class="form-inline mt-2 mt-md-0" action="/login" method="POST" >
+				<input class="form-control mr-sm-2" type="text" placeholder="Username" autofocus="autofocus" />
+				<input class="form-control mr-sm-2" type="password" placeholder="Password" />
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+			</form>
+		</div>
+	</nav>
+	</header>
+<!--/* END HEADER will be replaced */-->
+
+	<div class="container-fluid bg-white">
+
+<!-- IDs -->
+		<div class="d-lg-flex justify-content-around bd-highlight pt-3 mt-5">
+			<div class="bg-secondary rounded">
+					<input id="id_input" type="number" class="form-control font-weight-bold searchInput" placeholder=" ID" th:value="${desiredID}" />
+					<select id="id_out" class="form-control" multiple="multiple" size="4" style="overflow-y: auto;">
+						<option class="font-weight-bold text-secondary" sec:authorize="isAuthenticated()" th:each="pn : ${partNumbers}" th:value="${component.id}" th:text="${component.id}">Component IDs</option>
+					</select>
+			</div>
+			<div class="bg-secondary rounded">
+					<input id="pn_input" type="text" class="form-control font-weight-bold searchInput" placeholder=" IRT Part Number" th:value="${desiredPN}" />
+					<select id="pn_out" class="form-control w-100" multiple="multiple" size="4" style="overflow-y: auto;">
+						<option class="font-weight-bold text-secondary" th:each="pn : ${partNumbers}" th:value="${pn.id}" th:text="${pn.partNumber}">Part Number</option>
+					</select>
+			</div>
+			<div class="bg-secondary rounded">
+					<input id="mfrPN_input" type="text" class="form-control font-weight-bold searchInput" placeholder=" Mfr Part Number" th:value="${desiredMfrPN}" />
+					<select id="mfrPN_out" class="form-control" multiple="multiple" size="4" style="overflow-y: auto;">
+						<option class="font-weight-bold text-secondary" th:each="pn : ${partNumbers}" th:value="${pn.id}" th:text="${pn.partNumber}">Mfr Part Number</option>
+					</select>
+			</div>
+			<div class="=bg-secondary rounded">
+					<input id="mfr_input" type="text" class="form-control font-weight-bold searchInput" placeholder=" Company" th:value="${desiredCompany}" />
+					<select id="mfr_out" class="form-control" multiple="multiple" size="4" style="overflow-y: auto;">
+						<option class="font-weight-bold text-secondary" th:each="pn : ${partNumbers}" th:value="${pn.id}" th:text="${pn.partNumber}">Company</option>
+					</select>
+			</div>
+			<div class="bg-secondary rounded">
+					<input id="description_input" type="text" class="form-control  font-weight-bold searchInput" placeholder=" Description" th:value="${desiredDescription}" />
+					<select id="description_out" class="form-control" multiple="multiple" size="4" style="overflow-y: auto;">
+						<option class="font-weight-bold text-secondary" th:each="pn : ${partNumbers}" th:value="${pn.id}" th:text="${pn.partNumber}">Value</option>
+					</select>
+			</div>
+			<div class="bg-secondary rounded">
+					<input id="value_input" type="text" class="form-control  font-weight-bold searchInput" placeholder=" Value" th:value="${desiredValue}" />
+					<select id="value_out" class="form-control" multiple="multiple" size="4" style="overflow-y: auto;">
+						<option class="font-weight-bold text-secondary" th:each="pn : ${partNumbers}" th:value="${pn.id}" th:text="${pn.partNumber}">Value</option>
+					</select>
+			</div>
+		</div>
+		<div id="serchDetails" class="d-flex p-2 bd-highlight"></div>
+	</div>
+	<table class="table">
+  		<thead class="thead-light">
+    		<tr>
+      			<th scope="col">ID</th>
+      			<th scope="col">PN</th>
+      			<th scope="col">Mfr PN</th>
+      			<th scope="col">Mfr</th>
+      			<th scope="col">Description</th>
+      			<th scope="col">Val.</th>
+   			</tr>
+  	</thead>
+  	<tbody id="tableBody">
+  	</tbody>
+</table>
+	<div id="modal"></div>
+<th:block th:replace="home::bootstrap_script">
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</th:block>
+<script sec:authorize="isAuthenticated()" src="../static/js/search.js" th:src="@{/js/search.js}" type="text/javascript"></script>
+<script type="text/javascript">
+	$('#searchMenu').addClass('active');
+	//# sourceURL=search-page.js
+</script>
+    </body>
+</html>

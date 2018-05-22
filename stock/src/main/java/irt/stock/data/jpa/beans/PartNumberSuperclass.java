@@ -17,10 +17,12 @@ public class PartNumberSuperclass{
 	private Long id;
 	private String partNumber;
 	private String manufPartNumber;
+	private String description;
 
 	public Long getId() 				{ return id; }
 	public String getPartNumber() 		{ return partNumber; }
 	public String getManufPartNumber() 	{ return manufPartNumber; }
+	public String getDescription() 		{ return description; }
 
 	public void setId(Long id) {
 		this.id = id;
@@ -66,5 +68,11 @@ public class PartNumberSuperclass{
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + " [id=" + id + ", partNumber=" + partNumber + ", manufPartNumber=" + manufPartNumber
+				+ ", description=" + description + "]";
 	}
 }

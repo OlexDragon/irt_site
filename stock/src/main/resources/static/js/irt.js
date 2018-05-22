@@ -115,34 +115,6 @@ $('#toAssenbly').click(function(){ $('#modalLoad').load('/modal/to_assembly/' + 
 //Move all BOM component from MFR to PCA
 $('#mfrToBulk').click(function(){ $('#modalLoad').load('/modal/mfr_to_bulk/' + componentId); });
 
-function partNumberAddDashes(pn){
-
-	if (typeof pn === 'string' || pn instanceof String){
-		length = pn.length;
-
-		if(length>15){
-			position = length-3;
-			pn = pn.slice(0, position) + "-" + pn.slice(position);
-		}
-
-		if(pn.length>10){
-			var sub = pn.substring(0,3);
-
-			if(sub==='00I' || sub==='TPB' || sub==='TRS')
-				pn = pn.slice(0, 10) + "-" + pn.slice(10);
-
-			else if(sub==='0IS' || sub==='0RF')
-				pn = pn.slice(0, 8) + "-" + pn.slice(8);
-
-			else
-				pn = pn.slice(0, 9) + "-" + pn.slice(9);
-		}
-
-		if(pn.length>3)
-			pn = pn.slice(0, 3) + "-" + pn.slice(3);
-	}
-	return pn;
-}
 function fillFields(){
 	if(componentId)
 	$.get("/pn/details", {pnId : componentId})
@@ -157,23 +129,23 @@ function fillFields(){
 		//Bulk and 'TO CO MFR' buttons
 		stockQty = data ? data.qty : 0;
 		if(stockQty>0)
-			$('.hiddenBtn').removeClass('d-none');
+			$('.fromStockBtn').removeClass('d-none');
 		else
-			$('.hiddenBtn').addClass('d-none');
+			$('.fromStockBtn').addClass('d-none');
 
 	//'TO STOCK' buttons
 		var maxQt
 		if(data){
 			companyQties = data.companyQties ? data.companyQties : 0;
-			maxQty = data.companyQties ? Math.max.apply( Math, data.companyQties.map(function(o){return o.qty;})) : 0;
+			maxQty = companyQties ? Math.max.apply( Math, companyQties.map(function(o){return o.qty;})) : 0;
 		}else{
 			maxQty = 0;
 		}
 		if(maxQty>0){
+			$('.fromMfrBtn').removeClass('d-none');
 			//'TO PCA' button
 			if(data.partNumber.indexOf('PCB')==0){
 				var _csrf = $( "input[name='_csrf']" ).val();
-				$('.from-mfr').removeClass('d-none');
 				$.post('/bom/exists/' + componentId, {_csrf : _csrf})
 				.done(function(data){
 					if(data)
@@ -188,7 +160,7 @@ function fillFields(){
 			}else
 				$('#toAssenbly').addClass('d-none');
 		}else{
-			$('.from-mfr').addClass('d-none');
+			$('.fromMfrBtn').addClass('d-none');
 			$('#toAssenbly').addClass('d-none');
 		}
 
@@ -362,6 +334,13 @@ function fillFields(){
 		alert(error.responseText);
 	});
 }
+
+
+$('#whereUsed').click(function(){
+	if(componentId)
+		$('#modalLoad').load('/modal/where_used/' + componentId);
+});
+
 function fillPriceHistoryTab(){
 	if(componentId)
 		$.get('/component/price/history', {componentId : componentId})
@@ -391,12 +370,14 @@ function fillComponentHistoryTab(){
 			var componentHistory = $('#componentHistory').empty();
 			$(data).each(function(){
 
-				var quantity = this.qty;
+				if(!this.qty)
+					return;
+
 				var to = this.id.componentMovement.to;
 				var from = this.id.componentMovement.from;
 
 				if(from=='STOCK' || to=='ASSEMBLED' || to=='BULK')
-					quantity*=-1;
+					this.qty*=-1;
 
 				componentHistory
 				.append($('<tr>'))
@@ -406,8 +387,8 @@ function fillComponentHistoryTab(){
 			    .append($('<td>', { text : this.id.componentMovement.toCompany ? this.id.componentMovement.toCompany.companyName : to, title : to }))
 			    .append($('<td>', { text : this.id.componentMovement.description }))
 			    .append($('<td>', { text : this.oldQty }))
-			    .append($('<td>', { text : quantity }))
-			    .append($('<td>', { text : this.oldQty || quantity>0 ? this.oldQty + quantity : '' }));
+			    .append($('<td>', { text : this.qty }))
+			    .append($('<td>', { text : this.oldQty || this.qty>0 ? this.oldQty + this.qty : '' }));
 			});
 		})
 		.fail(function(error) {
@@ -445,23 +426,28 @@ function buttonSaveEnable(){
 	var divider = $('#selectDivider option:selected').val();
 	var poNumber = $('#savePO').val();
 
+	var addToStockBtn = $('#addToStockBtn');
+
 	if(poNumber){
 
 		if(disabled){
-			$('#addToStockBtn').prop('disabled', false);
 			$('#savePriceBtn').prop('disabled', true);
+			addToStockBtn.prop('disabled', false);
+			addToStockBtn.prop('title', 'Add this component to the stock.')
 		}else{
 			if(divider<=0){
 				$('#savePriceBtn').prop('disabled', true);
-				$('#addToStockBtn').prop('disabled', true);
+				addToStockBtn.prop('disabled', true);
+				addToStockBtn.prop('title', 'Add this component to the stock.')
 			}else{
 				$('#savePriceBtn').prop('disabled', false);
-				$('#addToStockBtn').prop('disabled', false);
+				addToStockBtn.prop('disabled', false);
+				addToStockBtn.prop('title', 'Save the price and add this component to the stock.')
 			}
 		}
 
 	}else{
-		$('#addToStockBtn').prop('disabled', true);
+		addToStockBtn.prop('disabled', true);
 		$('#savePriceBtn').prop('disabled', true);
 	}
 }

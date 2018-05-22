@@ -70,12 +70,67 @@
 		</div>
 		<script type="text/javascript" th:inline="javascript">
 		/*<![CDATA[*/
-			/*[+ $.getScript( '/js/move_to_assembly.js'); +]*/
 			$('#modalMessage').modal('show').on('hidden.bs.modal', function(e) { $(this).remove(); });
+			$('#topPNs').change(enableButtun);
+			$('#coMfr').change(enableButtun);
+
+			$('#pcbQty').on('input', function(){
+				enableButtun();
+
+				var coMfrIdAndQty = $('#coMfr option:selected').val();
+
+				if(!(coMfrIdAndQty && this.value))
+					return;
+
+				var val = parseInt(this.value);
+				var obj = JSON.parse(coMfrIdAndQty);
+				var coMfrQty = obj.qty;
+
+				if(val > coMfrQty){
+					this.value = coMfrQty;
+					$(this).addClass('text-danger');
+				}else
+					$(this).removeClass('text-danger');
+			});
+
+			$('#confirmBtn').click(function(){
+
+
+				var _csrf = $( "input[name='_csrf']" ).val();
+				var qty = $('#pcbQty').val();
+				var fromId = JSON.parse($('#coMfr option:selected').val());
+				var topId = $('#topPNs option:selected').val();
+
+				$.post('/bom/to_assembly/' + topId + '/' + fromId.id + '/' + qty, {_csrf : _csrf})
+				.done(function(){
+					fillFields();
+				})
+				.fail(function(error) { alert(error.responseText); })
+			})
+
+			function enableButtun() {
+
+				var coMfr = $('#coMfr option:selected').val();
+				var topPN = $('#topPNs option:selected').val();
+				var inputQty = $('#pcbQty');
+				var pcbQty = inputQty.val();
+
+				if(coMfr){
+					inputQty.prop('disabled', false);
+
+					if (topPN && pcbQty > 0)
+						$('#confirmBtn').prop('disabled', false);
+					else
+						$('#confirmBtn').prop('disabled', true);
+				}else{
+					inputQty.prop('disabled', true);
+					inputQty.val('');
+					$('#confirmBtn').prop('disabled', true);
+				}
+			}
 		/*]]>*/
+		//# sourceURL=move_to_assemble.js
 		</script>
 	</div>
-
-	<script src="../../static/js/move_to_assembly.js" type="text/javascript"></script>
 </body>
 </html>
