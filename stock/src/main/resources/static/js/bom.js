@@ -59,34 +59,28 @@ $('#pns_out > option').each(function() {
 	option.text(partNumberAddDashes(option.text()));
 });
 
-function partNumberAddDashes(pn){
+$('.bom_action').click(function(e){
+	e.preventDefault();
 
-	if (typeof pn === 'string' || pn instanceof String){
-		length = pn.length;
+	var selected = $('#selected_bom_component').val();
+	var url = '/bom/modal/' + this.id + '/' + selected;
+	$('#modal').load(url);
+});
 
-		if(length>15){
-			position = length-3;
-			pn = pn.slice(0, position) + "-" + pn.slice(position);
-		}
+//move to co manufacture
+$('#toCoMfrBtn').click(function(){
+	var selected = $('#selected_bom_component').val();
+	$('#modal').load('/modal/to_co_mfr/' + selected, function(){
+		
+		var pcaDescription = $('#bomDetails h4').text();
+		$('#descriptionCoMfr').val(pcaDescription);
+	});
+});
 
-		if(pn.length>10){
-			var sub = pn.substring(0,3);
-
-			if(sub==='00I' || sub==='TPB' || sub==='TRS')
-				pn = pn.slice(0, 10) + "-" + pn.slice(10);
-
-			else if(sub==='0IS' || sub==='0RF')
-				pn = pn.slice(0, 8) + "-" + pn.slice(8);
-
-			else
-				pn = pn.slice(0, 9) + "-" + pn.slice(9);
-		}
-
-		if(pn.length>3)
-			pn = pn.slice(0, 3) + "-" + pn.slice(3);
-	}
-	return pn;
-}
+$('#whereUsed').click(function(){
+	var selected = $('#selected_bom_component').val();
+	$('#modal').load('/modal/where_used/' + selected);
+});
 
 //Search part numbers containing 'str'
 function pcaPartNumbers(str){
@@ -128,12 +122,6 @@ function pcaPartNumbers(str){
 		});
 }
 
-function selectComponent(){
-	if(pnsOut.val()!=componentId){
-		pnsOut.val(componentId);
-		fillFields();
-	}
-}
-
+function selectComponent(){ if(pnsOut.val()!=componentId){ pnsOut.val(componentId); fillFields(); } }
 function fillFields(){ $('#bomDetails').load('/bom/details/' + componentId); }
 

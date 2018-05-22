@@ -18,13 +18,14 @@
        		</button>
         	<div id="navbarMainMenu" class="collapse navbar-collapse justify-content-end">
           		<ul class="navbar-nav">
-          			<li id='stockMenu' class="nav-item"> <a class="nav-link active" href="/">Stock</a> </li>
+          			<li id='searchMenu' class="nav-item"> <a class="nav-link active" href="/search">Search</a> </li>
+           			<li id='stockMenu' class="nav-item"> <a class="nav-link active" href="/">Stock</a> </li>
           			<li id="bomMenu" class="nav-item"> <a class="nav-link" href="/bom">BOM</a> </li>
           		</ul>
 <!--/* LOGIN FORM */-->
 				<form sec:authorize="isAnonymous()" class="form-inline mt-2 mt-md-0" th:action="@{/login}" method="POST">
 					<input name="username" class="form-control mr-sm-2" type="text" placeholder="Username" required="required" autofocus="autofocus" />
-					<input name="password" class="form-control mr-sm-2" type="password" placeholder="Password" required="required" />
+					<input name="password" class="form-control mr-sm-2" type="password" placeholder="Password" required="required" autocomplete="off" />
 					<input type="hidden" name="remember-me" value="true" />
 					<button type="submit" class="btn btn-outline-success my-2 my-sm-0">Login</button>
 				</form>

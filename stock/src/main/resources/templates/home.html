@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3" lang="en">
     <head>
         <title>IRT Stock</title>
 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-<link rel="stylesheet" href="http://localhost:8087/css/irt.css" >
+<link rel="stylesheet" href="/css/irt.css" >
 <!-- <style type="text/css"> html,body { height:100%; margin:0; } </style> -->
 </head>
     <body>
@@ -82,14 +85,17 @@
 			<nav>
  				 <div class="nav nav-tabs" id="nav-tab" role="tablist">
  					<a id="info-tab" class="nav-item nav-link active" data-toggle="tab" href="#nav-info" role="tab" aria-controls="nav-info" aria-selected="true">Info</a>
-					<a id="edit-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-edit" role="tab" aria-controls="edite-tab" aria-selected="false">Edit</a>
+					<a id="edit-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-edit" role="tab" aria-controls="edite-tab" aria-selected="false" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STOCK')">Edit</a>
 					<a id="price-hystory-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-price-history" role="tab" aria-controls="nav-price-history" aria-selected="false">Price History</a>
 					<a id="component-hystory-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-component-history" role="tab" aria-controls="nav-component-history" aria-selected="false">Component History</a>
-					<button id="toCoMfrBtn" type="button" class="btn btn-outline-primary d-none hiddenBtn ml-2">TO CO MFR</button>
-					<button id="toBulkBtn" type="button" class="btn btn-outline-secondary d-none hiddenBtn ml-2">TO BULK</button>
-					<button id="toStockBtn" type="button" class="btn btn-outline-success d-none hiddenBtn ml-2 from-mfr">TO STOCK</button>
-					<button id="mfrToBulk" type="button" class="btn btn-outline-danger d-none hiddenBtn ml-2 from-mfr">MFR TO BULK</button>
-					<button id="toAssenbly" type="button" class="btn btn-outline-info d-none hiddenBtn ml-2">TO PCA</button>
+					<button id="whereUsed" type="button" class="btn btn-outline-dark ml-2">Where used?</button>
+					<th:block sec:authorize="hasAuthority('ADMIN') or hasAuthority('STOCK')">
+						<button id="toCoMfrBtn" type="button" class="btn btn-outline-primary d-none fromStockBtn ml-2">TO CO MFR</button>
+						<button id="toBulkBtn" type="button" class="btn btn-outline-secondary d-none fromStockBtn ml-2">TO BULK</button>
+						<button id="toStockBtn" type="button" class="btn btn-outline-success d-none fromMfrBtn Btn ml-2">TO STOCK</button>
+						<button id="mfrToBulk" type="button" class="btn btn-outline-danger d-none fromMfrBtn ml-2">MFR TO BULK</button>
+						<button id="toAssenbly" type="button" class="btn btn-outline-info d-none ml-2">TO PCA</button>
+					</th:block>
 				</div>
 			</nav>
 		</div>
@@ -308,8 +314,8 @@
      				<select id="selectDivider" class="form-control"></select>
 					<button type="button" class="btn btn-secondary form-control" data-dismiss="modal">Cancel</button>
 					<form id="savePriceForm" th:action="@{/component/price}" method="POST">
-						<button name="savePriceBtn" type="submit" class="btn btn-outline-primary form-control">Save Price</button>
-						<button name="addToStockBtn" type="submit" class="btn btn-outline-success form-control">Add to stock</button>
+						<button name="savePriceBtn" type="submit" class="btn btn-outline-primary form-control">Save Price.</button>
+						<button name="addToStockBtn" type="submit" class="btn btn-outline-success form-control">Add to stock.</button>
 					</form>
       			</div>
     		</div>
@@ -321,11 +327,21 @@
 	<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+	<script src="/js/irt_main.js" type="text/javascript"></script>
+
+	<script type="text/javascript" sec:authorize="isAuthenticated()" >
+		$('#navbarMainMenu a').removeClass('active');
+		var _csrf = $( "input[name='_csrf']" ).val();
+		setInterval(function(){ $.post('/pn/testConnection', {_csrf : _csrf}).done(function(data){
+			if( data != true)
+				alert('The session was over. Please reload the page.');
+		}).fail(function(error) { alert(error.responseText); }); }, 10*60*1000);
+		//# sourceURL=main-script.js
+	</script>
 </th:block>
 <script sec:authorize="isAuthenticated()" src="../static/js/irt.js" th:src="@{/js/irt.js}" type="text/javascript"></script>
 
 <script type="text/javascript">
-	$('#navbarMainMenu a').removeClass('active');
 	$('#stockMenu').addClass('active');
 	//# sourceURL=home.js
 </script>

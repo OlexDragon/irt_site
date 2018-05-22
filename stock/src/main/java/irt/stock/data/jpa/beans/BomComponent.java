@@ -41,6 +41,7 @@ public class BomComponent {
 
 	@Override
 	public String toString() {
-		return "BomComponent [id=" + id + ", component=" + component + ", reference=" + reference + "]";
+		return "BomComponent [id=" + id + ", topPartNumber=" + topPartNumber + ", component=" + component
+				+ ", reference=" + reference + "]";
 	}
 }

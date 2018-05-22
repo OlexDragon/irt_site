@@ -26,7 +26,7 @@ public class Component extends PartNumberSuperclass{
 		this.manufacture = manufacture;
 	}
 
-	private String description;
+	private String value;
 	private String schematicLetter;
 	private Long qty;
 
@@ -49,13 +49,13 @@ public class Component extends PartNumberSuperclass{
 	@JoinColumn(name = "idComponents", nullable=true)
 	private List<Cost> costs;
 
-	public String getDescription() { return description; }
 	public Long getQty() { return qty; }
 	public List<CompanyQty> getCompanyQties() { return companyQties; }
 	public Manufacture getManufacture() { return manufacture; }
 	public List<ComponentAlternative> getAlternatives() { return alternativeComponents; }
 	public List<Cost> getCosts() { return costs; }
 	public String getSchematicLetter() { return schematicLetter; }
+	public String getValue() { return value; }
 
 	public void setAlternatives(List<ComponentAlternative> alternativeComponents) {
 		this.alternativeComponents = alternativeComponents;
@@ -67,8 +67,9 @@ public class Component extends PartNumberSuperclass{
 
 	@Override
 	public String toString() {
-		return "Component [description=" + description + ", schematicLetter=" + schematicLetter + ", qty=" + qty
-				+ ", manufacture=" + manufacture + ", companyQties=" + companyQties + ", alternativeComponents="
-				+ alternativeComponents + ", costs=" + costs + "]";
+		return "Component [schematicLetter=" + schematicLetter + ", qty=" + qty + ", manufacture=" + manufacture
+				+ ", companyQties=" + companyQties + ", alternativeComponents=" + alternativeComponents + ", costs="
+				+ costs + ", getId()=" + getId() + ", getPartNumber()=" + getPartNumber() + ", getManufPartNumber()="
+				+ getManufPartNumber() + ", getDescription()=" + getDescription() + "]";
 	}
 }

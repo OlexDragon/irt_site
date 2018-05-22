@@ -63,11 +63,64 @@
 		<script type="text/javascript" th:inline="javascript">
 		/*<![CDATA[*/
 			$('#modalMessage').modal('show').on('hidden.bs.modal', function (e) { $(this).remove(); });
-			/*[+ $.getScript( '/js/move_to_co_mfr.js'); +]*/
+			$('#coMfr').change(enableButtun);
+			$('#qtyToCoMfr').on('input', function(){
+
+				enableButtun();
+
+				if(!this.value)
+					return;
+
+				var stockQty = /*[[${component.qty}]]*/ 17;
+				var val = parseInt(this.value);
+
+				if(val > stockQty){	
+					this.value = stockQty;
+					$(this).addClass('text-danger');
+				}else
+					$(this).removeClass('text-danger');
+
+			});
+			$('#descriptionCoMfr').on('input', enableButtun);
+
+			$('#confirmBtn').click(function(){
+
+				var action = '/component/to_co_mfr';
+				var _csrf = $("input[name='_csrf']").val();
+				var qty = $('#qtyToCoMfr').val();
+				var coMfr = $('#coMfr option:selected').val();
+				var descriptionVal = $('#descriptionCoMfr').val();
+				var id = /*[[${component.id}]]*/ 0;
+
+				$.post(action, {
+					_csrf : _csrf,
+					qty : qty,
+					componentId : id,
+					companyId : coMfr,
+					description : descriptionVal
+
+				}).done(function() {
+					fillFields(); //from 'irt.js' file
+				}).fail(function(error) {
+					alert(error.responseText);
+				})
+
+			})
+
+			function enableButtun() {
+
+				var coMfr = $('#coMfr option:selected').val();
+				var description = $('#descriptionCoMfr').val();
+				var qtyToCoMfr = $('#qtyToCoMfr').val();
+
+				if (coMfr && description && qtyToCoMfr > 0)
+					$('#confirmBtn').prop('disabled', false);
+				else
+					$('#confirmBtn').prop('disabled', true);
+			}
 		/*]]>*/
+		//# sourceURL=move_to_co_mfr.js
 		</script>
 	</div>
-
-<script src="../../static/js/move_to_co_mfr.js" type="text/javascript"></script>
     </body>
 </html>
