@@ -1,6 +1,11 @@
 package irt.stock.data.jpa.beans;
 
+import java.util.Base64;
+import java.util.Optional;
+
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -18,27 +23,41 @@ public class User {
 	private Long permission;
 	private String extension;
 	private String eMail;
+	@Enumerated(EnumType.ORDINAL)
+	private Status status;
 
 	protected User(){}
-	public User(String username, String password, String firstName, String lastName, Long permission, String extension, String email) {
+	public User(String username, String password, String firstName, String lastName, Long permission, String extension, String email, Status status) {
 
-		this.username = username;
-		this.password = password;
-		this.firstname = firstName;
-		this.lastname = lastName;
+		setUsername(username);
+		setPassword(password);
+		setFirstName(firstName);
+		setLastName(lastName);
 		this.permission = permission;
-		this.extension = extension;
-		this.eMail = email;
+		setExtension(extension);
+		setEmail(email);
+		this.status = status;
 	}
 
 	public Long   getId() 			{ return id; }
 	public String getUsername() 	{ return username; }
 	public String getPassword() 	{ return password; }
+	public String getDecodedPassword(){ return Optional.ofNullable(password).filter(p->!p.equals("?")).filter(p->p.length()>1).map(p->new String(Base64.getDecoder().decode(p))).orElse("?"); }
 	public String getFirstName() 	{ return firstname; }
 	public String getLastName() 	{ return lastname; }
 	public Long   getPermission() 	{ return permission; }
 	public String getExtension() 	{ return extension; }
 	public String getEmail() 		{ return eMail; }
+	public Status getStatus() 		{ return status; }
+
+	public void setUsername(String username) 	{ this.username = Optional.ofNullable(username).map(String::trim).filter(un->!un.isEmpty()).orElseThrow(()->new NullPointerException("Username can not be null.")); }
+	public void setPassword(String password) 	{ this.password = Optional.ofNullable(password).map(String::trim).filter(un->!un.isEmpty()).orElseThrow(()->new NullPointerException("Password can not be null.")); }
+	public void setFirstName(String firstname) 	{ this.firstname = Optional.ofNullable(firstname).map(String::trim).filter(un->!un.isEmpty()).orElse(null); }
+	public void setLastName(String lastname) 	{ this.lastname =  Optional.ofNullable(lastname).map(String::trim).filter(un->!un.isEmpty()).orElse(null); }
+	public void setPermission(Long permission) 	{ this.permission = permission; }
+	public void setExtension(String extension) 	{ this.extension = Optional.ofNullable(extension).map(String::trim).filter(un->!un.isEmpty()).orElse(null); }
+	public void setStatus(Status status) 		{ this.status = status; }
+	public void setEmail(String email) 			{ this.eMail = Optional.ofNullable(email).map(String::trim).filter(un->!un.isEmpty()).orElse(null); }
 
 	@Override
 	public int hashCode() {
@@ -64,8 +83,13 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", password=" + password + ", firstName=" + firstname
-				+ ", lastName=" + lastname + ", permision=" + permission + ", extension=" + extension + ", email="
-				+ eMail + "]";
+		return "User [id=" + id + ", username=" + username + ", password=" + password + ", firstname=" + firstname
+				+ ", lastname=" + lastname + ", permission=" + permission + ", extension=" + extension + ", eMail="
+				+ eMail + ", status=" + status + "]";
+	}
+
+	public enum Status{
+		INACTIVE,
+		ACTIVE
 	}
 }

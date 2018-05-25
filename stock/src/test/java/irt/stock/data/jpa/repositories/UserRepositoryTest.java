@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import irt.stock.data.jpa.beans.User;
+import irt.stock.data.jpa.beans.User.Status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -30,7 +31,7 @@ public class UserRepositoryTest {
 
 	@Before
 	public void before() {
-		user = repository.save(new User( "username", "password", "firstName", "lastName", 7777777L, "extension", "email"));
+		user = repository.save(new User( "username", "password", "firstName", "lastName", 7777777L, "extension", "email", Status.ACTIVE));
 	}
 
 	@Test

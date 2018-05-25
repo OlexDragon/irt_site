@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.springframework.security.core.GrantedAuthority;
 
 import irt.stock.data.jpa.beans.User;
+import irt.stock.data.jpa.beans.User.Status;
 
 public class UserPrincipalTest {
 
@@ -23,7 +24,7 @@ public class UserPrincipalTest {
 
 	@Before
 	public void before() {
-		up = new UserPrincipal(new User("User Name", "password", "Firstname", "Lastname", UserRoles.ADMIN.getPermission()|UserRoles.STOCK.getPermission(), null, null));
+		up = new UserPrincipal(new User("User Name", "password", "Firstname", "Lastname", UserRoles.ADMIN.getPermission()|UserRoles.STOCK.getPermission(), null, null, Status.ACTIVE));
 	}
 
 	@Test

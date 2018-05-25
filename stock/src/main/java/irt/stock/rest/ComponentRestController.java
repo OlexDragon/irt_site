@@ -93,7 +93,7 @@ public class ComponentRestController {
 
 								BigDecimal p = price.setScale(8, RoundingMode.HALF_UP);
 								Cost cost = savePrice(alternativeId, forQty, currency, orderType, orderNumber, component, froMCompany, p);
-								date = cost.getChangeDate();
+								date = Optional.ofNullable(cost.getChangeDate()).orElse(new Date());
 
 							}else
 								date = new Date();

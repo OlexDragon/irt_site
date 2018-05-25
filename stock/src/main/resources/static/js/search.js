@@ -137,6 +137,7 @@ function search($this){
 					.append($tdMfrPN)
 					.append($('<td>', {text : this.manufacture ? this.manufacture.name : ''}))
 					.append($('<td>', {text : this.description}))
+					.append($('<td>', {text : this.qty}))
 					.append($('<td>', {text : this.value})));
 		});
 	})

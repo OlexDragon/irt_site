@@ -32,3 +32,12 @@ select > option:hover{
     background-image: none;
 	
 }
+/* placeholder */
+.form-control::placeholder { color: MistyRose; opacity:1; } /* Chrome, Firefox */
+:-ms-input-placeholder.form-control { color: MistyRose; opacity:1; }  /* Internet Explorer 10-11 */
+.form-control::-ms-input-placeholder { color: MistyRose; opacity:1; } /* Microsoft Edge */
+
+/* .form-control::-moz-placeholder { color: MistyRose; opacity:1; }  */
+/* ::-webkit-input-placeholder.form-control { color: MistyRose; opacity:1; }  WebKit, Blink, Edge */
+/* :-moz-placeholder.form-control { color: MistyRose; opacity:1; }  Mozilla Firefox 4 to 18 */
+/* ::-moz-placeholder.form-control { color: MistyRose; opacity:1; }  Mozilla Firefox 19+ */
