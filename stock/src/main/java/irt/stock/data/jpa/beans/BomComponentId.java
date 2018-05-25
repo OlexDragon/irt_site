@@ -26,6 +26,34 @@ public class BomComponentId implements Serializable{
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = prime + ((componentId == null) ? 0 : componentId.hashCode());
+		return prime * result + ((topComponentId == null) ? 0 : topComponentId.hashCode());
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BomComponentId other = (BomComponentId) obj;
+		if (componentId == null) {
+			if (other.componentId != null)
+				return false;
+		} else if (!componentId.equals(other.componentId))
+			return false;
+		if (topComponentId == null) {
+			if (other.topComponentId != null)
+				return false;
+		} else if (!topComponentId.equals(other.topComponentId))
+			return false;
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return "BomComponentId [topComponentId=" + topComponentId + ", componentId=" + componentId + "]";
 	}

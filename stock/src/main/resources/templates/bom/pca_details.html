@@ -30,7 +30,7 @@
   			<tr th:each="comp, iterStat : ${components}">
   				<td th:text="${iterStat.count}" th:value="${comp.component.id}" class="sequence" th:title="${'Component ID: ' + comp.component.id}">1</td>
  				<td class="d-none component_id" th:text="${comp.component.id}"></td>
- 				<td class="part_number" th:text="${comp.component.partNumber}"></td>
+ 				<td class="part_number"><a href="/" th:text="${comp.component.partNumber}"></a></td>
  				<td class="mfr_pn" th:text="${comp.component.manufPartNumber}"></td>
  				<td class="qty" th:text="${comp.reference.getQty()}"></td>
  				<td class="descr" th:text="${comp.component.description}"></td>
@@ -39,6 +39,16 @@
   			</tr>
    			</table>
    			<script type="text/javascript" th:inline="javascript">
+
+   				var $anchors = $('.part_number a');
+   				$anchors.each(function(){
+   					$this = $(this);
+   					$this.text(partNumberAddDashes($this.text()));
+   					$this.click(function(){
+   						var pn = $(this).text();
+   						Cookies.set("desiredPN", pn, { expires: 7 });
+   					})
+   				})
 
    				var pcaId = /*[[${component.id}]]*/ 0;
 

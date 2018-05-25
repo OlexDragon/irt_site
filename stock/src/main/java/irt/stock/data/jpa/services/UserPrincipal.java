@@ -1,5 +1,6 @@
 package irt.stock.data.jpa.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import irt.stock.data.jpa.beans.User;
+import irt.stock.data.jpa.beans.User.Status;
 
 public class UserPrincipal implements UserDetails {
 	private static final long serialVersionUID = -1600005108091389940L;
@@ -20,7 +22,7 @@ public class UserPrincipal implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return UserRoles.getAuthorities(user.getPermission());
+		return user.getPassword().equals("?") ? new ArrayList<>() : UserRoles.getAuthorities(user.getPermission());
 	}
 
 	@Override
@@ -40,7 +42,7 @@ public class UserPrincipal implements UserDetails {
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return Optional.ofNullable(user.getPermission()).filter(p->p>0).isPresent();
+		return user.getStatus()==Status.ACTIVE && Optional.ofNullable(user.getPermission()).filter(p->p>0).isPresent();
 	}
 
 	@Override

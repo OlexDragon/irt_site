@@ -26,6 +26,7 @@ import irt.stock.data.jpa.beans.ComponentMovementDetail;
 import irt.stock.data.jpa.beans.ComponentMovementDetailId;
 import irt.stock.data.jpa.beans.Manufacture;
 import irt.stock.data.jpa.beans.User;
+import irt.stock.data.jpa.beans.User.Status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,7 +48,7 @@ public class ComponentMovementDetailRepositoryTest {
 
 	@Before
 	public void before() {
-		User user = userRepository.save(new User("username", "password", "firstName", "lastName", 16777200L, "extension", "email"));
+		User user = userRepository.save(new User("username", "password", "firstName", "lastName", 16777200L, "extension", "email", Status.ACTIVE));
 		Company company = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
 		final Manufacture manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
 		component = componentRepository.save(new Component("partNumber", manufacture));

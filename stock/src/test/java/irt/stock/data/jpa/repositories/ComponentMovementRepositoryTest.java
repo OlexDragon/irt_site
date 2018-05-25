@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import irt.stock.data.jpa.beans.Company;
 import irt.stock.data.jpa.beans.Company.CompanyType;
+import irt.stock.data.jpa.beans.User.Status;
 import irt.stock.data.jpa.beans.ComponentMovement;
 import irt.stock.data.jpa.beans.User;
 
@@ -37,7 +38,7 @@ public class ComponentMovementRepositoryTest {
 
 	@Before
 	public void before() {
-		user = userRepository.save(new User("username", "password", "firstName", "lastName", 16777200L, "extension", "email"));
+		user = userRepository.save(new User("username", "password", "firstName", "lastName", 16777200L, "extension", "email", Status.ACTIVE));
 		fromCompany = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
 		toCompany = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
 		final ComponentMovement entity = new ComponentMovement(user, fromCompany, toCompany, "String description", new Date());

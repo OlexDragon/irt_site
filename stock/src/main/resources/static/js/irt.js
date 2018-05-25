@@ -115,6 +115,27 @@ $('#toAssenbly').click(function(){ $('#modalLoad').load('/modal/to_assembly/' + 
 //Move all BOM component from MFR to PCA
 $('#mfrToBulk').click(function(){ $('#modalLoad').load('/modal/mfr_to_bulk/' + componentId); });
 
+//Copy part number to Clipboard
+$('#infoPN').dblclick(function(){
+
+	if (document.body.createTextRange) {
+        const range = document.body.createTextRange();
+        range.moveToElementText(this);
+        range.select();
+    } else if (window.getSelection) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(this);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        alert("Could not select text in node: Unsupported browser.");
+        return;
+    }
+	document.execCommand("copy");
+	alert('Part number copied to the clipboard')
+})
+
 function fillFields(){
 	if(componentId)
 	$.get("/pn/details", {pnId : componentId})
