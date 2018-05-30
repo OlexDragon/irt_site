@@ -127,8 +127,12 @@ function search($this){
 					Cookies.set("desiredPCA", partNumber, { expires: 7 });
 				});
 				$tdMfrPN.append($anchorMfrPN);
-			}else
-				$tdMfrPN.text(manufPartNumber);
+			}else{
+				if(this.link)
+					$tdMfrPN.append($('<a>', {href : 'http://irttechnologies:8080' + this.link.link, target : '_blank', text : this.manufPartNumber ? this.manufPartNumber : "N/A" }));
+				else
+					$tdMfrPN.text(manufPartNumber);
+			}
 
 			tableBody
 			.append($('<tr>')

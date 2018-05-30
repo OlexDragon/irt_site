@@ -14,7 +14,11 @@
     </Appenders>
 
     <Loggers>
-        <Root level="info">
+
+		<logger name="irt.stock.rest.ComponentRestControllerTest" level="all" />
+		<logger name="irt.stock.rest.ComponentRestController" level="all" />
+
+        <Root level="error">
             <AppenderRef ref="ConsoleAppender" />
         </Root>
     </Loggers>

@@ -49,6 +49,10 @@ public class Component extends PartNumberSuperclass{
 	@JoinColumn(name = "idComponents", nullable=true)
 	private List<Cost> costs;
 
+	@ManyToOne
+	@JoinColumn(name="link", nullable=true)
+	private Link link;
+
 	public Long getQty() { return qty; }
 	public List<CompanyQty> getCompanyQties() { return companyQties; }
 	public Manufacture getManufacture() { return manufacture; }
@@ -56,10 +60,10 @@ public class Component extends PartNumberSuperclass{
 	public List<Cost> getCosts() { return costs; }
 	public String getSchematicLetter() { return schematicLetter; }
 	public String getValue() { return value; }
+	public Link getLink() { return link; }
 
-	public void setAlternatives(List<ComponentAlternative> alternativeComponents) {
-		this.alternativeComponents = alternativeComponents;
-	}
+	public void setAlternatives(List<ComponentAlternative> alternativeComponents) { this.alternativeComponents = alternativeComponents; }
+	public void setQty(Long qty) { this.qty = qty; }
 
 	public void addQty(long add) {
 		qty = Optional.ofNullable(qty).map(q->q + add).filter(q->q>=0).orElse(add>0 ? add : 0);

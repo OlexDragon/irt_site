@@ -1,16 +1,26 @@
 package irt.stock.rest;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -294,6 +304,103 @@ public class ComponentRestController {
 		final CostHistory costHistory = new CostHistory(cost);
 		costHistoryRepository.save(costHistory);
 		return cost;
+	}
+
+	@GetMapping(path = "/report")
+	public ResponseEntity<Resource> fullStockReport() throws IOException {
+
+
+		final String collect = StreamSupport.stream( componentRepository.findAll().spliterator(), false)
+				.map(c->{
+
+					String[] result = componentStockReport(c);
+
+					return Arrays.stream(result).collect(Collectors.joining(","));
+				})
+				.collect(Collectors.joining("\n"));
+
+		final byte[] bytes = collect.getBytes();
+		ByteArrayResource resource = new ByteArrayResource(bytes);
+
+	    return ResponseEntity
+	    		.ok()
+	            .header("Content-Disposition", "attachment; filename=report.csv")
+	            .contentLength(bytes.length)
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .body(resource);
+	}
+
+	public static  String[] componentStockReport(Component component){
+
+		Long qty = Optional.ofNullable(component.getQty()).orElse(0L);
+
+		final String partNumber = component.getPartNumber();
+		final String manufPartNumber = Optional.ofNullable(component.getManufPartNumber()).map(d->d.replaceAll("\"", "\"\"")).map(d->"\"" + d + "\"").orElse("");
+		final String description = Optional.ofNullable(component.getDescription()).map(d->d.replaceAll("\"", "\"\"")).map(d->"\"" + d + "\"").orElse("");
+		final String qtyStr = qty.toString();
+		final String alternatives = component.getAlternatives().parallelStream().map(a->a.getAltMfrPartNumber()).collect(Collectors.joining(" : "));
+
+		final Map<Boolean, List<Cost>> mapCost = component.getCosts().parallelStream().collect(Collectors.partitioningBy(cost->cost.getChangeDate()!=null));
+
+		final List<Cost> withDate = mapCost.get(true);
+		withDate.sort((a, b)->b.getChangeDate().compareTo(a.getChangeDate()));
+
+		String costStr = "";
+		String sumStr = "";
+		BigDecimal cst = BigDecimal.ZERO;		
+
+		for(Cost cost : withDate){
+
+			if(qty==0)
+				break;
+
+
+			final Long forQty = Optional.of(cost.getForQty()).filter(fq->fq>0).orElse(qty);
+			cst = Optional.of(cost.getCost().stripTrailingZeros()).filter(cs->cs.compareTo(BigDecimal.ZERO)>0).orElse(cst);
+
+			if(forQty>=qty){
+				costStr += cost.getCurrency() + " $" + cst.toString();
+				BigDecimal bdQty = new BigDecimal(qty);
+				final BigDecimal multiply = cst.multiply(bdQty);
+				sumStr += NumberFormat.getCurrencyInstance().format(multiply);
+				qty = 0L;
+
+				logger.debug("bdQty:{} x cst:{} = {}", bdQty, cst, multiply);
+			}else{
+				qty -= forQty;
+				costStr += forQty + "x" + Optional.ofNullable(cost.getCurrency()).map(c->c + " $").orElse("$")   + cst.toString() + " + ";
+				BigDecimal bdQty = new BigDecimal(forQty);
+				final BigDecimal multiply = cst.multiply(bdQty);
+				sumStr += NumberFormat.getCurrencyInstance().format(multiply) + " + ";
+
+				logger.debug("bdQty:{} x cst:{} = {}", bdQty, cst, multiply);
+			}
+		}
+
+		if(qty>0){
+
+			BigDecimal bdQty = new BigDecimal(qty);
+
+			final Optional<BigDecimal> oCst = mapCost
+					.get(false)
+					.parallelStream()
+					.map(Cost::getCost)
+					.map(bd->new BigDecimal[]{bd, BigDecimal.ONE})
+					.reduce((a, b)->new BigDecimal[]{a[0].add(b[0]), a[1].add(b[1])})
+					.map(arr->arr[0].divide(arr[1], RoundingMode.HALF_UP));
+
+			final Optional<String> map = Optional.of(cst).filter(bd->bd==BigDecimal.ZERO).map(bd->"");
+			costStr += oCst
+					.map(BigDecimal::toString)
+					.orElse(map.orElse(bdQty + "x~" + cst));
+
+			if(oCst.isPresent())
+				sumStr += NumberFormat.getCurrencyInstance().format(oCst.get().multiply(bdQty));
+			else
+				sumStr += map.orElse("~$" + NumberFormat.getCurrencyInstance().format(cst.multiply(bdQty)));
+		}
+
+		return new String[]{partNumber, manufPartNumber, description, qtyStr, costStr, sumStr, alternatives };
 	}
 
 	public class Response{
