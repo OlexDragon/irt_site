@@ -24,7 +24,7 @@ $.get("/companies/co_mfr")
 	coManufactures = data;
 })
 .fail(function(error) {
-	alert(error.responseText);
+	alert('$.get("/companies/vendors")\n' + error.responseText);
 });
 // Part number input listener
 timer = 0;
@@ -88,7 +88,7 @@ $('#savePriceForm').submit(function(event){
 		fillFields();
 	})
 	.fail(function(error) {
-		alert(error.responseText);
+		alert("$.post('/component/price', data)\n" + error.responseText);
 	});
 
 //	location.reload();
@@ -136,10 +136,14 @@ $('#infoPN').dblclick(function(){
 	alert('Part number copied to the clipboard')
 })
 
+var fill;
 function fillFields(){
-	if(componentId)
-	$.get("/pn/details", {pnId : componentId})
-	.done(function(data) {
+	if(componentId){
+
+		if(fill)fill.abort();
+
+		fill = $.get("/pn/details", {pnId : componentId})
+		.done(function(data) {
 
 		//fill selected tabs
 		if($('#price-hystory-tab').hasClass( 'active' ))
@@ -187,21 +191,48 @@ function fillFields(){
 
 		$('#infoPN').text(partNumberAddDashes(data.partNumber)).prop('title', 'component ID: ' + componentId);
 		$('#infoDescription').text(data.description ? data.description : "N/A");
-		$('#infoMfrPN').text(data.manufPartNumber ? data.manufPartNumber : "N/A");
+
+		var mfrPN = $('#infoMfrPN').empty();
+		if(data.link)
+			mfrPN.append($('<a>', {href : 'http://irttechnologies:8080' + data.link.link, target : '_blank', text : data.manufPartNumber ? data.manufPartNumber : "N/A" }));
+		else
+			mfrPN.text(data.manufPartNumber ? data.manufPartNumber : "N/A");
+
 		$('#infoMfr').text(data.manufacture ? data.manufacture.name : "N/A");
 //Quantity
+
+		var qty = data.qty!='null' ? data.qty : "N/A";
+		var $qty = $('<dd>', { class : 'col-sm-8',  text : qty ? qty + ' pc.' : 'N/A'});
+		var hasAutority = $('#hasAutority').val();
+
+		if(hasAutority && qty!="N/A"){
+
+			var price = stockPrice(qty, data.costs);
+			var p = '';
+
+			if(price['USD'])
+				p = ' USD $' + price['USD'] + ';';
+
+			if(price['CAD'])
+				p += ' CAD $' + price['CAD'] + ';';
+
+			if(price['na'])
+				p += ' $' + price['na'];
+
+			if(p && qty)
+				$qty.append($('<span>', { text : '(' + p + ' )'}));
+		}
+
 		$('#infoQty').empty();
 		$('#infoQty').append($('<dt>', { 
 			class : 'col-sm-4',
 	        text : 'Stock'
 	    }))
-	    .append($('<dd>', { 
-			class : 'col-sm-8',
-	        text : data.qty ? data.qty : "N/A"
-	    }));
+	    .append($qty);
 
 		$(data.companyQties).each(function(){
-			$('#infoQty').append($('<dt>', { 
+			$('#infoQty')
+			.append($('<dt>', { 
 				class : 'col-sm-4',
 		        text : this.company.companyName,
 		        title : 'company ID: '+ this.company.id
@@ -309,7 +340,7 @@ function fillFields(){
 												})
 												.fail(function(error) {
 													var responseText = error.responseText
-													alert(responseText);
+													alert('$.post( action, {_csrf : _csrf})\n' + responseText);
 												})
 												
 											})
@@ -352,8 +383,10 @@ function fillFields(){
 		});
 	})
 	.fail(function(error) {
-		alert(error.responseText);
+		if(error.statusText!='abort')
+			alert('$.get("/pn/details", {pnId : ' + componentId + '})\n' + error.responseText);
 	});
+	}
 }
 
 
@@ -380,7 +413,7 @@ function fillPriceHistoryTab(){
 			});
 		})
 		.fail(function(error) {
-			alert(error.responseText);
+			alert('"fillPriceHistoryTab"\n' + error.responseText);
 		});
 
 }
@@ -413,7 +446,7 @@ function fillComponentHistoryTab(){
 			});
 		})
 		.fail(function(error) {
-			alert(error.responseText);
+			alert('"fillComponentHistoryTab"\n' + error.responseText);
 		});
 }
 function buttonSetEnable(){
@@ -519,8 +552,52 @@ function partNumbers(str){
 			}
 		})
 		.fail(function(error) {
-			alert(error.responseText);
+			alert('"partNumbers"\n' + error.responseText);
 		});
+}
+
+function stockPrice(qty, costs){
+
+	var price ={};
+	if(!(costs && costs.length))
+			return price;
+
+	var c = costs.filter(function(cost){return cost.changeDate!=null}).filter(function(cost){return cost.cost>0});
+	if(c.length){
+
+		c = c.sort(function(a, b){return new Date(a.changeDate).getTime() - new Date(b.changeDate).getTime(); });
+		for(var i=0; i<c.length; i++){
+
+			var forQty = c[i].forQty;
+
+			if(forQty>=qty){
+				price[c[i].currency] = (c[i].cost * qty).toFixed(2);
+				qty = 0;
+				break;
+			}else{
+				price[c[i].currency] = (c[i].cost * forQty).toFixed(2);
+				qty -= forQty;
+			}
+		}
+	}
+
+	if(qty>0){
+		c = costs.filter(function(cost){return cost.changeDate==null});
+		if(c.length)
+			price['na'] = (averagePrice(c) * qty).toFixed(2);
+		else
+			price['na'] = '?';
+	}
+
+	return price;
+}
+
+function averagePrice(costs){
+	var c = costs.map(function(cost){return cost.cost}).filter(function(cost){return cost>0});
+	var sum = 0.0;
+	for(var i=0; i<c.length; i++)
+		sum += c[i];
+	return sum/c.length;
 }
 //$body = $("body");
 //loading spinning circle
