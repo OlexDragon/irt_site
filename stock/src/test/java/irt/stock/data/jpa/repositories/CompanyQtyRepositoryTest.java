@@ -38,7 +38,7 @@ public class CompanyQtyRepositoryTest {
 	public void before() {
 
 		company = companyRepository.save(new Company("Test Company", CompanyType.VENDOR));
-		component = componentRepository.save(new Component("partNumber", null));
+		component = componentRepository.save(new Component("partNumber", null, null));
 
 		repository.save( new CompanyQty(company.getId(), component.getId(), 120));
 

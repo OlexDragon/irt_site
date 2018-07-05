@@ -8,7 +8,7 @@ import javax.persistence.Table;
 public class PartNumber extends PartNumberSuperclass{
 
 	protected PartNumber() { }
-	public PartNumber(String partNumber, String manufPartNumber) {
-		super(partNumber, manufPartNumber);
+	public PartNumber(String partNumber, String manufPartNumber, String description) {
+		super(partNumber, manufPartNumber, description);
 	}
 }

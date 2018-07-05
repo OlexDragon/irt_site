@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<link rel="stylesheet" href="/css/bootstrap/4.1.0/bootstrap.min.css">
+<link rel="stylesheet" href="/css/bootstrap/4.1.1/bootstrap.min.css">
 <link rel="stylesheet" href="/css/irt.css" >
 <!-- <style type="text/css"> html,body { height:100%; margin:0; } </style> -->
 </head>
@@ -53,13 +53,14 @@
 			</div>
 
 <!-- part derails -->
+			<input id="hasAutority" type="hidden" value="true" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STOCK')" />
 
 			<div class="col-sm-10 bg-light">
 			<div class="border border-dark rounded m-2 p-2">
 			<div class="row">
 				<h2 id="infoPN" class="bg-success rounded text-center flex-fill" th:text="''">000-AB0337-SM002</h2>
 
-				<th:block sec:authorize="hasAuthority('ADMIN') or hasAuthority('STOCK')">
+				<th:block sec:authorize="hasAuthority('ADMIN') or hasAuthority('STOCK_REPORT')">
 					<div class="dropdown dropleft">
 						<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
 
@@ -68,9 +69,6 @@
   						</div>
 					</div>
 				</div>
-
-				<input id="hasAutority" type="hidden" value="true" />
-			</th:block>
 <!-- part number info -->
 				<blockquote class="blockquote border">
  							<dl class="row">
@@ -352,11 +350,27 @@
 		}).fail(function(error) { alert(error.responseText); }); }, 10*60*1000);
 		//# sourceURL=main-script.js
 	</script>
+	<script type="text/javascript" sec:authorize="hasAuthority('ADMIN')">
+		$('#scanLogFile').click(function(event){
+			event.preventDefault();
+
+			var _csrf = $( "input[name='_csrf']" ).val();
+			$.post("/log_file/scan", {_csrf : _csrf})
+			.done(function(data) {
+				if(data==true)
+					alert('Shipped Log.xlsx file scan DONE')
+			})
+			.fail(function(error) {
+				alert("Shipped Log.xlsx file scan\n" + error.responseText);
+			});
+		});
+	</script>
 </th:block>
 <script sec:authorize="isAuthenticated()" src="../static/js/irt.js" th:src="@{/js/irt.js}" type="text/javascript"></script>
 
 <script type="text/javascript">
-	$('#stockMenu').addClass('active');
+$('#stockMenu').addClass('active');
+$('#componentsMenu').addClass('active');
 	//# sourceURL=home.js
 </script>
     </body>

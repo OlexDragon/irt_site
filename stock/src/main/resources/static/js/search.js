@@ -122,7 +122,7 @@ function search($this){
 			var $tdMfrPN = $('<td>');
 
 			if(partNumber && partNumber.indexOf('PCA')==0){
-				$anchorMfrPN = $('<a>', {href : '/bom', text : manufPartNumber});
+				$anchorMfrPN = $('<a>', {href : '/bom', text : manufPartNumber, target : '_blank'});
 				$anchorMfrPN.click(function(){
 					Cookies.set("desiredPCA", partNumber, { expires: 7 });
 				});

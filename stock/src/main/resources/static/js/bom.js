@@ -81,7 +81,6 @@ $('#whereUsed').click(function(){
 	var selected = $('#selected_bom_component').val();
 	$('#modal').load('/modal/where_used/' + selected);
 });
-
 //Search part numbers containing 'str'
 function pcaPartNumbers(str){
 

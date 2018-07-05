@@ -28,8 +28,7 @@ public class BomHistory {
 		this.action = bomAction;
 	}
 
-	@Id @GeneratedValue
-	private Long id;
+	@Id @GeneratedValue private Long id;
 	@Column(nullable=false)
 	private Long userId;
 	@Column(nullable=false)

@@ -80,4 +80,6 @@ public interface ComponentRepository extends CrudRepository<Component, Long> {
 
 	//	DESCRIPTION + VAL
 	List<Component> findByDescriptionContainingAndValueContaining(String description, String value);
+
+	Iterable<Component> findAllByOrderByPartNumberAsc();
 }

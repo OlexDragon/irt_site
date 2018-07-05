@@ -19,7 +19,8 @@ import irt.stock.TestUser;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class HomeControllerTest {
-//
+
+	//
 //	private Authentication authentication;
 
 	@Autowired private WebApplicationContext context;
@@ -40,5 +41,4 @@ public class HomeControllerTest {
 		.perform(post("/")
 				.with(user(new TestUser())));
 	}
-
 }

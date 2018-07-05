@@ -51,7 +51,7 @@ public class ComponentMovementDetailRepositoryTest {
 		User user = userRepository.save(new User("username", "password", "firstName", "lastName", 16777200L, "extension", "email", Status.ACTIVE));
 		Company company = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
 		final Manufacture manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
-		component = componentRepository.save(new Component("partNumber", manufacture));
+		component = componentRepository.save(new Component("partNumber", manufacture, null));
 		movement = componentMovementRepository.save(new ComponentMovement(user, company, company, "description", new Date()));
 
 		componentMovementDetail = new ComponentMovementDetail(movement, component, 25L, null);

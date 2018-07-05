@@ -3,10 +3,12 @@ package irt.stock.rest;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -45,18 +47,22 @@ public class ComponentRestControllerTest {
 
 	private Component component;
 
+	private Company company;
+
 	@Before
 	public void befor() {
 
 		final Manufacture manufacture = manufactureRepository.save(new Manufacture("CA", "name", "link"));
-		final Component entity = new Component("partNumber", manufacture);
+		final Component entity = new Component("partNumber", manufacture, null);
 		entity.setQty(1234L);
 		component = componentRepository.save(entity);
 
-		Company company = companyRepository.save(new Company("companyName", CompanyType.CO_MANUFACTURER));
+		company = companyRepository.save(new Company("companyName", CompanyType.CO_MANUFACTURER));
 		Cost cost = new Cost(component, null, company, 1000L, new BigDecimal("32"), Currency.CAD, OrderType.INV, "orderNumber");
 		costRepository.save(cost);
 		cost = new Cost(component, null, company, 200L, new BigDecimal("31.6"), null, null, null);
+		costRepository.save(cost);
+		cost = new Cost(component, null, company, 200L, BigDecimal.ZERO, null, null, null);
 		costRepository.save(cost);
 
 		alternativeRepository.save(new ComponentAlternative(null, component.getId(), "altMfrPartNumber", manufacture, true));
@@ -64,6 +70,7 @@ public class ComponentRestControllerTest {
 
 	@Test
 	public void test() throws InterruptedException {
+		logger.info("\n\t****** Start Test ******\n");
 
 		List<Date> dates = new ArrayList<>();
 
@@ -93,5 +100,18 @@ public class ComponentRestControllerTest {
 		logger.info("qty:{}, {}", c.getQty(), c.getCosts());
 		final String[] componentStockReport = ComponentRestController.componentStockReport(c);
 		logger.info("{}", Arrays.stream(componentStockReport).collect(Collectors.joining(",")));
+	}
+
+
+	@Test
+	public void roundReportTest(){
+		logger.info("\n\t****** Start Test ******\n");
+
+		List<Cost> list = new ArrayList<>();
+		final Cost cost = new Cost(component, null, company, 1L, new BigDecimal(900), null, null, null);
+		list.add(cost);
+		logger.info(cost);
+		final Optional<BigDecimal> round = ComponentRestController.round(list);
+		logger.info("round: {}; {}", round,  NumberFormat.getCurrencyInstance().format(round.get().multiply(new BigDecimal(2))));
 	}
 }
