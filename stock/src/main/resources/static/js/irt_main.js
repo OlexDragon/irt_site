@@ -1,14 +1,14 @@
 function partNumberAddDashes(pn){
 
 	if (typeof pn === 'string' || pn instanceof String){
-		length = pn.length;
+		var length = pn.length;
 
 		if(length>15){
-			position = length-3;
+			var position = length-3;
 			pn = pn.slice(0, position) + "-" + pn.slice(position);
 		}
 
-		if(pn.length>10){
+		if(length>10){
 			var sub = pn.substring(0,3);
 
 			if(sub==='00I' || sub==='TPB' || sub==='TRS')
@@ -21,7 +21,7 @@ function partNumberAddDashes(pn){
 				pn = pn.slice(0, 9) + "-" + pn.slice(9);
 		}
 
-		if(pn.length>3)
+		if(length>3)
 			pn = pn.slice(0, 3) + "-" + pn.slice(3);
 	}
 	return pn;

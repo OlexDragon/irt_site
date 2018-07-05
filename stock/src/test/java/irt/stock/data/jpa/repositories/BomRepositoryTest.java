@@ -38,10 +38,10 @@ public class BomRepositoryTest {
 	@Before
 	public void before() {
 		Manufacture manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
-		top = componentRepository.save(new Component("top component", manufacture));
+		top = componentRepository.save(new Component("top component", manufacture, null));
 		components = new ArrayList<>();
-		components.add(new Component("component #1", manufacture));
-		components.add(new Component("component #2", manufacture));
+		components.add(new Component("component #1", manufacture, null));
+		components.add(new Component("component #2", manufacture, null));
 		componentRepository.saveAll(components);
 		ref1 = bomReferenceRepository.save(new BomReference("references1"));
 		ref2 = bomReferenceRepository.save(new BomReference("references2"));

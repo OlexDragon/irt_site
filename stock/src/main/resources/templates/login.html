@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -13,13 +13,24 @@
 			<a class="navbar-brand" href="http://irttechnologies:8080/irt/" th:text="${#authorization.expression('isAuthenticated()')} ? 
                ${#authentication.name} : 
                'IRT Technologies'"></a>
-			<button class="navbar-toggler" aria-expanded="false" aria-controls="navbarCollapse" aria-label="Toggle navigation" type="button" data-toggle="collapse" data-target="#navbarCollapse">
-         		 <span class="navbar-toggler-icon"></span>
-       		</button>
-        	<div id="navbarMainMenu" class="collapse navbar-collapse justify-content-end">
-          		<ul class="navbar-nav">
+         	<div id="navbarMainMenu" class="collapse navbar-collapse">
+          		<ul class="navbar-nav ml-auto">
           			<li id='searchMenu' class="nav-item"> <a class="nav-link active" href="/search">Search</a> </li>
-           			<li id='stockMenu' class="nav-item"> <a class="nav-link active" href="/">Stock</a> </li>
+
+           			<li id='productionMenu' class="nav-item dropdown">
+           				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Production</a>
+						<div class="dropdown-menu">
+							<a id="coMenu" class="dropdown-item " href="/production/co">Customer Orders</a>
+							<a id="scanLogFile" class="dropdown-item" href="#" sec:authorize="hasAuthority('ADMIN') or hasAuthority('SCAN_LOG_FILE')">Scan Shipped Log.xlsx</a>
+					    </div>
+
+           			<li id='stockMenu' class="nav-item dropdown">
+           				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Stock</a>
+						<div class="dropdown-menu">
+							<a id="componentsMenu" class="dropdown-item " href="/">Components</a>
+					    </div>
+           			</li>
+
           			<li id="bomMenu" class="nav-item"> <a class="nav-link" href="/bom">BOM</a> </li>
           			<li id="userMenu" class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('USER_EDIT')"> <a class="nav-link" href="/user">USERS</a> </li>
           		</ul>

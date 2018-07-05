@@ -32,7 +32,7 @@ public class ComponentAlternativeRepositoryTest {
 	@Before
 	public void before() {
 		manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
-		component = componentRepository.save(new Component("partNumber", null));
+		component = componentRepository.save(new Component("partNumber", null, null));
 		alternative = alternativeRepository.save(new ComponentAlternative(null, component.getId(), "Mfr PN", manufacture, null));
 	}
 

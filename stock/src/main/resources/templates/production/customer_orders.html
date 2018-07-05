@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3" lang="en">
+    <head>
+        <title>Customer Orders</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" th:href="@{/css/bootstrap/4.1.1/bootstrap.min.css}">
+<link rel="stylesheet" href="/css/irt.css" >
+<style type="text/css"> .table_head{ cursor: pointer; } </style>
+</head>
+    <body>
+<!--/* HEADER will be replaced */-->
+	<header th:replace="login::header">
+	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+		<a class="navbar-brand" href="http://irttechnologies:8080/irt/">IRT Technologies</a>
+			<a class="navbar-brand" href="http://irttechnologies:8080/irt/">IRT Technologies</a>
+			<button class="navbar-toggler" aria-expanded="false" aria-controls="navbarCollapse" aria-label="Toggle navigation" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+         		 <span class="navbar-toggler-icon"></span>
+       		</button>
+      	<div class="collapse navbar-collapse" id="navbarMainMenu">
+          	<ul class="navbar-nav mr-auto">
+          		<li class="nav-item">
+    				<a class="nav-link active" href="#">BOM</a>
+  				</li>
+          	</ul>
+			<form class="form-inline mt-2 mt-md-0" action="/login" method="POST" >
+				<input class="form-control mr-sm-2" type="text" placeholder="Username" autofocus="autofocus" />
+				<input class="form-control mr-sm-2" type="password" placeholder="Password" />
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+			</form>
+		</div>
+	</nav>
+	</header>
+<!--/* END HEADER will be replaced */-->
+
+	<div class="container-fluid bg-white">
+
+<table class="table bd-highlight pt-3 mt-5">
+  <thead class="thead-light">
+    <tr style="cursor:pointer;">
+      <th id="clear" scope="col" th:title="'Find ' + ${customerOrders.size()} + ' rows'">#</th>
+      <th id="order" scope="col" title="Customer Order">COrder</th>
+      <th id="created" scope="col">Created</th>
+      <th id="shipped" scope="col">Shipped</th>
+      <th id="pn" scope="col" title="Part Number">PN</th>
+      <th id="sn" scope="col" title="Serial Number">SN</th>
+      <th id="description" scope="col">Description</th>
+      <th id="subunits" scope="col" title="Subunits">Subunits</th>
+    </tr>
+  </thead>
+  <tbody>
+  	<th:block th:each="o, iStatus : ${customerOrders}"  th:with="size = ${o.productionUnits.size()}">
+		<th:block  th:each="pu, st : ${o.productionUnits}">
+			<tr th:if="${st==null or st.index==0}">
+				<td th:text="${iStatus.count}" th:rowspan="${size}" rowspan="2">1</td>
+				<th scope="row" th:text="${o.orderNumber}" th:class="${o.statusClass}" th:title="${o.status}" th:rowspan="${size}" rowspan="2">WO1403004-2</th>
+				<td th:text="${#calendars.format(o.created, 'dd.MMM.yy')}" th:rowspan="${size}" rowspan="2">22.May.18</td>
+				<td th:text="${#calendars.format(o.shipped, 'dd.MMM.yy')}" th:rowspan="${size}" rowspan="2">22.May.18</td>
+				<!--/*/
+				<th:block th:if="${o.productionUnits.size()==0}">
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</th:block>
+				/*/-->
+				<td><a href="/" class="partNumber" th:text="${pu.partNumber!=null ? pu.partNumber.partNumber : ''}">IFC-LXK2000-RM01</a></td>
+				<td th:text="${pu.serialNumber}">1414004</td>
+				<td th:text="${pu.description}">L toKU</td>
+				<td th:text="${o.getInclidedSNs(pu.id)}"></td>
+		</tr>
+		<tr th:if="${st!=null and st.index>0}">
+				<td th:text="${pu.partNumber!=null ? pu.partNumber.partNumber : ''}">IFC-LXK2000-RM01</td>
+				<td th:text="${pu.serialNumber}">1414004</td>
+				<td th:text="${pu.description}">L toKU</td>
+				<td th:text="${o.getInclidedSNs(pu.id)}"></td>
+		</tr>
+		</th:block>
+	</th:block>
+  </tbody>
+</table>
+	</div>
+	<p>Filtered by: <strong>CO Status:</strong> <span th:text="${orderStatus}"></span>; <strong>CO:</strong> <span th:text="${orderContains}"></span>;</p>
+	<div id="modal"></div>
+<th:block th:replace="home::bootstrap_script">
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</th:block>
+<script sec:authorize="isAuthenticated()" src="../static/js/co.js" th:src="@{/js/co.js}" type="text/javascript"></script>
+<script type="text/javascript">
+$('#productionMenu').addClass('active');
+$('#coMenu').addClass('active');
+	//# sourceURL=customer-order-page.js
+</script>
+    </body>
+</html>

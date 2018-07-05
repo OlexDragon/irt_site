@@ -11,11 +11,16 @@
 	<div id="bomContent" class="col-md-10">
 
 		<div class="table-responsive" th:fragment="pcaDetails">
- 			<h4 class="text-center"><span id="pca_pn" th:text="${component.partNumber}" th:title="${'PCA ID: ' + component.id}"></span> : <span th:text="${component.description}"></span></h4>
+ 			<h4 class="text-center"><a href="/" id="pca_pn" th:text="${component.partNumber}" th:title="${'PCA ID: ' + component.id}"></a> : <span th:text="${component.description}"></span></h4>
 			<script type="text/javascript">
-   				var cap = $('#pca_pn');
-   				cap.text(partNumberAddDashes(cap.text()))
-   			</script>
+   				var $pca_pn = $('#pca_pn');
+   				$pca_pn.text(partNumberAddDashes($pca_pn.text()))
+ 
+				$pca_pn.click(function(){
+					Cookies.set("desiredPN", this.text, { expires: 7 });
+				});
+   				//# sourceURL=bom-pca-pn.js
+ 			</script>
   			<table class="table table-striped table-hover table-sm">
   			<caption class="text-center font-weight-bold" ><font size="5" th:text="${component.partNumber}">Table Title</font></caption>
   			<tr>
@@ -30,7 +35,7 @@
   			<tr th:each="comp, iterStat : ${components}">
   				<td th:text="${iterStat.count}" th:value="${comp.component.id}" class="sequence" th:title="${'Component ID: ' + comp.component.id}">1</td>
  				<td class="d-none component_id" th:text="${comp.component.id}"></td>
- 				<td class="part_number"><a href="/" th:text="${comp.component.partNumber}"></a></td>
+ 				<td class="part_number"><a href="/" class="text-nowrap" th:text="${comp.component.partNumber}"></a></td>
  				<td class="mfr_pn" th:inline='text'>[[${comp.component.link==null} ? ${comp.component.manufPartNumber}]]<a th:if="${comp.component.link!=null}" th:href="${comp.component.link.link}" th:text="${comp.component.manufPartNumber}">Mfr Part Number</a></td>
  				<td class="qty" th:text="${comp.reference.getQty()}"></td>
  				<td class="descr" th:text="${comp.component.description}"></td>

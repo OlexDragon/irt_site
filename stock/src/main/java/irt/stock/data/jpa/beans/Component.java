@@ -21,8 +21,8 @@ import org.hibernate.annotations.NotFoundAction;
 public class Component extends PartNumberSuperclass{
 
 	protected Component() {}
-	public Component(String partNumber, Manufacture manufacture) {
-		super(partNumber, null);
+	public Component(String partNumber, Manufacture manufacture, String description) {
+		super(partNumber, null, description);
 		this.manufacture = manufacture;
 	}
 

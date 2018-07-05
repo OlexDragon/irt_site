@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="en">
+<head>
+<title>Customer Orders</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" th:href="@{/css/bootstrap/4.1.1/bootstrap.min.css}">
+<link rel="stylesheet" href="/css/irt.css">
+</head>
+<body>
+	<div>
+		<!-- Modal -->
+		<div id="modalMessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" th:fragment="filter">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalCenterTitle">Customer Order filter</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form id="filterForm" action="#">
+
+					<div class="modal-body">
+						<div class="btn-group btn-group-toggle" data-toggle="buttons">
+							<label class="btn btn-outline-secondary" th:each="status : ${T(irt.stock.data.jpa.beans.production.CustomerOrder.CustomerOrderStatus).values()}" th:classappend="${selected!=null and status.inList(selected)} ? 'active'" th:inline="text" >
+								<input type="checkbox" name="status" th:id="${status}" autocomplete="off" th:checked="${selected!=null and status.inList(selected)}">[[${status}]]</label>
+						</div>
+      					<div class="input-group">
+        					<div class="input-group-prepend">
+          						<div class="input-group-text">Customer Order Contains</div>
+        					</div>
+        					<input id="coComtains" type="text" class="form-control mt-2" th:value="${coContains}">
+        				</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Filter</button>
+					</div>
+
+					</form>
+				</div>
+			</div>
+		<script type="text/javascript">
+		/*<![CDATA[*/
+			$('#modalMessage').modal('show');
+			$('#modalMessage').on('hidden.bs.modal', function(e) { $(this).remove(); });
+
+			$("input[type=checkbox]").change(function(){
+				var inputs = $("input[type=checkbox]:checked");
+
+				if(inputs.length==0)
+					Cookies.remove("order_status");
+				else{
+					var checked = inputs.map(function(){return $(this).prop('id');}).get().join();;
+					Cookies.set("order_status", checked, { expires: 7 });
+				}
+			});
+			$('#filterForm').submit(function(event){
+				event.preventDefault();
+
+				var coContains = $('#coComtains').val();
+				if(coContains)
+					Cookies.set("order_contains", coContains, { expires: 7 });
+				else
+					Cookies.remove("order_contains");
+
+				location.reload();
+			});
+			/*]]>*/
+   				//# sourceURL= filter_orders.js
+		</script>
+		</div>
+	</div>
+</body>
+</html>

@@ -56,7 +56,7 @@ public class ComponentRepositoryTest {
 		company = companyRepository.save(new Company("Company Name", CompanyType.VENDOR));
 		manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
 
-		component = componentRepository.save(new Component("partNumber", manufacture));
+		component = componentRepository.save(new Component("partNumber", manufacture, null));
 
 		alternative = new ComponentAlternative(null, component.getId(), null, manufacture, null);
 		List<ComponentAlternative> list = new ArrayList<>();

@@ -49,7 +49,7 @@ public class CostRepositoryTest {
 	@Before
 	public void befor() {
 		manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
-		component = componentRepository.save(new Component("partNumber", manufacture));
+		component = componentRepository.save(new Component("partNumber", manufacture, null));
 		alternative = alternativeRepository.save(new ComponentAlternative(null, component.getId(), "altMfrPartNumber", manufacture, null));
 		company = companyRepository.save(new Company("companyName", CompanyType.VENDOR));
 		cost[0] = costRepository.save(new Cost(component, alternative, company, 10L, new BigDecimal("1234.4321"), Currency.CAD, null, null));

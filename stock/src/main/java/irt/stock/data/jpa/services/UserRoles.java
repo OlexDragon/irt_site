@@ -10,12 +10,12 @@ import org.springframework.security.core.GrantedAuthority;
 public enum UserRoles implements GrantedAuthority{
 
 	WORK_ORDER			(512, "Can work with work orders."),
-//	DEVICE_TYPE_UPDATE	(1024, ""),
+	SCAN_LOG_FILE		(1024, "Cen scan 'Z:/Shipping/Shipped Log.xlsx' file"),
 	USER_EDIT			(2048, "Can edit IRT worker's data."),
     SCHEMATIC_LETTER	(4096, "Can change schematic letter(AutoCAD)."),
     ALT_PART_NUMBER		(8192, "Can add alternative components."),
     EDIT_COST			(16384, "Can edit cost"),
-//    DEVICE_TYPE			(32768, ""),
+    CUSTOMER_ORDER		(32768, "Can edit CUSTOMER ORDERs"),
     SCHEMATIC_PART		(65536, "Can change schematic part(AutoCAD)."),
     STOCK				(131072, "Stok worker"),
     EDIT_COMPANIES		(262144, "Can add, edit, delete company"),
@@ -24,7 +24,8 @@ public enum UserRoles implements GrantedAuthority{
 	EDITING				(2097152, "Edit component data."),
 	SELLERS				(4194304, "Can add, edit, delete sellers"),
 	DATABASE			(8388608, "Database"),
-	EDIT_BOM			(16777216, "Can edit BOMs.");
+	EDIT_BOM			(16777216, "Can edit BOMs."),
+	STOCK_REPORT		(33554432, "Component report to CSV file.");
 
 	private final long permission;
 	private String description;
