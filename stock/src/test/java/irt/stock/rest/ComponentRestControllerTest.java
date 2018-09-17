@@ -33,6 +33,7 @@ import irt.stock.data.jpa.repositories.ComponentAlternativeRepository;
 import irt.stock.data.jpa.repositories.ComponentRepository;
 import irt.stock.data.jpa.repositories.CostRepository;
 import irt.stock.data.jpa.repositories.ManufactureRepository;
+import irt.stock.rest.helpers.StockReport;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -98,7 +99,7 @@ public class ComponentRestControllerTest {
 		final Component c = componentRepository.findById(component.getId()).get();
 		logger.info(c);
 		logger.info("qty:{}, {}", c.getQty(), c.getCosts());
-		final String[] componentStockReport = ComponentRestController.componentStockReport(c);
+		final String[] componentStockReport = StockReport.componentStockReport(c);
 		logger.info("{}", Arrays.stream(componentStockReport).collect(Collectors.joining(",")));
 	}
 
@@ -111,7 +112,7 @@ public class ComponentRestControllerTest {
 		final Cost cost = new Cost(component, null, company, 1L, new BigDecimal(900), null, null, null);
 		list.add(cost);
 		logger.info(cost);
-		final Optional<BigDecimal> round = ComponentRestController.round(list);
+		final Optional<BigDecimal> round = StockReport.round(list);
 		logger.info("round: {}; {}", round,  NumberFormat.getCurrencyInstance().format(round.get().multiply(new BigDecimal(2))));
 	}
 }

@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -44,7 +42,6 @@ import irt.stock.data.jpa.beans.Cost.Currency;
 import irt.stock.data.jpa.beans.Cost.OrderType;
 import irt.stock.data.jpa.beans.CostHistory;
 import irt.stock.data.jpa.beans.CostId;
-import irt.stock.data.jpa.beans.PartNumber;
 import irt.stock.data.jpa.repositories.CompanyQtyRepository;
 import irt.stock.data.jpa.repositories.CompanyRepository;
 import irt.stock.data.jpa.repositories.ComponentAlternativeRepository;
@@ -54,6 +51,7 @@ import irt.stock.data.jpa.repositories.ComponentRepository;
 import irt.stock.data.jpa.repositories.CostHistoryRepository;
 import irt.stock.data.jpa.repositories.CostRepository;
 import irt.stock.data.jpa.services.UserPrincipal;
+import irt.stock.rest.helpers.StockReport;
 
 @RestController
 @RequestMapping("/component")
@@ -258,7 +256,6 @@ public class ComponentRestController {
 							componentRepository.save(component);
 						});
 					});
-
 				});
 		return new Response("Done");
 	}
@@ -315,8 +312,9 @@ public class ComponentRestController {
 	public ResponseEntity<Resource> fullStockReport() throws IOException {
 
 
-		final String collect = StreamSupport.stream( componentRepository.findAllByOrderByPartNumberAsc().spliterator(), false)
-				.map(c->Arrays.stream(componentStockReport(c)).collect(Collectors.joining(","))).collect(Collectors.joining("\n"));
+		Iterable<Component> findAll = componentRepository.findAllByOrderByPartNumberAsc();
+		final String collect = StreamSupport.stream( findAll.spliterator(), false)
+				.map(c->Arrays.stream(StockReport.componentStockReport(c)).collect(Collectors.joining(","))).collect(Collectors.joining("\n"));
 
 		final byte[] bytes = collect.getBytes();
 		ByteArrayResource resource = new ByteArrayResource(bytes);
@@ -329,96 +327,6 @@ public class ComponentRestController {
 	            .contentLength(bytes.length)
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .body(resource);
-	}
-
-	public static  String[] componentStockReport(Component component){
-
-		Long qty = Optional.ofNullable(component.getQty()).orElse(0L);
-
-		final String partNumber = PartNumber.addDashes(component.getPartNumber());
-		final String manufPartNumber = Optional.ofNullable(component.getManufPartNumber()).map(d->d.replaceAll("\"", "\"\"")).map(d->"\"" + d + "\"").orElse("");
-		final String description = Optional.ofNullable(component.getDescription()).map(d->d.replaceAll("\"", "\"\"")).map(d->"\"" + d + "\"").orElse("");
-		final String qtyStr = qty.toString();
-		final String alternatives = component.getAlternatives().parallelStream().map(a->a.getAltMfrPartNumber()).collect(Collectors.joining(" : "));
-
-		final Map<Boolean, List<Cost>> mapCost = component.getCosts().parallelStream().collect(Collectors.partitioningBy(cost->cost.getChangeDate()!=null));
-
-		if(qty==null || qty.compareTo(0L)<=0 || (mapCost.get(true).isEmpty() && mapCost.get(false).isEmpty()))
-			return new String[]{partNumber, manufPartNumber, description, qtyStr, "", "", alternatives };
-
-		final List<Cost> withDate = mapCost.get(true);
-		withDate.sort((a, b)->b.getChangeDate().compareTo(a.getChangeDate()));
-
-		String costStr = "";
-		String sumStr = "";
-		BigDecimal sum = BigDecimal.ZERO;		
-		BigDecimal cst = BigDecimal.ZERO;
-
-		for(Cost cost : withDate){
-
-			BigDecimal gCost = cost.getCost();
-
-			if(gCost==null || gCost.compareTo(BigDecimal.ZERO)<=0)
-				continue;
-
-			final Long forQty = Optional.of(cost.getForQty()).filter(fq->fq>0).orElse(qty);
-
-			cst = gCost.stripTrailingZeros();
-
-			if(forQty>=qty){
-
-				costStr += cost.getCurrency() + " $" + cst.toPlainString();
-				BigDecimal bdQty = new BigDecimal(qty);
-				final BigDecimal multiply = cst.multiply(bdQty);
-				sum = sum.add(multiply);
-				qty = 0L;
-
-			}else{
-
-				qty -= forQty;
-				costStr += forQty + "x" + Optional.ofNullable(cost.getCurrency()).map(c->c + " $").orElse("$")   + cst.toPlainString() + " + ";
-
-				BigDecimal bdQty = new BigDecimal(forQty);
-				final BigDecimal multiply = cst.multiply(bdQty);
-				sum = sum.add(multiply);
-
-			}
-
-			sumStr = NumberFormat.getCurrencyInstance().format(sum);
-
-			if(qty.compareTo(0L)<=0)
-				break;
-		}
-
-		if(qty.compareTo(0L)>0){
-
-			BigDecimal bdQty = new BigDecimal(qty);
-
-			final List<Cost> withoutDate = mapCost.get(false);
-			final Optional<BigDecimal> oCst = round(withoutDate);
-
-			final Optional<BigDecimal> oCostWithDate = Optional.of(cst).filter(bd->bd.compareTo(BigDecimal.ZERO)>0);
-
-			costStr += oCst.map(BigDecimal::toPlainString).map(r->bdQty + "x~$" + r).orElseGet(()->oCostWithDate.map(cs->bdQty + "x~$" + cs.toPlainString()).orElse(""));
-
-			final BigDecimal s = sum;
-			sum = oCst.map(price->s.add(price.multiply(bdQty))).orElseGet(()->oCostWithDate.map(cs->s.add(cs.multiply(bdQty))).orElse(s));
-
-			sumStr = "~" + NumberFormat.getCurrencyInstance().format(sum);
-		}
-
-		return new String[]{partNumber, manufPartNumber, description, qtyStr, "\"" + costStr + "\"", "\"" + sumStr + "\"", alternatives };
-	}
-
-	public static Optional<BigDecimal> round(final List<Cost> withoutDate) {
-		return withoutDate
-				.parallelStream()
-				.map(Cost::getCost)
-				.filter(c->!c.equals(BigDecimal.ZERO))
-				.map(bd->new BigDecimal[]{bd, BigDecimal.ONE})
-				.reduce((a, b)->new BigDecimal[]{a[0].add(b[0]), a[1].add(b[1])})
-				.map(arr->arr[0].divide(arr[1], RoundingMode.HALF_UP).stripTrailingZeros())
-				.filter(c->c.compareTo(BigDecimal.ZERO)>0);
 	}
 
 	public class Response{

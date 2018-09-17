@@ -36,7 +36,7 @@
   				<td th:text="${iterStat.count}" th:value="${comp.component.id}" class="sequence" th:title="${'Component ID: ' + comp.component.id}">1</td>
  				<td class="d-none component_id" th:text="${comp.component.id}"></td>
  				<td class="part_number"><a href="/" class="text-nowrap" th:text="${comp.component.partNumber}"></a></td>
- 				<td class="mfr_pn" th:inline='text'>[[${comp.component.link==null} ? ${comp.component.manufPartNumber}]]<a th:if="${comp.component.link!=null}" th:href="${comp.component.link.link}" th:text="${comp.component.manufPartNumber}">Mfr Part Number</a></td>
+ 				<td class="mfr_pn" th:inline='text'>[[${comp.component.link==null} ? ${comp.component.manufPartNumber}]]<a th:if="${comp.component.link!=null}" th:href="@{'http://irttechnologies:8080/' + ${comp.component.link.link}}" th:text="${comp.component.manufPartNumber}" target='_blank' >Mfr Part Number</a></td>
  				<td class="qty" th:text="${comp.reference.getQty()}"></td>
  				<td class="descr" th:text="${comp.component.description}"></td>
   				<td class="letter" th:text="${comp.component.schematicLetter}"></td>

@@ -37,16 +37,16 @@ public class CustomerOrder {
 	private String productionUnits;
 	
 	private Date created = new Date();
-	private Date shipped;
-	@Enumerated(EnumType.ORDINAL)
-	private CustomerOrderStatus customerOrderStatus = CustomerOrderStatus.OPEND;
+	private Date closed;
+	@Enumerated(EnumType.STRING)
+	private CustomerOrderStatus customerOrderStatus = CustomerOrderStatus.CREATED;
 
 	public Long getId() { return id; }
 	public String getOrderNumber() { return orderNumber; }
 	public Date getCreated() { return created; }
 	public CustomerOrderStatus getCustomerOrderStatus() { return customerOrderStatus; }
 	public String getProductionUnits() { return productionUnits; }
-	public Date getShipped() { return shipped; }
+	public Date getClosed() { return closed; }
 
 	public void setOrderNumber(String orderNumber) {
 		this.orderNumber = orderNumber;
@@ -89,12 +89,12 @@ public class CustomerOrder {
 		this.customerOrderStatus = customerOrderStatus;
 	}
 
-	public CustomerOrder setShipped(Date shipped) {
+	public CustomerOrder setClosed(Date closed) {
 
-		if(created==null || created.compareTo(shipped)>0)
-			created = shipped;
+		if(created==null || created.compareTo(closed)>0)
+			created = closed;
 
-		this.shipped = shipped;
+		this.closed = closed;
 		customerOrderStatus = CustomerOrderStatus.CLOSED;
 
 		return this;
@@ -103,11 +103,11 @@ public class CustomerOrder {
 	@Override
 	public String toString() {
 		return "CustomerOrder [id=" + id + ", orderNumber=" + orderNumber + ", created=" + created + ", shipped="
-				+ shipped + ", customerOrderStatus=" + customerOrderStatus + "]";
+				+ closed + ", customerOrderStatus=" + customerOrderStatus + "]";
 	}
 
 	public enum CustomerOrderStatus{
-		OPEND,
+		CREATED,
 		IN_PROCESS,
 		CLOSED,
 		CANCELED,
