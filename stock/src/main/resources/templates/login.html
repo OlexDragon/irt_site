@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+<th:block th:replace="home::links">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+</th:block>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -21,13 +23,14 @@
            				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Production</a>
 						<div class="dropdown-menu">
 							<a id="coMenu" class="dropdown-item " href="/production/co">Customer Orders</a>
-							<a id="scanLogFile" class="dropdown-item" href="#" sec:authorize="hasAuthority('ADMIN') or hasAuthority('SCAN_LOG_FILE')">Scan Shipped Log.xlsx</a>
+							<a id="scanLogFile" class="dropdown-item" href="#" sec:authorize="hasAuthority('SCAN_LOG_FILE')">Scan Shipped Log.xlsx</a>
 					    </div>
 
            			<li id='stockMenu' class="nav-item dropdown">
            				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Stock</a>
 						<div class="dropdown-menu">
 							<a id="componentsMenu" class="dropdown-item " href="/">Components</a>
+   							<a id="fullReport" class="dropdown-item" href="/component/report" target="_blank">Full Stock Report</a>
 					    </div>
            			</li>
 

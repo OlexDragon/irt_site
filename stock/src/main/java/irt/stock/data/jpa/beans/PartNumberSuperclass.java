@@ -12,7 +12,7 @@ public class PartNumberSuperclass{
 	protected PartNumberSuperclass() { }
 	public PartNumberSuperclass(String partNumber, String manufPartNumber, String description) {
 
-		this.partNumber 	 = Optional.ofNullable(partNumber).map(pn->pn.replaceAll("[^A-Z0-9]", "")).filter(pn->!pn.isEmpty() && pn.length()>2).map(String::toUpperCase).orElseThrow(()->new NullPointerException("Part number can not be empty."));
+		this.partNumber 	 = Optional.ofNullable(partNumber).map(String::toUpperCase).map(pn->pn.replaceAll("[^A-Z0-9]", "")).filter(pn->!pn.isEmpty() && pn.length()>2).map(String::toUpperCase).orElseThrow(()->new NullPointerException("Part number can not be empty."));
 		this.manufPartNumber = manufPartNumber;
 		setDescription(description);
 	}

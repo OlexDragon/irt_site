@@ -60,12 +60,15 @@ public class ShippedLogFileController {
 
 	@PostMapping("scan")
 	public Boolean scanLogFile() throws IOException{
+		logger.info("Start scanning the file 'Shipped Log.xlsx'\\192.");
 
 		Path path = Paths.get("z:", "Shipping", "Shipped Log.xlsx");
 		File file = path.toFile();
 
-		if(!file.exists())
+		if(!file.exists()) {
+			logger.info("The 'file Shipped Log.xls' does not exist.");
 			return false;
+		}
 
 		FileInputStream excelFile = new FileInputStream(file);
 
@@ -98,10 +101,10 @@ public class ShippedLogFileController {
 						.parseDate(currentRow.getCell(SHIPMENT_DATE_COLUMN))
 						.filter(
 								d->
-								co.getShipped()==null || !co.getShipped().equals(d))
+								co.getClosed()==null || !co.getClosed().equals(d))
 						.map(
 								d->customerOrderRepository
-								.save(co.setShipped(d)))
+								.save(co.setClosed(d)))
 						.orElse(co))
 
 				// Shipped units

@@ -13,8 +13,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +25,7 @@ import irt.stock.web.controllers.filters.SearchByOrderNumberFilter;
 
 @Service
 public class CustomerOrderService {
-	private final static Logger logger = LogManager.getLogger();
+//	private final static Logger logger = LogManager.getLogger();
 
 	private static final int ALL 		= 0;
 	private static final int STATUS 	= 1;

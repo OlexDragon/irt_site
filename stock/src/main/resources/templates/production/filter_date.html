@@ -31,8 +31,10 @@
 <th:block th:if="${dates!=null and not dates.years.isEmpty()}">
 
 						<div class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
-							<label class="btn btn-outline-secondary" th:each="searchStyle : ${T(irt.stock.web.controllers.filters.SearchByDateFilter.SearchStyle).values()}" th:inline="text">
-								<input type="radio" name="status" th:id="${searchStyle}" autocomplete="off" th:value="${searchStyle}" th:checked="${selectedStyle==searchStyle}">[[${searchStyle}]]</label>
+							<div class="form-check" th:each="searchStyle : ${T(irt.stock.web.controllers.filters.SearchByDateFilter.SearchStyle).values()}">
+								<label class="btn btn-outline-secondary" th:text="${searchStyle}">Label</label>
+								<input type="radio" name="status" th:id="${searchStyle}" autocomplete="off" th:value="${searchStyle}" th:checked="${selectedStyle==searchStyle}">
+							</div>
 <th:block th:remove="all">
 							<label class="btn btn-outline-secondary">
 								<input type="radio" name="status" id="exact" autocomplete="off">Exact</label>
@@ -102,7 +104,7 @@
 				location.reload();
 			});
 			/*]]>*/
-   				//# sourceURL= filter_orders.js
+   				//# sourceURL= filter_by_date.js
 		</script>
 		</div>
 	</div>

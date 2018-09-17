@@ -34,7 +34,7 @@ public class CustomerOrderWeb {
 		id 			= customerOrder.getId();
 		orderNumber = customerOrder.getOrderNumber();
 		created 	= customerOrder.getCreated();
-		shipped 	= customerOrder.getShipped();
+		shipped 	= customerOrder.getClosed();
 		status 		= customerOrder.getCustomerOrderStatus();
 
 		productionUnitsStr = customerOrder.getProductionUnits();
@@ -93,7 +93,7 @@ public class CustomerOrderWeb {
 		case CLOSED:
 			htmlClass = "table-secondary";
 			break;
-		case OPEND:
+		case CREATED:
 			htmlClass = "table-primary";
 			break;
 		case WAITING:
