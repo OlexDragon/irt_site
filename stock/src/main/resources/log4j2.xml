@@ -28,7 +28,8 @@
 
 <!-- 		<logger name="irt.stock.rest.ComponentRestController" level="all" /> -->
 <!-- 		<logger name="irt.stock.rest.PartNumberRestController" level="debug" /> -->
-		<logger name="irt.stock.rest.ShippedLogFileController" level="debug" />
+<!-- 		<logger name="irt.stock.rest.ShippedLogFileController" level="debug" /> -->
+<!-- 		<logger name="irt.stock.rest.ComponentImageRestController" level="all" /> -->
 <!-- 		<logger name="irt.stock.rest.BomRestController" level="all" /> -->
 <!-- 		<logger name="irt.stock.web.controllers.BomController" level="all" /> -->
 <!-- 		<logger name="irt.stock.web.configs.WebSecurityConfig" level="all" /> -->

@@ -15,6 +15,9 @@
 			<a class="navbar-brand" href="http://irttechnologies:8080/irt/" th:text="${#authorization.expression('isAuthenticated()')} ? 
                ${#authentication.name} : 
                'IRT Technologies'"></a>
+ 			<button class="navbar-toggler" aria-expanded="false" aria-controls="navbarCollapse" aria-label="Toggle navigation" type="button" data-toggle="collapse" data-target="#navbarMainMenu">
+         		 <span class="navbar-toggler-icon"></span>
+       		</button>
          	<div id="navbarMainMenu" class="collapse navbar-collapse">
           		<ul class="navbar-nav ml-auto">
           			<li id='searchMenu' class="nav-item"> <a class="nav-link active" href="/search">Search</a> </li>

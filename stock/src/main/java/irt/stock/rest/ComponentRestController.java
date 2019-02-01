@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -311,10 +312,24 @@ public class ComponentRestController {
 	@GetMapping(path = "/report")
 	public ResponseEntity<Resource> fullStockReport() throws IOException {
 
-
+		AtomicInteger index = new AtomicInteger(1);
 		Iterable<Component> findAll = componentRepository.findAllByOrderByPartNumberAsc();
-		final String collect = StreamSupport.stream( findAll.spliterator(), false)
-				.map(c->Arrays.stream(StockReport.componentStockReport(c)).collect(Collectors.joining(","))).collect(Collectors.joining("\n"));
+
+		final String collect = StreamSupport
+
+				.stream( findAll.spliterator(), false)
+				.map(
+						c->{
+							final int i = index.getAndIncrement();
+							final String[] stockReport = StockReport.componentStockReport(c);
+							stockReport[7] = String.format(stockReport[7], i);
+							stockReport[8] = String.format(stockReport[8], i);
+							stockReport[9] = String.format(stockReport[9], i);
+
+							return Arrays.stream(stockReport)
+							.collect(Collectors.joining(","));
+						})
+				.collect(Collectors.joining("\n"));
 
 		final byte[] bytes = collect.getBytes();
 		ByteArrayResource resource = new ByteArrayResource(bytes);

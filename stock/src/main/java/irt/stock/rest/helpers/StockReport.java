@@ -32,60 +32,64 @@ public class StockReport {
 		final String qtyStr = qty.toString();
 		final String alternatives = component.getAlternatives().parallelStream().map(a->a.getAltMfrPartNumber()).collect(Collectors.joining(" : "));
 
-		final Map<Boolean, List<Cost>> mapCost = component.getCosts().parallelStream().collect(Collectors.partitioningBy(cost->cost.getChangeDate()!=null));
+		final List<Cost> cs = component.getCosts();
+		final Optional<Cost> lastPurchase = cs.parallelStream().collect(Collectors.maxBy(
+				(a,b)->{
 
-		if(qty.compareTo(0L)<=0 || (mapCost.get(true).isEmpty() && mapCost.get(false).isEmpty()))
-			return new String[]{partNumber, manufPartNumber, description, qtyStr, "", "", alternatives };
+					return Optional
+							.ofNullable(a.getChangeDate())
+							.map(
+									aDate->
+									Optional.ofNullable(b.getChangeDate())
+									.map(
+											bDate->
+											aDate.after(bDate) ? 1 : aDate.before(bDate) ? -1 : 0)
+									.orElse(1))
+							.orElse(-1);
+				}));
 
-		// Get component cost with date
-		final List<Cost> withDate = mapCost.get(true);
-		withDate.sort((a, b)->b.getChangeDate().compareTo(a.getChangeDate()));
+		final String[] result = new String[11];
+		result[0] = partNumber;
+		result[1] = manufPartNumber;
+		result[2] = description;
+		result[3] = qtyStr;
+		result[7] = "=D%1$d*E%1$d";
+		result[8] = "=D%1$d*F%1$d";
+		result[9] = "=D%1$d*G%1$d";
+		result[10] = alternatives;
 
-		// Collecting line of the price report
-		CostCollector costs = new CostCollector();
+		if(lastPurchase.isPresent()) {
 
-		BigDecimal cst = null;
-		for(Cost cost : withDate){
+			final Cost cost = lastPurchase.get();
+			final Currency currency = cost.getCurrency();
 
-			BigDecimal gCost = cost.getCost();
+			BigDecimal us = BigDecimal.ZERO;
+			BigDecimal ca = BigDecimal.ZERO;
+			BigDecimal un = BigDecimal.ZERO;
 
-			// If the price does not contain a quantity, use the quantity of components
-			final Long forQty = Optional.of(cost.getForQty()).filter(fq->fq>0).orElse(qty);
+			if(currency==null)
+				un = cost.getCost();
+			else
+				switch(currency) {
+				case CAD:
+					ca = cost.getCost();
+					break;
+				case USD:
+					us = cost.getCost();
+					break;
+				default:
+					un = cost.getCost();
+				}
+			result[4] = us.toString();
+			result[5] = ca.toString();
+			result[6] = un.toString();
 
-			cst = gCost.stripTrailingZeros();
-			Currency currency = cost.getCurrency();
-
-			// The number of purchased components is greater than or equal to the number of components in the stock.
-			if(forQty>=qty){
-
-				costs.add(currency, cst, qty);
-				qty = 0L;
-
-			}else{
-
-				qty -= forQty;
-				costs.add(currency, cst, forQty);
-			}
-
-			if(qty.compareTo(0L)<=0)
-				break;
+		}else {
+			result[4] = "0";
+			result[5] = "0";
+			result[6] = "0";
 		}
-
-		// With out date
-		if(qty.compareTo(0L)>0){
-
-			final BigDecimal oCst = Optional.ofNullable(mapCost.get(false)).flatMap(StockReport::round).orElse(cst);
-
-			Long q = qty;
-			 Optional.of(oCst)
-			 .filter(bd->bd.compareTo(BigDecimal.ZERO)>0)
-			 .ifPresent(bd->{
-				 
-				 costs.add(null, bd, q);
-			 });
-		}
-
-		return new String[]{partNumber, manufPartNumber, description, qtyStr, "\"" + costs + "\"", "\"" + costs.getSum() + "\"", alternatives };
+		return result;
 	}
 
 	public static Optional<BigDecimal> round(final List<Cost> withoutDate) {
@@ -194,6 +198,29 @@ public class StockReport {
 				sumCAD = sumCAD.add(toAdd);
 				break;
 			}
+		}
+
+		public String sumOf(Currency currency) {
+
+			BigDecimal result = Optional
+
+					.ofNullable(currency)
+					.map(c->{
+						switch(currency) {
+						case CAD:
+							return sumCAD;
+						case USD:
+							return sumUSD;
+						default:
+							return sum;
+						}
+					})
+					.orElse(sum);
+
+			return Optional.of(result)
+
+					.map(CURRENCY_INSTANCE::format)
+					.orElse("");
 		}
 
 		private String currencyToString(Currency currency, BigDecimal sum, String str) {

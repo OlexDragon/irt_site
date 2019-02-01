@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -115,6 +117,32 @@ public class CustomerOrder {
 
 		public boolean inList(List<CustomerOrderStatus> list){
 			return list.contains(this);
+		}
+
+		public static List<CustomerOrderStatus> parse(String orderStatus) {
+
+				return Optional.ofNullable(orderStatus)
+
+						.map(s -> s.split(","))
+						.map(Arrays::stream)
+						.orElse(Stream.empty())
+						.map(String::trim)
+						.filter(str->!str.isEmpty())
+						.map(String::toUpperCase)
+						.map(
+								str -> {
+									try {
+
+										return CustomerOrderStatus.valueOf(str);
+
+									} catch (Exception e) {
+
+										return null;
+									}
+								})
+						.filter(cos->cos!=null)
+						.distinct()
+						.collect(Collectors.toList());
 		}
 	}
 }
