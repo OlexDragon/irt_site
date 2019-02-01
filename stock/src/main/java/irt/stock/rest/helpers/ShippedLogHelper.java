@@ -74,7 +74,7 @@ public class ShippedLogHelper {
 		Optional<Cell> ofNullable = Optional.ofNullable(dateCell);
 
 		return ofNullable
-				.filter(c->c.getCellTypeEnum()==CellType.NUMERIC)
+				.filter(c->c.getCellType()==CellType.NUMERIC)
 				.filter(HSSFDateUtil::isCellDateFormatted)
 				.map(Cell::getDateCellValue)
 				.map(Optional::of)
@@ -88,7 +88,7 @@ public class ShippedLogHelper {
 	public static Optional<Date> parseDate(Cell cell) {
 
 		return Optional.ofNullable(cell)
-						.filter(c->c.getCellTypeEnum()==CellType.STRING)
+						.filter(c->c.getCellType()==CellType.STRING)
 						.map(Cell::getStringCellValue)
 						.map(ShippedLogHelper::stringToDate)
 						.orElseGet(()->getDateCellValue(cell));
@@ -117,13 +117,13 @@ public class ShippedLogHelper {
 		Optional<Cell> oSerialNumber = Optional.ofNullable(serialNumberCell);
 
 		String serialNumber = oSerialNumber
-								.filter(c->c.getCellTypeEnum()==CellType.NUMERIC)
+								.filter(c->c.getCellType()==CellType.NUMERIC)
 								.map(Cell::getNumericCellValue).map(Double::intValue)
 								.map(n->n.toString())
 								.orElseGet(
 										()->
 										oSerialNumber
-										.filter(c->c.getCellTypeEnum()==CellType.STRING)
+										.filter(c->c.getCellType()==CellType.STRING)
 										.map(Cell::getStringCellValue)
 										.map(String::trim)
 										.filter(s->!s.isEmpty())

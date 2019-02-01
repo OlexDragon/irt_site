@@ -29,8 +29,6 @@ import irt.stock.data.jpa.beans.production.CustomerOrder;
 import irt.stock.data.jpa.beans.production.ProductionUnit;
 import irt.stock.data.jpa.beans.production.SoftwareBuild;
 import irt.stock.data.jpa.repositories.PartNumberRepository;
-import irt.stock.data.jpa.repositories.production.CustomerOrderCommentRepository;
-import irt.stock.data.jpa.repositories.production.CustomerOrderDescriptionRepository;
 import irt.stock.data.jpa.repositories.production.CustomerOrderRepository;
 import irt.stock.data.jpa.repositories.production.ProductionUnitRepository;
 import irt.stock.data.jpa.repositories.production.SoftwareBuildRepository;
@@ -53,8 +51,8 @@ public class ShippedLogFileController {
 
 	@Autowired private PartNumberRepository partNumberRepository;
 	@Autowired private CustomerOrderRepository customerOrderRepository;
-	@Autowired private CustomerOrderCommentRepository commentRepository;
-	@Autowired private CustomerOrderDescriptionRepository descriptionRepository;
+//	@Autowired private CustomerOrderCommentRepository commentRepository;
+//	@Autowired private CustomerOrderDescriptionRepository descriptionRepository;
 	@Autowired private SoftwareBuildRepository buildRepository;
 	@Autowired private ProductionUnitRepository unitRepository;
 

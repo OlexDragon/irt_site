@@ -9,9 +9,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" th:href="@{/css/bootstrap/4.1.1/bootstrap.min.css}">
-<link rel="stylesheet" href="/css/irt.css">
-</head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../../static/css/irt.css" th:hfef="@{/css/irt.css}">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script></head>
 <body>
 	<div>
 		<!-- Modal -->
@@ -31,18 +33,17 @@
 <th:block th:if="${dates!=null and not dates.years.isEmpty()}">
 
 						<div class="btn-group btn-group-toggle mb-3" data-toggle="buttons">
-							<div class="form-check" th:each="searchStyle : ${T(irt.stock.web.controllers.filters.SearchByDateFilter.SearchStyle).values()}">
-								<label class="btn btn-outline-secondary" th:text="${searchStyle}">Label</label>
-								<input type="radio" name="status" th:id="${searchStyle}" autocomplete="off" th:value="${searchStyle}" th:checked="${selectedStyle==searchStyle}">
-							</div>
-<th:block th:remove="all">
+							<label class="btn btn-outline-secondary" th:inline="text" th:each="searchStyle : ${searchStyles}">[[${searchStyle}]]
+								<input type="radio" name="status" th:id="${searchStyle}" autocomplete="off" th:value="${searchStyle}" th:checked="${selectedStyle==searchStyle}" />
+							</label>
+	<th:block th:remove="all">
 							<label class="btn btn-outline-secondary">
 								<input type="radio" name="status" id="exact" autocomplete="off">Exact</label>
 							<label class="btn btn-outline-secondary">
 								<input type="radio" name="status" id="after" autocomplete="off">After</label>
 							<label class="btn btn-outline-secondary">
 								<input type="radio" name="status" id="between" autocomplete="off">Between</label>
-</th:block>
+	</th:block>
 						</div>
       					<div class="input-group">
       						<select id="year" class="form-control" title="Year">
@@ -54,6 +55,20 @@
       							<option th:each="month : ${dates.months}" th:value="${month}" th:text="${month}"></option>
       						</select>
       						<select id="day" class="form-control" title="Day">
+      							<option>Any</option>
+      							<option th:each="day : ${dates.days}" th:value="${day}" th:text="${day}"></option>
+      						</select>
+         				</div>
+      					<div class="input-group d-none">
+      						<select id="year2" class="form-control" title="Year">
+      							<option>Any</option>
+      							<option th:each="year : ${dates.years}" th:value="${year}" th:text="${year}"></option>
+      						</select>
+      						<select id="month2" class="form-control" title="Month">
+       							<option>Any</option>
+      							<option th:each="month : ${dates.months}" th:value="${month}" th:text="${month}"></option>
+      						</select>
+      						<select id="day2" class="form-control" title="Day">
       							<option>Any</option>
       							<option th:each="day : ${dates.days}" th:value="${day}" th:text="${day}"></option>
       						</select>
@@ -71,12 +86,12 @@
 					</form>
 				</div>
 			</div>
-		<script type="text/javascript">
+		<script type="text/javascript" th:inline="javascript">
 		/*<![CDATA[*/
 			$('#modalMessage').modal('show');
 			$('#modalMessage').on('hidden.bs.modal', function(e) { $(this).remove(); });
 
-			$("input[type=checkbox]").change(function(){
+			$("input[type=checkbox]").closest('label').click(function(){
 				var inputs = $("input[type=checkbox]:checked");
 
 				if(inputs.length==0)

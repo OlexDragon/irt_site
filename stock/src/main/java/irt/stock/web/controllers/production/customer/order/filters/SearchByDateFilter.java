@@ -1,4 +1,4 @@
-package irt.stock.web.controllers.filters;
+package irt.stock.web.controllers.production.customer.order.filters;
 public class SearchByDateFilter {
 
 	public SearchByDateFilter(SearchStyle createdType, String createdYear, String createdMonth, String createdDay) {
