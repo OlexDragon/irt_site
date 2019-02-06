@@ -1,5 +1,6 @@
 package irt.stock.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -12,6 +13,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.transaction.Transactional;
 
@@ -52,6 +55,7 @@ import irt.stock.data.jpa.repositories.ComponentRepository;
 import irt.stock.data.jpa.repositories.CostHistoryRepository;
 import irt.stock.data.jpa.repositories.CostRepository;
 import irt.stock.data.jpa.services.UserPrincipal;
+import irt.stock.rest.helpers.CoworkerReport;
 import irt.stock.rest.helpers.StockReport;
 
 @RestController
@@ -313,11 +317,12 @@ public class ComponentRestController {
 	public ResponseEntity<Resource> fullStockReport() throws IOException {
 
 		AtomicInteger index = new AtomicInteger(1);
-		Iterable<Component> findAll = componentRepository.findAllByOrderByPartNumberAsc();
+		Iterable<Component> allComponents = componentRepository.findAllByOrderByPartNumberAsc();
 
+		final CoworkerReport coworkerReport = new CoworkerReport();
 		final String collect = StreamSupport
 
-				.stream( findAll.spliterator(), false)
+				.stream( allComponents.spliterator(), false)
 				.map(
 						c->{
 							final int i = index.getAndIncrement();
@@ -326,22 +331,56 @@ public class ComponentRestController {
 							stockReport[8] = String.format(stockReport[8], i);
 							stockReport[9] = String.format(stockReport[9], i);
 
+							coworkerReport.add(
+										stockReport[StockReport.PART_NUMBER],
+										stockReport[StockReport.USD],
+										stockReport[StockReport.CAD],
+										stockReport[StockReport.UNKNOWN],
+										c.getCompanyQties());
+
 							return Arrays.stream(stockReport)
 							.collect(Collectors.joining(","));
 						})
 				.collect(Collectors.joining("\n"));
 
-		final byte[] bytes = collect.getBytes();
-		ByteArrayResource resource = new ByteArrayResource(bytes);
+		final String collectCoworkers = coworkerReport.getReport();
 
 		Date date = new Date();
 	    final String format = dateFormat.format(date);
+		final byte[] zip = toZip(format, collect, collectCoworkers);
+
+		ByteArrayResource resource = new ByteArrayResource(zip);
 		return ResponseEntity
 	    		.ok()
-	            .header("Content-Disposition", "attachment; filename=report_" + format + ".csv")
-	            .contentLength(bytes.length)
+	            .header("Content-Disposition", "attachment; filename=report_" + format + ".zip")
+	            .contentLength(zip.length)
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .body(resource);
+	}
+
+	private String[] fileNames = new String[]{"Stok", "Coworkers"};
+	private byte[] toZip(String format, String... files) throws IOException {
+
+		byte[] byteArray;
+
+		try(	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ZipOutputStream zos = new ZipOutputStream(baos);){
+
+			for(int i=0; i<files.length; i++)
+				putEntry(zos, fileNames[i] + format + ".csv", files[i].getBytes());
+
+			byteArray = baos.toByteArray();
+		}
+
+		return byteArray;
+	}
+
+	private void putEntry(ZipOutputStream zos, String fileName, byte[] input) throws IOException{
+		ZipEntry entry = new ZipEntry(fileName);
+		entry.setSize(input.length);
+		zos.putNextEntry(entry);
+		zos.write(input);
+		zos.closeEntry();
 	}
 
 	public class Response{
