@@ -14,7 +14,7 @@ public interface ComponentRepository extends CrudRepository<Component, Long> {
 	//	PN
 	List<Component> findByPartNumberContaining(String desired);
 	//	MFR_PN
-	List<Component> findByManufPartNumberContaining(String desired);
+	List<Component> findDistinctByManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContaining(String mfrPN, String aMfrPN);
 	//	MFR
 	List<Component> findByManufactureNameContaining(String desired);
 	//	DESCRIPTION
@@ -82,4 +82,6 @@ public interface ComponentRepository extends CrudRepository<Component, Long> {
 	List<Component> findByDescriptionContainingAndValueContaining(String description, String value);
 
 	Iterable<Component> findAllByOrderByPartNumberAsc();
+
+	List<Component> findDistinctByPartNumberContainingOrManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(String desiredPN, String mfrPn, String altMfrPn);
 }

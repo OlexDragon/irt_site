@@ -22,10 +22,10 @@ public class PartNumberRestController {
 	@Autowired private ComponentRepository componentRepository;
 
 	@RequestMapping
-	public List<? extends PartNumber> postPartNambers(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
+	public List<Component> postPartNambers(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
 
-		desiredPN = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
-		return partNumberRepository.findByPartNumberContainingOrManufPartNumberContainingOrderByPartNumber(desiredPN, desiredPN);
+		String pn = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
+		return componentRepository.findDistinctByPartNumberContainingOrManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(pn, desiredPN, desiredPN);
 	}
 
 	@RequestMapping("like")

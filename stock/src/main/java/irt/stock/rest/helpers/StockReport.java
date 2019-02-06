@@ -20,6 +20,10 @@ import irt.stock.data.jpa.beans.PartNumber;
 
 public class StockReport {
 
+	public static final int PART_NUMBER = 0;
+	public static final int UNKNOWN = 6;
+	public static final int CAD = 5;
+	public static final int USD = 4;
 	private final static NumberFormat CURRENCY_INSTANCE = NumberFormat.getCurrencyInstance();
 
 	public static  String[] componentStockReport(Component component){
@@ -49,7 +53,7 @@ public class StockReport {
 				}));
 
 		final String[] result = new String[11];
-		result[0] = partNumber;
+		result[PART_NUMBER] = partNumber;
 		result[1] = manufPartNumber;
 		result[2] = description;
 		result[3] = qtyStr;
@@ -80,14 +84,14 @@ public class StockReport {
 				default:
 					un = cost.getCost();
 				}
-			result[4] = us.toString();
-			result[5] = ca.toString();
-			result[6] = un.toString();
+			result[USD] = us.toString();
+			result[CAD] = ca.toString();
+			result[StockReport.UNKNOWN] = un.toString();
 
 		}else {
-			result[4] = "0";
-			result[5] = "0";
-			result[6] = "0";
+			result[USD] = "0";
+			result[CAD] = "0";
+			result[StockReport.UNKNOWN] = "0";
 		}
 		return result;
 	}

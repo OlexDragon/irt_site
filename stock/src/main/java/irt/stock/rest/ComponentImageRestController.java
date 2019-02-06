@@ -132,10 +132,7 @@ public class ComponentImageRestController {
 		return oLink
 				.map(ImageLink::getLink)
 				.map(
-						link->{
-							logger.error(link);
-							return Paths.get(defaultImagesFolder, link);
-						})
+						link->Paths.get(defaultImagesFolder, link))
 				.filter(Files::exists);
 	}
 

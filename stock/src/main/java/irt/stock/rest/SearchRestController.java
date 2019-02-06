@@ -80,7 +80,7 @@ public class SearchRestController {
 						return componentRepository.findByPartNumberContaining(partNumber);
 
 					case MFR_PN:
-						return componentRepository.findByManufPartNumberContaining(mfrPN);
+						return componentRepository.findDistinctByManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContaining(mfrPN, mfrPN);
 
 					case MFR:
 						return componentRepository.findByManufactureNameContaining(mfr);
