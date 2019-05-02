@@ -109,13 +109,14 @@
 					<a id="price-hystory-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-price-history" role="tab" aria-controls="nav-price-history" aria-selected="false">Price History</a>
 					<a id="component-hystory-tab" class="nav-item nav-link" data-toggle="tab" href="#nav-component-history" role="tab" aria-controls="nav-component-history" aria-selected="false">Component History</a>
 					<button id="whereUsed" type="button" class="btn btn-outline-dark ml-2">Where used?</button>
-					<th:block sec:authorize="hasAuthority('ADMIN') or hasAuthority('STOCK')">
+					<th:block sec:authorize="hasAuthority('STOCK')">
 						<button id="toCoMfrBtn" type="button" class="btn btn-outline-primary d-none fromStockBtn ml-2">TO CO MFR</button>
 						<button id="toBulkBtn" type="button" class="btn btn-outline-secondary d-none fromStockBtn ml-2">TO BULK</button>
 						<button id="toStockBtn" type="button" class="btn btn-outline-success d-none fromMfrBtn Btn ml-2">TO STOCK</button>
 						<button id="mfrToBulk" type="button" class="btn btn-outline-danger d-none fromMfrBtn ml-2">MFR TO BULK</button>
 						<button id="toAssenbly" type="button" class="btn btn-outline-info d-none ml-2">TO PCA</button>
 					</th:block>
+					<button id="printSticker" type="button" class="btn btn-outline-info d-none ml-2">Print Label</button>
 				</div>
 			</nav>
 		</div>
@@ -261,7 +262,7 @@
 		<!-- component history -->
  				<div id="nav-component-history" class="tab-pane fade table-responsive" role="tabpanel" aria-labelledby="conponent-hystory-tab">
  					<table class="table table-striped">
-						<caption>Price history</caption>
+						<caption>Component history</caption>
 						<thead>
 							<tr>
 								<th scope="col">Date</th>

@@ -80,7 +80,7 @@ public class CostHistory {
 	private OrderType orderType;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern="dd.MMM.yy")
+	@JsonFormat(pattern="dd.MMM.yyyy")
 	public Date changeDate;
 
 	public Long getId() 			{ return id; }

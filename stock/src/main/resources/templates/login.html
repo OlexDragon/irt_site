@@ -37,8 +37,8 @@
 					    </div>
            			</li>
 
-          			<li id="bomMenu" class="nav-item"> <a class="nav-link" href="/bom">BOM</a> </li>
-          			<li id="userMenu" class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('USER_EDIT')"> <a class="nav-link" href="/user">USERS</a> </li>
+          			<li id="bomMenu" class="nav-item"> <a class="nav-link" href="/bom" ondrop="dropToBomMenu(event)" ondragover="allowDrop(event)">BOM</a> </li>
+           			<li id="userMenu" class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('USER_EDIT')"> <a class="nav-link" href="/user">USERS</a> </li>
           		</ul>
 <!--/* LOGIN FORM */-->
 				<form sec:authorize="isAnonymous()" class="form-inline mt-2 mt-md-0" th:action="@{/login}" method="POST">

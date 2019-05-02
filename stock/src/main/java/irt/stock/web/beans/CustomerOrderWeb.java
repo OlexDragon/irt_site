@@ -20,9 +20,9 @@ public class CustomerOrderWeb {
 
 	private Long id;
 	private String orderNumber;
-	@JsonFormat(pattern="dd.MMM.yy")
+	@JsonFormat(pattern="dd.MMM.yyyy")
 	private Date created;
-	@JsonFormat(pattern="dd.MMM.yy")
+	@JsonFormat(pattern="dd.MMM.yyyy")
 	private Date shipped;
 	private CustomerOrderStatus status;
 	private String productionUnitsStr;

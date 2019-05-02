@@ -26,7 +26,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	        http
 	            .authorizeRequests()
 	            .antMatchers("/log_file/scan").hasAnyAuthority("ADMIN")
-	            .antMatchers("/webjars/**", "/css/**", "/js/**", "/images/**", "/sm/**").permitAll()
+	            .antMatchers("/webjars/**", "/css/**", "/js/**", "/images/**", "/barcode/**", "/sm/**").permitAll()
 	                .anyRequest()
 	                	.authenticated()
 

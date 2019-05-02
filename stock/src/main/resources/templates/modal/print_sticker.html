@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>IRT Sticker Creator</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+<!-- <link rel="stylesheet" href="http://localhost:8087/css/irt.css"> -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+	<!-- Modal dialog for make and print the sticker -->
+
+	<div id="modalMessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Sticker Maker" aria-hidden="true" th:fragment="printSticker">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Sticker Maker</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<h4 class="text-center" ><strong id="printPartNumber" th:text="${T(irt.stock.data.jpa.beans.PartNumberSuperclass).addDashes(component.partNumber)}" >000-A10641-FT002</strong></h4>
+					<div class="input-group mt-2">
+						<div class="input-group-prepend">
+							<label class="input-group-text" for="qtyToBulk">Mfr. PN:
+							</label>
+						</div>
+						<select id="printMfrPN" class="form-control" >
+							<option th:text="${component.manufPartNumber}">54-790-018</option>
+							<th:block th:each="c : ${component.alternatives}">
+								<option th:text="${c.altMfrPartNumber}">54F-790-018</option>
+							</th:block>
+						</select>
+					</div>
+					<div class="input-group mt-2">
+						<div class="input-group-prepend">
+							<label class="input-group-text" for="qtyToBulk">Description:</label>
+						</div>
+						<input id="printDescription" type="text" th:value="${component.description}" class="form-control" />
+					</div>
+					<div>
+						<canvas id='stickerCreator' class="mt-2 input-group" width="720" height="420" style="border:1px solid #000000;" ></canvas>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="btnPrint" type="button" class="btn btn-primary">Print</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+			$('#modalMessage').modal('show').on('hidden.bs.modal', function(e) { $(this).remove(); });
+
+			var canvas = $('#stickerCreator')[0];
+			var ctx = canvas.getContext('2d');
+			var img = $('#image');
+			var titleFont = "italic 24px Arial";
+			var font = "bold 54px Arial";
+			var descrFont = "bold 40px Arial";
+			var titleShift = 150;
+			var valueShift = 45;
+			var step = 80;
+
+// Header
+			ctx.font = "bold 48px Arial";
+			ctx.fillText("IRT Technologies Inc.", 5, 75); 
+//Part Number
+			ctx.font = titleFont;
+			ctx.fillText("IRT Part Number:", 15, titleShift); 
+			ctx.font = font;
+			ctx.fillText($('#printPartNumber').text(), 5, titleShift+valueShift); 
+//Manufacture Part Number
+			ctx.font = titleFont;
+			ctx.fillText("Manufacturing Part Number:", 15, titleShift+step); 
+			paintMfrPN($('#printMfrPN').find(":selected").text())
+//Description
+			ctx.font = titleFont;
+			ctx.fillText("Description:", 15, titleShift+step*2); 
+			paintDescription($('#printDescription').val());
+
+			var conv = $('#stickerCreator');
+			var ctx = conv[0].getContext('2d');
+
+			$('#printMfrPN').on('change', function (e) {
+
+				ctx.clearRect(5,titleShift+step, 715, valueShift);
+				var value = $("option:selected", this).val();
+				paintMfrPN(value)
+			});
+
+			$('#printDescription').on('keyup', function (e) {
+
+				ctx.clearRect(5, titleShift+step*2, 715, valueShift*2);
+				var value = $(this).val();
+				paintDescription(value);
+			});
+
+			var http =  /*[['/barcode/part_number/' +${component.id}]]*/ 'http://oleksandr:8087/barcode/part_number/1';
+			$.get(http)
+			.done(function(data) {
+				if(data){
+					var lines = data.split('\n');
+					var dotSize = 7;
+					var startX =570;
+					var startY =5;
+					for(var r=0; r<lines.length; r++){
+						var dots = lines[r].split(',');
+						for(var c=0; c<dots.length; c++){
+							var d = Number(dots[c]);
+							var x = startX + d*dotSize;
+							var y = startY + r*dotSize;
+							ctx.fillRect(x, y, dotSize, dotSize);
+						}
+					}
+				}
+			})
+			.fail(function(error) {
+				alert("$.post(http)\n" + error.responseText);
+			});
+
+			$('#btnPrint').on('click', function(){
+
+				// Sve Canvas to file
+				var fileName = 'tmpLabel' + (new Date()).getTime().toString(16) + '.png'
+				var link = document.createElement('a');
+				document.body.appendChild(link);
+				link.setAttribute('download', fileName);
+				link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+				link.click();
+ 		 		document.body.removeChild(link);
+			});
+
+			function paintMfrPN(value){
+				ctx.font = font;
+				ctx.fillText(value, 5, titleShift+valueShift+step); 
+			}
+
+			function paintDescription(value){
+
+				ctx.font = descrFont;
+				var y = titleShift+valueShift+step*2-10;
+				var maxLength = 25;
+
+				if(value.length>maxLength){
+
+					var firstLine = value.substring(0,maxLength);
+					var indexOf = firstLine.lastIndexOf(' ');
+
+					ctx.fillText(firstLine.substring(0,indexOf), 5, y); 
+					ctx.fillText(value.substring(indexOf+1), 5, y+valueShift); 
+
+				}else{
+					ctx.fillText(value, 5, y); 
+				}
+			}
+		/*]]>*/
+		//# sourceURL=print_sticker.js
+		</script>
+	</div>
+
+</body>
+</html>

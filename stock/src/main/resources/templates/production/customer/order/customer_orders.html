@@ -58,8 +58,8 @@
 			<tr th:if="${st==null or st.index==0}">
 				<td th:text="${iStatus.count}" th:rowspan="${size}" rowspan="2">1</td>
 				<th scope="row" th:text="${o.orderNumber}" th:class="${o.statusClass}" th:title="${o.status}" th:rowspan="${size}" rowspan="2">WO1403004-2</th>
-				<td th:text="${#calendars.format(o.created, 'dd.MMM.yy')}" th:rowspan="${size}" rowspan="2">22.May.18</td>
-				<td th:text="${#calendars.format(o.shipped, 'dd.MMM.yy')}" th:rowspan="${size}" rowspan="2">22.May.18</td>
+				<td th:text="${#calendars.format(o.created, 'dd.MMM.yyyy')}" th:rowspan="${size}" rowspan="2">22.May.18</td>
+				<td th:text="${#calendars.format(o.shipped, 'dd.MMM.yyyy')}" th:rowspan="${size}" rowspan="2">22.May.18</td>
 				<!--/*/
 				<th:block th:if="${o.productionUnits.size()==0}">
 					<td></td>

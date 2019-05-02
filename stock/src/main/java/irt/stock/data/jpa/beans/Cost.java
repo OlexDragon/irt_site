@@ -49,7 +49,7 @@ public class Cost {
 	@JoinColumn(name="manuf_id", nullable=true)
 	private OrderType orderType;
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern="dd.MMM.yy")
+	@JsonFormat(pattern="dd.MMM.yyyy")
 	public Date changeDate;
 
 	@ManyToOne(fetch=FetchType.EAGER)

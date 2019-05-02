@@ -86,4 +86,12 @@ public class ModalTemplatesController {
 
 		return "modal/where_used :: whereUsed";
 	}
+
+	@GetMapping("print_sticker/{componentId}")
+	public String printSticker(@PathVariable Long componentId, Model model){
+
+		componentRepository.findById(componentId).ifPresent(component->model.addAttribute("component", component));
+
+		return "modal/print_sticker :: printSticker";
+	}
 }
