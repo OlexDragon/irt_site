@@ -47,7 +47,7 @@ public class ComponentMovement {
 	private String description;
 	private int status = 2;
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern="dd.MMM.yy")
+	@JsonFormat(pattern="dd.MMM.yyyy")
 	private Date dateTime;
 
 	@ManyToOne(fetch=FetchType.EAGER)

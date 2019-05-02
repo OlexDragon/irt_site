@@ -26,3 +26,23 @@ function partNumberAddDashes(pn){
 	}
 	return pn;
 }
+
+function allowDrop(ev)  {
+	ev.preventDefault();
+}
+
+function dropToBomMenu(ev)  {
+    ev.preventDefault();
+    var partNumber = ev.dataTransfer.getData("text");
+
+    if(partNumber.toUpperCase().startsWith('PCA')){
+    	Cookies.set("desiredPCA", partNumber, { expires: 7 });
+    	location.href = ev.currentTarget.href;
+    }else{
+    	alert('Part Number should start with "PCA..."')
+	}
+}
+
+//function keyFilter(){
+//	alert('Yee');
+//}

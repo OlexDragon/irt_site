@@ -118,130 +118,120 @@ $('#mfrToBulk').click(function(){ $('#modalLoad').load('/modal/mfr_to_bulk/' + c
 //Copy part number to Clipboard
 $('#infoPN').dblclick(function(){
 
-	if (document.body.createTextRange) {
-        const range = document.body.createTextRange();
-        range.moveToElementText(this);
-        range.select();
-    } else if (window.getSelection) {
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(this);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    } else {
-        alert("Could not select text in node: Unsupported browser.");
-        return;
-    }
-	document.execCommand("copy");
+	selectAndCopy(this);
 	alert('Part number copied to the clipboard')
 })
 
 var fill;
 function fillFields(){
 	if(componentId){
+//		if(/*@cc_on!@*/false || !!document.documentMode){
+			$('#printSticker').removeClass('d-none');
+//		}
 
 		if(fill)fill.abort();
 
 		fill = $.get("/pn/details", {pnId : componentId})
-		.done(function(data) {
+		.done(
+				function(data) {
 
-		//fill selected tabs
-		if($('#price-hystory-tab').hasClass( 'active' ))
-			fillPriceHistoryTab();
-		else if($('#component-hystory-tab').hasClass( 'active' ))
-			fillComponentHistoryTab();
+					//fill selected tabs
+					if($('#price-hystory-tab').hasClass( 'active' ))
+						fillPriceHistoryTab();
+					else if($('#component-hystory-tab').hasClass( 'active' ))
+						fillComponentHistoryTab();
 
-		//Bulk and 'TO CO MFR' buttons
-		stockQty = data ? data.qty : 0;
-		if(stockQty>0)
-			$('.fromStockBtn').removeClass('d-none');
-		else
-			$('.fromStockBtn').addClass('d-none');
-
-	//'TO STOCK' buttons
-		var maxQt
-		if(data){
-			companyQties = data.companyQties ? data.companyQties : 0;
-			maxQty = companyQties ? Math.max.apply( Math, companyQties.map(function(o){return o.qty;})) : 0;
-		}else{
-			maxQty = 0;
-		}
-		if(maxQty>0){
-			$('.fromMfrBtn').removeClass('d-none');
-			//'TO PCA' button
-			if(data.partNumber.indexOf('PCB')==0){
-				var _csrf = $( "input[name='_csrf']" ).val();
-				$.post('/bom/exists/' + componentId, {_csrf : _csrf})
-				.done(function(data){
-					if(data)
-						$('#toAssenbly').removeClass('d-none');
+					//Bulk and 'TO CO MFR' buttons
+					stockQty = data ? data.qty : 0;
+					if(stockQty>0)
+						$('.fromStockBtn').removeClass('d-none');
 					else
-						$('#toAssenbly').addClass('d-none');
-				})
-				.fail(function(error) {
-					location.reload(true);
+						$('.fromStockBtn').addClass('d-none');
+
+					//'TO STOCK' buttons
+					var maxQt
+					if(data){
+						companyQties = data.companyQties ? data.companyQties : 0;
+						maxQty = companyQties ? Math.max.apply( Math, companyQties.map(function(o){return o.qty;})) : 0;
+					}else{
+						maxQty = 0;
+					}
+					if(maxQty>0){
+						$('.fromMfrBtn').removeClass('d-none');
+						//'TO PCA' button
+						if(data.partNumber.indexOf('PCB')==0){
+							var _csrf = $( "input[name='_csrf']" ).val();
+							$.post('/bom/exists/' + componentId, {_csrf : _csrf})
+							.done(function(data){
+								if(data)
+									$('#toAssenbly').removeClass('d-none');
+								else
+									$('#toAssenbly').addClass('d-none');
+							})
+							.fail(function(error) {
+								location.reload(true);
 //					alert(error.responseText);
-				});
-			}else
-				$('#toAssenbly').addClass('d-none');
-		}else{
-			$('.fromMfrBtn').addClass('d-none');
-			$('#toAssenbly').addClass('d-none');
-		}
+							});
+						}else
+							$('#toAssenbly').addClass('d-none');
+					}else{
+						$('.fromMfrBtn').addClass('d-none');
+						$('#toAssenbly').addClass('d-none');
+					}
 
-		$('#infoPN').text(partNumberAddDashes(data.partNumber)).prop('title', 'component ID: ' + componentId);
-		$('#infoDescription').text(data.description ? data.description : "N/A");
+					$('#infoPN').text(partNumberAddDashes(data.partNumber)).prop('title', 'component ID: ' + componentId);
+					$('#infoDescription').text(data.description ? data.description : "N/A");
 
-		var mfrPN = $('#infoMfrPN').empty();
-		if(data.link)
-			mfrPN.append($('<a>', {href : 'http://irttechnologies:8080' + data.link.link, target : '_blank', text : data.manufPartNumber ? data.manufPartNumber : "N/A" }));
-		else
-			mfrPN.text(data.manufPartNumber ? data.manufPartNumber : "N/A");
+					var mfrPN = $('#infoMfrPN').empty();
+					if(data.link)
+						mfrPN.append($('<a>', {href : 'http://irttechnologies:8080' + data.link.link, target : '_blank', text : data.manufPartNumber ? data.manufPartNumber : "N/A" }));
+					else
+						mfrPN.text(data.manufPartNumber ? data.manufPartNumber : "N/A");
 
-		$('#infoMfr').text(data.manufacture ? data.manufacture.name : "N/A");
+					$('#infoMfr').text(data.manufacture ? data.manufacture.name : "N/A");
 //Quantity
 
-		var qty = data.qty!='null' ? data.qty : "N/A";
-		var $qty = $('<dd>', { class : 'col-sm-8',  text : qty ? qty + ' pc.' : 'N/A'});
-		var hasAutority = $('#hasAutority').val();
+					var qty = data.qty!='null' ? data.qty : "N/A";
+					var $qty = $('<dd>', { class : 'col-sm-8',  text : qty ? qty + ' pc.' : 'N/A'});
+					var hasAutority = $('#hasAutority').val();
 
-		if(hasAutority && qty!="N/A"){
+					if(hasAutority && qty!="N/A"){
 
-			var price = stockPrice(qty, data.costs);
-			var p = '';
+						var price = stockPrice(qty, data.costs);
+						var p = '';
 
-			if(price['USD'])
-				p = ' USD $' + price['USD'] + ';';
+						if(price['USD'])
+							p = ' USD $' + price['USD'] + ';';
 
-			if(price['CAD'])
-				p += ' CAD $' + price['CAD'] + ';';
+						if(price['CAD'])
+							p += ' CAD $' + price['CAD'] + ';';
 
-			if(price['na'])
-				p += ' $' + price['na'];
+						if(price['na'])
+							p += ' $' + price['na'];
 
-			if(p && qty)
-				$qty.append($('<span>', { text : '(' + p + ' )'}));
-		}
+						if(p && qty)
+							$qty.append($('<span>', { text : '(' + p + ' )'}));
+					}
 
-		$('#infoQty').empty();
-		$('#infoQty').append($('<dt>', { 
-			class : 'col-sm-4',
-	        text : 'Stock'
-	    }))
-	    .append($qty);
+					$('#infoQty').empty();
+					$('#infoQty').append($('<dt>', { 
+						class : 'col-sm-4',
+						text : 'Stock'
+					}))
+					.append($qty);
 
-		$(data.companyQties).each(function(){
-			$('#infoQty')
-			.append($('<dt>', { 
-				class : 'col-sm-4',
-		        text : this.company.companyName,
-		        title : 'company ID: '+ this.company.id
-		    }))
-		    .append($('<dd>', { 
-				class : 'col-sm-8',
-		        text : this.qty
-		    }));
-		});
+					$(data.companyQties).each(function(){
+						$('#infoQty')
+						.append($('<dt>', { 
+							class : 'col-sm-4',
+							text : this.company.companyName,
+							title : 'company ID: '+ this.company.id
+						}))
+						.append($('<dd>', { 
+							class : 'col-sm-8',
+							text : this.qty
+						}));
+					});
 //Alternative Part Numbers
 		var selectMfrPN = $('<select>', {id : 'selectMfrPN', class : 'form-control' }).append($('<option>', { value : 0,  text : data.manufPartNumber }));// Used in the Edit tub; 0 -> not alternative
 		$('#infoAlternative').empty();
@@ -356,6 +346,9 @@ function fillFields(){
 
 		$('#selectDivider')	.change(buttonSaveEnable);//On select quantity change ( 'selectDivider' )
 		$(selectVendors) 	.change(buttonSetEnable);
+//		$(window).keypress(function(){
+//			alert('Yeee 2');
+//		});
 		$(selectCurrency)	.change(buttonSetEnable);
 
 		$('#savePO').on('input', buttonSaveEnable);//On input PO or Invoice change ( 'selectDivider' )
@@ -386,9 +379,15 @@ function fillFields(){
 		if(error.statusText!='abort')
 			alert('$.get("/pn/details", {pnId : ' + componentId + '})\n' + error.responseText);
 	});
+	}else{
+		$('#printSticker').addClass('d-none');
 	}
 }
 
+$('#printSticker').click(function(){
+	if(componentId)
+		$('#modalLoad').load('/modal/print_sticker/' + componentId);
+});
 
 $('#whereUsed').click(function(){
 	if(componentId)
@@ -599,6 +598,25 @@ function averagePrice(costs){
 		sum += c[i];
 	return sum/c.length;
 }
+
+function selectAndCopy(element) {
+    if (document.body.createTextRange) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(element);
+        range.select();
+    } else if (window.getSelection) {
+        var selection = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(element);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        alert("Could not select text in node: Unsupported browser.");
+        return;
+    }
+	document.execCommand("copy");
+}
+
 //$body = $("body");
 //loading spinning circle
 //$(document).on({

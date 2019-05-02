@@ -41,7 +41,7 @@ public class BomHistory {
 	@Column(nullable=false)
 	private BomAction action;
 	@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(pattern="dd.MMM.yy")
+	@JsonFormat(pattern="dd.MMM.yyyy")
 	public Date actionDate;
 
 	@PrePersist

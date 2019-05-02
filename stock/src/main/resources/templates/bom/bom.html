@@ -58,7 +58,7 @@
 					</select>
 				</div>
 				<input id="selected_bom_component" type="hidden">
-				<div id="bom_action" class="container-fluid d-none mt-3" sec:authorize="hasAuthority('ADMIN') or hasAuthority('EDIT_BOM')">
+				<div id="bom_action" class="container-fluid d-none mt-3" sec:authorize="hasAuthority('EDIT_BOM')">
 					<a id="add_component" class="btn btn-outline-dark form-control mb-2 bom_action" href="#">Add</a>
 					<a id="replace_component" class="btn btn-outline-dark form-control mb-2 bom_action" href="#">Replace</a>
 					<a id="delete_component" class="btn btn-outline-dark form-control mb-2 bom_action" href="#">Delete</a>
@@ -72,7 +72,7 @@
 	</div>
 	<div id="stockBtns" class="col-md-2 fixed-bottom bg-dark pt-2">
 		<button id="whereUsed" type="button" class="btn btn-outline-light form-control mb-2" disabled>Where used?</button>
-		<button id="toCoMfrBtn" type="button" class="btn btn-outline-warning form-control mb-2" sec:authorize="hasAuthority('ADMIN') or hasAuthority('STOCK')" disabled>TO CO MFR</button>
+		<button id="toCoMfrBtn" type="button" class="btn btn-outline-warning form-control mb-2" sec:authorize="hasAuthority('STOCK')" disabled>TO CO MFR</button>
 	</div>
 	<div id="modal"></div>
 <th:block th:replace="home::bootstrap_script">

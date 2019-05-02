@@ -50,7 +50,7 @@ public class ComponentImageRestController {
 	
 	@GetMapping("image/{componentId}")
 	public ResponseEntity<byte[]> getImage(@PathVariable(required=false) Long componentId) throws IOException {
-		logger.entry(componentId);
+		logger.traceEntry("{}",componentId);
 
 		Optional<ImageLink> oLink = Optional.ofNullable(componentId)
 				.flatMap(componentImageRepository::findById)
@@ -70,7 +70,7 @@ public class ComponentImageRestController {
 
 	@GetMapping("image/byname")
 	public ResponseEntity<byte[]> getImage(@RequestParam String imageName) {
-		logger.entry(imageName);
+		logger.traceEntry("{}",imageName);
 
 		Optional<ImageLink> oLink = imageRepository.findByLinkEndsWith(imageName);
 
@@ -128,7 +128,7 @@ public class ComponentImageRestController {
 	}
 
 	private Optional<Path> linkToPath(Optional<ImageLink> oLink) {
-		logger.entry(oLink);
+		logger.traceEntry("{}",oLink);
 		return oLink
 				.map(ImageLink::getLink)
 				.map(
@@ -138,7 +138,7 @@ public class ComponentImageRestController {
 
 	@PostMapping(value="image/upload/{componentId}", consumes = {"multipart/form-data"})
 	public ResponseEntity<byte[]> uploadImage(@PathVariable Long componentId, @RequestParam("imageFile") MultipartFile imageFile) {
-		logger.entry(componentId, imageFile, imageFile.getSize());
+		logger.traceEntry("{}",componentId, imageFile, imageFile.getSize());
 
 		if (!imageFile.isEmpty()) {
 			try {
