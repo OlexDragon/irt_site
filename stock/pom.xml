@@ -11,7 +11,7 @@
 
 	<groupId>irt</groupId>
 	<artifactId>stock</artifactId>
-	<version>0.0.34</version>
+	<version>0.0.35</version>
 
 	<name>IRT Technologies Stock</name>
 	<description>Irt Stock works</description>
@@ -136,6 +136,12 @@
 			<artifactId>javase</artifactId>
 			<version>3.3.3</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
 		<!-- <dependency> -->
 		<!-- <groupId>org.springframework.boot</groupId> -->
@@ -163,6 +169,17 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<compilerArguments>
+						<bootclasspath>${sun.boot.class.path}${path.separator}${java.home}/jre/lib/ext/jfxrt.jar</bootclasspath>
+					</compilerArguments>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

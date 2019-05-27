@@ -132,7 +132,7 @@ public class BomRestController {
 
 	@PostMapping("delete/{pcaId}")
 	public Boolean removeComponentForomTheBOM(@PathVariable Long pcaId, @RequestParam(required=false) Long componentId) {
-		logger.entry(pcaId, componentId);
+		logger.traceEntry("{}",pcaId, componentId);
 
 		if(componentId==null)
 				return false;
@@ -156,7 +156,7 @@ public class BomRestController {
 
 	@PostMapping("delete_bom/{pcaId}")
 	public Boolean removeBOM(@PathVariable Long pcaId) {
-		logger.entry(pcaId);
+		logger.traceEntry("{}",pcaId);
 
 		componentRepository.findById(pcaId)
 		.ifPresent(component->{
@@ -181,7 +181,7 @@ public class BomRestController {
 
 	@PostMapping("edit/{pcaId}")
 	public Boolean editBomReferences(@PathVariable Long pcaId, @RequestParam(required=false) Long componentId, @RequestParam String references ) {
-		logger.entry(pcaId, componentId, references);
+		logger.traceEntry("{}",pcaId, componentId, references);
 
 		if(componentId==null ||  references==null)
 				return false;
@@ -195,7 +195,7 @@ public class BomRestController {
 
 	@PostMapping("add/{pcaId}")
 	public Boolean addComponentToTheBOM(@PathVariable Long pcaId, @RequestParam(required=false) Long componentId, @RequestParam(required=false) String partNumber, @RequestParam String refToAdd ) {
-		logger.entry(pcaId, componentId, partNumber, refToAdd);
+		logger.traceEntry("{}",pcaId, componentId, partNumber, refToAdd);
 
 		if(!((componentId!=null || partNumber!=null) && refToAdd!=null))
 				return false;
@@ -208,7 +208,7 @@ public class BomRestController {
 
 	@PostMapping("replace/{pcaId}")
 	public Boolean replaceComponentInTheBOM(@PathVariable Long pcaId, @RequestParam(required=false) Long exchangeable,  @RequestParam(required=false) Long replacementId,  @RequestParam(required=false) String replacementPN) {
-		logger.entry(pcaId, exchangeable, replacementId, replacementPN);
+		logger.traceEntry("{}",pcaId, exchangeable, replacementId, replacementPN);
 
 		if(exchangeable==null || replacementId==null && replacementPN==null)
 				return false;

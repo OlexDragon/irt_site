@@ -14,7 +14,7 @@
 	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
 			<a class="navbar-brand" href="http://irttechnologies:8080/irt/" th:text="${#authorization.expression('isAuthenticated()')} ? 
                ${#authentication.name} : 
-               'IRT Technologies'"></a>
+               'IRT Technologies'" target=”_blank” ></a>
  			<button class="navbar-toggler" aria-expanded="false" aria-controls="navbarCollapse" aria-label="Toggle navigation" type="button" data-toggle="collapse" data-target="#navbarMainMenu">
          		 <span class="navbar-toggler-icon"></span>
        		</button>
@@ -22,18 +22,21 @@
           		<ul class="navbar-nav ml-auto">
           			<li id='searchMenu' class="nav-item"> <a class="nav-link active" href="/search">Search</a> </li>
 
+<!--/* PRODUCTION MENU */-->
            			<li id='productionMenu' class="nav-item dropdown">
            				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Production</a>
 						<div class="dropdown-menu">
-							<a id="coMenu" class="dropdown-item " href="/production/co">Customer Orders</a>
+							<a id="coMenu" class="dropdown-item" href="/production/co">Customer Orders</a>
 							<a id="scanLogFile" class="dropdown-item" href="#" sec:authorize="hasAuthority('SCAN_LOG_FILE')">Scan Shipped Log.xlsx</a>
 					    </div>
 
+<!--/* STOCK MENU */-->
            			<li id='stockMenu' class="nav-item dropdown">
            				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Stock</a>
 						<div class="dropdown-menu">
 							<a id="componentsMenu" class="dropdown-item " href="/">Components</a>
    							<a id="fullReport" class="dropdown-item" href="/component/report" target="_blank">Full Stock Report</a>
+   							<a class="dropdown-item" href="/apks/barcode.apk" download>APP Android</a>
 					    </div>
            			</li>
 

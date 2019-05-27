@@ -186,7 +186,7 @@ public class ComponentRestController {
 
 	@PostMapping("mfr_to_bulk")
 	public Response moveFromMfrToBulk(@RequestParam Long componentId, @RequestParam Long qty, @RequestParam String description, @RequestParam Long coMfr) {
-		logger.entry(componentId, qty, description, coMfr);
+		logger.traceEntry("{}",componentId, qty, description, coMfr);
 
 		Optional
 				.of( SecurityContextHolder.getContext().getAuthentication())
@@ -313,7 +313,7 @@ public class ComponentRestController {
 
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
 
-	@GetMapping(path = "/report")
+	@GetMapping(path = "report")
 	public ResponseEntity<Resource> fullStockReport() throws IOException {
 
 		AtomicInteger index = new AtomicInteger(1);
@@ -324,9 +324,9 @@ public class ComponentRestController {
 
 				.stream( allComponents.spliterator(), false)
 				.map(
-						c->{
+						component->{
 							final int i = index.getAndIncrement();
-							final String[] stockReport = StockReport.componentStockReport(c);
+							final String[] stockReport = StockReport.componentStockReport(component);
 							stockReport[7] = String.format(stockReport[7], i);
 							stockReport[8] = String.format(stockReport[8], i);
 							stockReport[9] = String.format(stockReport[9], i);
@@ -336,7 +336,7 @@ public class ComponentRestController {
 										stockReport[StockReport.USD],
 										stockReport[StockReport.CAD],
 										stockReport[StockReport.UNKNOWN],
-										c.getCompanyQties());
+										component.getCompanyQties());
 
 							return Arrays.stream(stockReport)
 							.collect(Collectors.joining(","));

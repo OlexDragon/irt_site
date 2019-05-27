@@ -28,7 +28,7 @@ $.get("/companies/co_mfr")
 });
 // Part number input listener
 timer = 0;
-$("#pn_input").on('input', function() {
+$("#pn_input").change('input', function() {
     if (timer) {
         clearTimeout(timer);
     }
@@ -632,4 +632,36 @@ $('#price-hystory-tab').click(function(){
 //Component history tab
 $('#component-hystory-tab').click(function(){
 	fillComponentHistoryTab();
+});
+//synchronize with mobile device
+setInterval(sync,1000);
+var deviceID;
+var get;
+function sync(){
+	if(deviceID === undefined)
+		return;
+
+	if(get) get.abort();
+
+	get = $.get('/sync/' + deviceID)
+	.done(function(data){
+
+		var input = $('#pn_input');
+		if(input.val() === data)
+			return;
+
+		input.val(data);
+		partNumbers(data);
+
+	});
+}
+$('#synchronize').change(function(){
+
+	if ($(this).is(':checked')) {
+		$('#pn_input').prop('disabled', true);
+		$('#modalLoad').load('/sync/modal/select'); 
+	}else{
+		$('#pn_input').prop('disabled', false);
+		deviceID = undefined;
+	}
 });

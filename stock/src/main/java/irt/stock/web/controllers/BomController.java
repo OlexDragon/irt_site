@@ -111,7 +111,7 @@ public class BomController {
 
 	@GetMapping("modal/edit_references/{componentId}")
 	public String editComponentReferences(@PathVariable Long componentId, Model model) {
-		logger.entry(componentId);
+		logger.traceEntry("{}",componentId);
 
 		partNumberRepository.findById(componentId).ifPresent(component->model.addAttribute("component", component));
 
@@ -120,7 +120,7 @@ public class BomController {
 
 	@GetMapping("modal/delete_component/{componentId}")
 	public String removeComponentFromBOM(@PathVariable Long componentId, Model model) {
-		logger.entry(componentId);
+		logger.traceEntry("{}",componentId);
 
 		partNumberRepository.findById(componentId).ifPresent(component->model.addAttribute("component", component));
 
@@ -129,7 +129,7 @@ public class BomController {
 
 	@GetMapping("modal/replace_component/{componentId}")
 	public String replaceComponent(@PathVariable Long componentId, Model model) {
-		logger.entry(componentId);
+		logger.traceEntry("{}",componentId);
 
 		partNumberRepository.findById(componentId).ifPresent(component->model.addAttribute("component", component));
 
@@ -138,7 +138,7 @@ public class BomController {
 
 	@GetMapping("modal/delete_bom/{componentId}")
 	public String removeBomFromBOM(@CookieValue Long bomComponentId, Model model) {
-		logger.entry(bomComponentId);
+		logger.traceEntry("{}",bomComponentId);
 
 		partNumberRepository.findById(bomComponentId).ifPresent(component->model.addAttribute("component", component));
 

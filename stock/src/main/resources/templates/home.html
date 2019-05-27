@@ -53,7 +53,14 @@
 		<div class="row pt-3 mt-5">
 			<div class="col-md-2 bg-secondary rounded">
 				<div class="row p-2">
-					<input id="pn_input" type="text" class="form-control w-100 font-weight-bold" placeholder=" IRT Part Number" th:value="${#authorization.expression('isAuthenticated()')} ? ${desiredPN} : 'You must be logged in'"/>
+				<div class="input-group">
+				<div class="input-group-prepend">
+					<span class="input-group-text">
+						<input id="synchronize" type="checkbox" />
+					</span>
+				</div>
+					<input id="pn_input" type="text" class="form-control font-weight-bold" placeholder=" IRT Part Number" th:value="${#authorization.expression('isAuthenticated()')} ? ${desiredPN} : 'You must be logged in'"/>
+				</div>
 				</div>
 				<div class="row p-2">
 					<select id="pns_out" name="pns_out" class="form-control w-100" multiple="multiple" size="15" style="overflow-y: auto;">
