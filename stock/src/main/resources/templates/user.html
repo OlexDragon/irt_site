@@ -38,7 +38,7 @@
 <!--/* END HEADER will be replaced */-->
 
 	<div id="allUsers" class="container-fluid bg-white pt-3 mt-5"  sec:authorize="hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('USER_EDIT')">
-	<table class="table table-striped table-hover" th:with="canEdit=${#authorization.expression('hasAuthority(''ADMIN'')') or #authorization.expression('hasAuthority(''USER_EDIT'')')}">
+<table class="table table-striped table-hover" th:with="canEdit=${#authorization.expression('hasAuthority(''ADMIN'')') or #authorization.expression('hasAuthority(''USER_EDIT'')')}">
   		<thead class="thead-light">
     		<tr>
       			<th scope="col">Username</th>
@@ -46,17 +46,17 @@
       			<th scope="col">Last Name</th>
       			<th scope="col">Extension</th>
       			<th scope="col">Email</th>
-      			<th scope="col" th:if="${canEdit}">Status</th>
+      			<th scope="col" th:if="${canEdit?:false}">Status</th>
    			</tr>
   	</thead>
   	<tbody id="tableBody">
-  		<tr th:each="u : ${users}" th:attr="data-value=${u.id}" th:if="${canEdit or u.status==T(irt.stock.data.jpa.beans.User.Status).ACTIVE}" >
+  		<tr th:each="u : ${users}" th:attr="data-value=${u.id}" th:if="${canEdit?:false or u.status==T(irt.stock.data.jpa.beans.User.Status).ACTIVE}" >
   			<th th:text="${u.username}">Username</th>
   			<td th:text="${u.firstName}">First Name</td>
   			<td th:text="${u.lastName}">Last Name</td>
   			<td th:text="${u.extension}">Extension</td>
   			<td th:text="${u.email}">Email</td>
-  			<td th:text="${u.status}" th:if="${canEdit}" th:classappend="${ u.status==T(irt.stock.data.jpa.beans.User.Status).ACTIVE } ? 'table-success' : 'table-danger'"></td>
+  			<td th:text="${u.status}" th:if="${canEdit?:false}" th:classappend="${ u.status==T(irt.stock.data.jpa.beans.User.Status).ACTIVE } ? 'table-success' : 'table-danger'"></td>
   		</tr>
   	</tbody>
 </table>

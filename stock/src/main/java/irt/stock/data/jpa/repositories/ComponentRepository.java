@@ -84,4 +84,6 @@ public interface ComponentRepository extends CrudRepository<Component, Long> {
 	Iterable<Component> findAllByOrderByPartNumberAsc();
 
 	List<Component> findDistinctByPartNumberContainingOrManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(String desiredPN, String mfrPn, String altMfrPn);
+
+	Optional<Component> findByPartNumberOrManufPartNumber(String partNumber, String mfrPartNumber);
 }

@@ -26,7 +26,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	        http
 	            .authorizeRequests()
 	            .antMatchers("/log_file/scan").hasAnyAuthority("ADMIN")
-	            .antMatchers("/webjars/**", "/css/**", "/js/**", "/images/**", "/barcode/**", "/sm/**").permitAll()
+	            .antMatchers("/webjars/**", "/css/**", "/js/**", "/images/**", "/barcode/**", "/sm/**", "/sync/**").permitAll()
 	                .anyRequest()
 	                	.authenticated()
 
@@ -39,10 +39,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	            .logout()
 	            	.logoutSuccessUrl("/")
 	            .and()
-	            	.rememberMe().userDetailsService(userDetailsService);
-//	            .and()
-//	            .httpBasic()
-	            ;
+	            	.rememberMe().userDetailsService(userDetailsService)
+	            .and()
+	            .csrf().disable();
+
 	    }
 
 	    @Bean
