@@ -28,11 +28,19 @@ $.get("/companies/co_mfr")
 });
 // Part number input listener
 timer = 0;
-$("#pn_input").change('input', function() {
+$('#pn_input').on('input', function() {
     if (timer) {
         clearTimeout(timer);
     }
     timer = setTimeout(partNumbers, 600, $(this).val());
+});
+$('#pn_input').on('keyup', function(e) {
+	 if (e.keyCode === 13) {
+		 this.select();
+	 }
+});
+$('#pn_input').on('click', function(e) {
+	this.select();
 });
 
 // On select part number
@@ -527,7 +535,7 @@ function selectComponent(){
 }
 //Search part numbers containing 'str'
 function partNumbers(str){
-	$.get("/pn", {desiredPN: str})
+	$.post("/pn", {desiredPN: str})
 		.done(function(pns) {
 
 			Cookies.set("desiredPN", str, { expires: 7 });
