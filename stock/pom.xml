@@ -11,7 +11,7 @@
 
 	<groupId>irt</groupId>
 	<artifactId>stock</artifactId>
-	<version>0.0.35</version>
+	<version>0.0.36</version>
 
 	<name>IRT Technologies Stock</name>
 	<description>Irt Stock works</description>

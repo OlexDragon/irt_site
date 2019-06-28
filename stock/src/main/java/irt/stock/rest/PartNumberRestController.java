@@ -3,6 +3,8 @@ package irt.stock.rest;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +19,17 @@ import irt.stock.data.jpa.repositories.PartNumberRepository;
 @RestController
 @RequestMapping("/pn")
 public class PartNumberRestController {
+	private final static Logger logger = LogManager.getLogger();
 
 	@Autowired private PartNumberRepository partNumberRepository;
 	@Autowired private ComponentRepository componentRepository;
 
-	@RequestMapping
+	@PostMapping
 	public List<Component> postPartNambers(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
 
 		String pn = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
-		return componentRepository.findDistinctByPartNumberContainingOrManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(pn, desiredPN, desiredPN);
+		logger.debug("desiredPN: {}; pn: {}", desiredPN, pn);
+		return componentRepository.findDistinctByPartNumberContainingOrManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(pn, desiredPN, pn);
 	}
 
 	@RequestMapping("like")
