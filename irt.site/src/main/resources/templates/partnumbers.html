@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="home :: head"></head>
+<body onKeyDown="checkCtrl(event);" onKeyUp="checkCtrl(event);">
+<th:block th:replace="home :: header"></th:block>
+	<div id="content" class="cCenter">
+		<form id="pn" method="post" action="part-numbers" th:object="${partNumberForm}">
+			<input type="hidden" th:field="*{id}"/>
+			<div id="inputs" class="sticker">
+				<p>
+<!--/*    First digit         */-->
+					<select onchange="oneClick('submit-reset');" th:field="*{first}">
+						<option value="">Select</option>
+						<th:block th:remove="all-but-first">
+							<option th:each="f:${firstList}" th:value="${f.id}" th:text="${f.description}" th:selected="*{first}==${f.id}">Assemblies</option>
+							<option value="1">Components</option>
+							<option value="3">Metal Parts</option>
+							<option value="4">PCBs</option>
+							<option value="5">Raw Materials</option>
+							<option value="6">Screws</option>
+							<option value="7">Top Level ASSYs</option>
+						</th:block>
+					</select>
+<!--/*    second and third digits         */-->
+					 <select onchange="oneClick('submit-reset');" th:if="${secondList}" th:field="*{second}">
+						<option value="">Select</option>
+						<option th:each="s:${secondList}" th:value="${s.key.id}" th:text="${s.description}">Select</option>
+					</select>
+					<input type="submit" name="submit_to_text" id="submit_to_text" value="Show Part Number" />
+					<input type="submit" name="submit-search" id="submit-search" value="Search" />
+					<input type="submit" name="submit-reset" id="submit-reset" value="Reset"/>
+					<input type="submit" name="submit-add" id="submit-add" value="Add" th:if="${error}==null and *{partNumber}!=null and not *{#strings.contains(partNumber, '_')}" />
+					<input type="submit" name="submit-update" id="submit-update" value="Update" th:if="${error}==null and *{id}!=null"/><br/><br/>
+
+					<th:block th:each="f,s:${fields}">
+						<!--/*  s={index = 4, count = 5, size = 8, current = ArrayEntity [key=ArrayEntityPK [id=SeqN, name=cable_titles], description=label, sequence=5]} */-->
+						<label th:utext="${f.key.id}"></label>
+						<th:block th:switch="${f.description}">
+							<select th:case="'select'" th:field="*{fields[__${s.index}__]}" onchange="oneClick('submit_to_text');">
+								<option value="">Select</option>
+								<th:block th:if="${options}!=null">
+									<option th:each="o:${options[__${s.index}__]}" th:value="${o.value}" th:text="${o.text}" th:selected="${o.value} == *{fields[__${s.index}__]}">Select</option>
+								</th:block>
+							</select>
+							<input th:case="'text'" type="text" onfocus="this.select();" th:field="*{fields[__${s.index}__]}"/>
+							<label th:case="'label'" th:text="*{fields[__${s.index}__]}"></label>
+						</th:block>
+					</th:block>
+				</p>
+				<hr />
+				<p>
+					<input type="text" onfocus="this.select();" onkeypress="return oneKeyPress(event,'submit-parse')" th:field="*{partNumber}" />
+					<input type="submit" name="submit-parse" id="submit-parse" value="Parse" />
+
+				</p>
+			</div>
+
+			<h3 class="red" th:text="${error}">Error</h3>
+
+			<table>
+				<tr class="title">
+					<td></td>
+					<th>ID</th>
+					<th>Part Number</th>
+					<th>Mfr P/N</th>
+					<th>Mfr</th>
+					<th>Vendor</th>
+					<th>Price</th>
+					<th>MOQ</th>
+					<th>MOP</th>
+					<th>Qty</th>
+					<th>Total</th>
+				</tr>
+				<tr class="odd">
+					<td>1</td>
+					<td>237</td>
+					<td>000-AB0077-QF004</td>
+					<td>ABM3B-8.000MHZ-B2-T</td>
+					<td>Abracon</td>
+					<td>Future electronics</td>
+					<td>.38</td>
+					<td>1</td>
+					<td>.38</td>
+					<td>48</td>
+					<td>18.24</td>
+				</tr>
+				<tr class="even">
+					<td>2</td>
+					<td>237</td>
+					<td>000-AB0077-QF004</td>
+					<td>ABM3B-8.000MHZ-D2-T</td>
+					<td>Abracon</td>
+					<td>IRT</td>
+					<td></td>
+					<td>0</td>
+					<td></td>
+					<td>48</td>
+					<td></td>
+				</tr>
+			</table>
+
+		</form>
+	</div>
+
+</body>
+</html>
