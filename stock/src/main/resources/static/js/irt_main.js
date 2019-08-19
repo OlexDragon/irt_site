@@ -33,7 +33,7 @@ function allowDrop(ev)  {
 
 function dropToBomMenu(ev)  {
     ev.preventDefault();
-    var partNumber = ev.dataTransfer.getData("text");
+    var partNumber = ev.dataTransfer.getData("text").trim();
 
     if(partNumber.toUpperCase().startsWith('PCA')){
     	Cookies.set("desiredPCA", partNumber, { expires: 7 });
