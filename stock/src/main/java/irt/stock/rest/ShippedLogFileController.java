@@ -211,8 +211,14 @@ public class ShippedLogFileController {
 		.ofNullable(pu.getSerialNumber())
 		.flatMap(
 				sn->
-				unitRepository
-				.findBySerialNumber(sn))
+				{
+					try {
+						return unitRepository.findBySerialNumber(sn);
+					} catch (Exception e) {
+						logger.catching(e);
+					}
+					return Optional.empty();
+				})
 		.orElseGet(()->{
 
 			//Get partNumber from Database

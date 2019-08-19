@@ -26,6 +26,7 @@
            			<li id='productionMenu' class="nav-item dropdown">
            				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Production</a>
 						<div class="dropdown-menu">
+							<a id="tunMenu" class="dropdown-item" href="/production/tuning">Tuning</a>
 							<a id="coMenu" class="dropdown-item" href="/production/co">Customer Orders</a>
 							<a id="scanLogFile" class="dropdown-item" href="#" sec:authorize="hasAuthority('SCAN_LOG_FILE')">Scan Shipped Log.xlsx</a>
 					    </div>
@@ -40,7 +41,9 @@
 					    </div>
            			</li>
 
+<!--/* BOM MENU */-->
           			<li id="bomMenu" class="nav-item"> <a class="nav-link" href="/bom" ondrop="dropToBomMenu(event)" ondragover="allowDrop(event)">BOM</a> </li>
+<!--/* USER MENU */-->
            			<li id="userMenu" class="nav-item" sec:authorize="hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('USER_EDIT')"> <a class="nav-link" href="/user">USERS</a> </li>
           		</ul>
 <!--/* LOGIN FORM */-->

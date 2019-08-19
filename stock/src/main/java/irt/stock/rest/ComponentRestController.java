@@ -141,7 +141,6 @@ public class ComponentRestController {
 	@PostMapping("cost/delete/{componentId}/{alternativeId}/{companyId}/{forQty}")
 	public Response getDeleteCost(@PathVariable Long componentId, @PathVariable Long alternativeId, @PathVariable Long companyId, @PathVariable Long forQty) {
 
-
 		final CostId costId = new CostId(componentId, alternativeId, companyId, forQty);
 		costRepository.deleteById(costId);
 		return new Response("Done");
