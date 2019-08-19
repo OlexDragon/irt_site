@@ -6,6 +6,7 @@
 package irt.entities;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -32,7 +33,7 @@ public class ClassIdHasArrayEntity implements Serializable {
     private Integer classId;  public Integer getClassId() { return classId; }  public void setClassId(Integer classId) { this.classId = classId; }
 
 	@ManyToOne @JoinColumn(name = "id_array_names")
-    private ArrayNameEntity arrayNameEntity;  public ArrayNameEntity getArrayNameEntity() { return arrayNameEntity; } public void setArrayNameEntity(ArrayNameEntity arrayNameEntity) { this.arrayNameEntity = arrayNameEntity; }
+    private ArrayNameEntity arrayNameEntity;  public Optional<ArrayNameEntity> getArrayNameEntity() { return Optional.ofNullable(arrayNameEntity); } public void setArrayNameEntity(ArrayNameEntity arrayNameEntity) { this.arrayNameEntity = arrayNameEntity; }
 
 	@Override
     public int hashCode() {

@@ -2,6 +2,7 @@
 package irt.controllers.components;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class PartNumberForm {
 
@@ -21,16 +22,9 @@ public class PartNumberForm {
 
 		return fields;
 	}
-	public void setFields(String[] fields) { this.fields = fields; }
-	public String getField(int index){
-		String field;
-		if(fields!=null && fields.length>index)
-			field = fields[index];
-		else
-			field = null;
 
-		return field;
-	}
+	public void setFields(String[] fields) { this.fields = fields; }
+	public String getField(int index){ return Optional.ofNullable(fields).filter(f->f.length>index).map(f->f[index]).orElse(null); }
 
 	private String partNumber; public String getPartNumber() { return partNumber; } public void setPartNumber(String partNumber) { this.partNumber = partNumber; }
 

@@ -27,7 +27,7 @@
 						<option value="">Select</option>
 						<option th:each="s:${secondList}" th:value="${s.key.id}" th:text="${s.description}">Select</option>
 					</select>
-					<input type="submit" name="submit_to_text" id="submit_to_text" value="Show Part Number" />
+					<input type="submit" name="submit_show_part_number" id="submit_show_part_number" value="Show Part Number" />
 					<input type="submit" name="submit-search" id="submit-search" value="Search" />
 					<input type="submit" name="submit-reset" id="submit-reset" value="Reset"/>
 					<input type="submit" name="submit-add" id="submit-add" value="Add" th:if="${error}==null and *{partNumber}!=null and not *{#strings.contains(partNumber, '_')}" />
@@ -37,7 +37,7 @@
 						<!--/*  s={index = 4, count = 5, size = 8, current = ArrayEntity [key=ArrayEntityPK [id=SeqN, name=cable_titles], description=label, sequence=5]} */-->
 						<label th:utext="${f.key.id}"></label>
 						<th:block th:switch="${f.description}">
-							<select th:case="'select'" th:field="*{fields[__${s.index}__]}" onchange="oneClick('submit_to_text');">
+							<select th:case="'select'" th:field="*{fields[__${s.index}__]}" onchange="oneClick('submit_show_part_number');">
 								<option value="">Select</option>
 								<th:block th:if="${options}!=null">
 									<option th:each="o:${options[__${s.index}__]}" th:value="${o.value}" th:text="${o.text}" th:selected="${o.value} == *{fields[__${s.index}__]}">Select</option>

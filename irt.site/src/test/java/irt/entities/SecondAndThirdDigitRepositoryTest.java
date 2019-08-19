@@ -4,6 +4,7 @@ package irt.entities;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +39,7 @@ public class SecondAndThirdDigitRepositoryTest {
 			
 			assertNotNull(entity);
 			assertNotNull(entity.getHasArrayEntity());
-			assertTrue(entity.getHasArrayEntity().getArrayNameEntity().getArrayEntities().size()>0);
+			assertTrue(entity.getHasArrayEntity().flatMap(ClassIdHasArrayEntity::getArrayNameEntity).map(ArrayNameEntity::getArrayEntities).orElseGet(()->new ArrayList<>()).size()>0);
 		});
 	}
 }

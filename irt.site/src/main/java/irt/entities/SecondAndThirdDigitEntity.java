@@ -6,6 +6,7 @@
 package irt.entities;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -23,7 +24,6 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 /**
- *
  * @author Oleksandr
  */
 @Entity
@@ -54,7 +54,7 @@ public class SecondAndThirdDigitEntity implements Serializable{
     @OneToOne(optional = true, fetch=FetchType.LAZY)
     @NotFound(action = NotFoundAction.IGNORE)
     private ClassIdHasArrayEntity hasArrayEntity;
-	public ClassIdHasArrayEntity getHasArrayEntity() { return hasArrayEntity; }
+	public Optional<ClassIdHasArrayEntity> getHasArrayEntity() { return Optional.ofNullable(hasArrayEntity); }
 	public void setHasArrayEntity(ClassIdHasArrayEntity hasArrayEntity) { this.hasArrayEntity = hasArrayEntity; }
 
     public SecondAndThirdDigitEntity() { }

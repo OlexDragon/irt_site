@@ -1,6 +1,7 @@
 package irt.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +34,7 @@ import irt.entities.SecondAndThirdDigitEntity;
 @RequestMapping({"part-numbers", "irt/part-numbers"})
 public class PartNumbersController {
 
-	private Logger logger = LogManager.getLogger();
+	private final Logger logger = LogManager.getLogger();
 
 	@Autowired ApplicationContext applicationContext;
 	@Autowired private PartNumberService partNumberService;
@@ -51,7 +52,7 @@ public class PartNumbersController {
 								@CookieValue(required=false) Long componentId,
 								Model model){
 
-		logger.entry(first, second, componentId);
+		logger.error("\n1) '{}'\n2) '{}'\n3) '{}'\n4) '{}'", form, first, second, componentId);
 
 		PartNumberForm pnf = partNumberComponent.getPartNumberForm();
 		if(pnf!=null){
@@ -68,13 +69,15 @@ public class PartNumbersController {
 		return "partnumbers";
 	}
 
-	@RequestMapping(method=RequestMethod.POST, params="submit_to_text")
+	@RequestMapping(method=RequestMethod.POST, params="submit_show_part_number")
 	public String setPartNumber(
 								PartNumberForm form,
 								HttpServletResponse response,
 								Model model){
 
+//		logger.error(form);
 		partNumberService.fillForm(form);
+//		logger.error(form);
 
 		addAttributes(form, model);
 		addCookies(form, response);
@@ -88,12 +91,13 @@ public class PartNumbersController {
 								Model model,
 								HttpServletResponse response){
 
-		logger.entry(form);
+//		logger.error("getPartNumber:\n{}", form);
 
 		form.setId(null);
 		form.setFields(null);
 		form.setPartNumber(null);
 		partNumberService.fillForm(form);
+		logger.error("getPartNumber:{}", form);
 
 		addAttributes(form, model);
 
@@ -105,8 +109,6 @@ public class PartNumbersController {
 								PartNumberForm form,
 								Model model,
 								HttpServletResponse response){
-
-		logger.entry(form);
 
 		form.setId(null);
 		form.setPartNumber(null);
@@ -131,8 +133,6 @@ public class PartNumbersController {
 								PartNumberForm form,
 								Model model,
 								HttpServletResponse response){
-
-		logger.entry(form);
 
 		if(partNumberService.isValid(form, model)){
 
@@ -161,7 +161,6 @@ public class PartNumbersController {
 	@Autowired IrtComponentRepository componentRepository;
 	@RequestMapping(method=RequestMethod.POST, params="submit-parse")
 	public String parsePartNumber( PartNumberForm form, Model model, HttpServletResponse response){
-		logger.entry(form);
 
 		String pn = form.getPartNumber();
 		if(pn==null || pn.isEmpty() || (pn = pn.replaceAll("[-\\s]", "")).isEmpty()){
@@ -222,8 +221,8 @@ public class PartNumbersController {
 	}
 
 	private void addCookies(PartNumberForm partNumbetForm, HttpServletResponse response) {
-		response.addCookie(new Cookie("componentId", partNumbetForm.getId()!=null ? partNumbetForm.getId().toString() : null));
-		response.addCookie(new Cookie("first", partNumbetForm.getFirst()!=null ? partNumbetForm.getFirst().toString() : null));
+		response.addCookie(new Cookie("componentId", Optional.ofNullable(partNumbetForm.getId()).map(Object::toString).orElse(null)));
+		response.addCookie(new Cookie("first", Optional.ofNullable(partNumbetForm.getFirst()).map(Object::toString).orElse(null)));
 		response.addCookie(new Cookie("second", partNumbetForm.getSecond()));
 	}
 }

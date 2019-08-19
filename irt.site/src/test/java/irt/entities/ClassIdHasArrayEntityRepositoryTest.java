@@ -4,6 +4,7 @@ package irt.entities;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -27,8 +28,8 @@ public class ClassIdHasArrayEntityRepositoryTest {
 			
 			assertNotNull(arrayEntity);
 			assertNotNull(arrayEntity.getArrayNameEntity());
-			assertNotNull(arrayEntity.getArrayNameEntity().getArrayEntities());
-			assertTrue(arrayEntity.getArrayNameEntity().getArrayEntities().size()>0);
+			assertNotNull(arrayEntity.getArrayNameEntity().map(ArrayNameEntity::getArrayEntities).orElseGet(()->new ArrayList<>()));
+			assertTrue(arrayEntity.getArrayNameEntity().map(ArrayNameEntity::getArrayEntities).orElseGet(()->new ArrayList<>()).size()>0);
 		});
 	}
 

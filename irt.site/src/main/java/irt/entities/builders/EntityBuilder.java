@@ -5,12 +5,13 @@ import irt.entities.IrtComponentEntity;
 
 public interface EntityBuilder {
 
-	IrtComponentEntity build(PartNumberForm form);
-	void fillForm(PartNumberForm partNumberForm, IrtComponentEntity componentEntity);
+	IrtComponentEntity 	build(PartNumberForm form);
+	IrtComponentEntity 	updateEntity(PartNumberForm partNumberForm);
+	String				getMfrId(PartNumberForm partNumberForm);
+	String				getMfrPN(PartNumberForm partNumberForm);
+	String 				getDesctiption(PartNumberForm partNumberForm);
+
 	void fillForm(PartNumberForm partNumberForm);
 	void fillForm(PartNumberForm partNumberForm, String partNumber);
-	IrtComponentEntity updateEntity(PartNumberForm partNumberForm);
-	String getMfrId(PartNumberForm partNumberForm);
-	String getMfrPN(PartNumberForm partNumberForm);
-	String getDesctiption(PartNumberForm partNumberForm);
+	void fillForm(PartNumberForm partNumberForm, IrtComponentEntity componentEntity);
 }
