@@ -22,8 +22,8 @@ public class PartNumberComponent implements FirstDiditsList, SecondDiditsList {
 	/**  @return page title */
 	public String getPageTitle() { return title; }
 
-	private List<FirstDigitsEntity> firstDiditsList;
 	@Autowired FirstDigitsRepository firstDigitsRepository;
+	private List<FirstDigitsEntity> firstDiditsList;
 	@Override public List<FirstDigitsEntity> getFirstDiditsList() {
 		if(firstDiditsList==null)
 			firstDiditsList = firstDigitsRepository.findAll(Sort.by("description"));
@@ -45,7 +45,7 @@ public class PartNumberComponent implements FirstDiditsList, SecondDiditsList {
 //			componentEntity = null;
 //	}
 
-	PartNumberForm partNumberForm;
+	private PartNumberForm partNumberForm;
 	public PartNumberForm getPartNumberForm() { return partNumberForm; }
 	public void setPartNumberForm(PartNumberForm partNumberForm) { 
 		this.partNumberForm = partNumberForm;

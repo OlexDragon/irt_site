@@ -1,7 +1,7 @@
 package irt.controllers.components;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -17,7 +17,7 @@ import irt.entities.builders.EntityBuilder;
 @Service
 public class PartNumberService {
 
-	private final Logger logger = LogManager.getLogger();
+//	private final Logger logger = LogManager.getLogger();
 
 	@Autowired ApplicationContext applicationContext;
 	@Autowired IrtComponentRepository componentRepository;
@@ -59,25 +59,20 @@ public class PartNumberService {
 
 	public void fillForm(PartNumberForm partNumberForm) {
 
-		IrtComponentEntity entity = findEntityById(partNumberForm);
-		logger.trace("findEntityById:{}", entity);
+		IrtComponentEntity entity = findEntityById(partNumberForm)
+									.orElseGet(
+											()->findByMfrPN(partNumberForm)
+											.orElseGet(
+													()->findEntityByPN(partNumberForm)
+													.orElse(null)));
 
-		if(entity==null){
-			entity =  findByMfrPN(partNumberForm);
-			logger.trace("findByMfrPN:{}", entity);
-		}
-
-		if(entity==null){
-			entity =  findEntityByPN(partNumberForm);
-			logger.trace("findEntityByPN:{}", entity);
-		}
+//		logger.error(entity);
 
 		if(entity!=null)
 			fillForm(partNumberForm, entity);
 
-		else{
+		else
 			getBuilder(partNumberForm).fillForm(partNumberForm);
-		}
 	}
 
 	public void fillForm(PartNumberForm partNumberForm, IrtComponentEntity entity) {
@@ -107,17 +102,12 @@ public class PartNumberService {
 		
 	}
 
-	private IrtComponentEntity findByMfrPN(PartNumberForm partNumberForm) {
-		EntityBuilder entityBuilder = getBuilder(partNumberForm);
+	private Optional<IrtComponentEntity> findByMfrPN(PartNumberForm partNumberForm) {
 
-		IrtComponentEntity entity;
-		String mfrPN = entityBuilder.getMfrPN(partNumberForm);
-		if(mfrPN!=null && !(mfrPN).isEmpty())
-			entity = componentRepository.findOneByManufPartNumber(mfrPN);
-		else
-			entity = null;
-
-		return entity;
+		return Optional.of(getBuilder(partNumberForm))
+				.map(builder->builder.getMfrPN(partNumberForm))
+				.filter(mfrPN->!mfrPN.isEmpty())
+				.map(componentRepository::findOneByManufPartNumber);
 	}
 
 	public boolean isValid(PartNumberForm partNumberForm, Model model) {
@@ -131,8 +121,8 @@ public class PartNumberService {
 		return errorMessage==null;
 	}
 
-	private IrtComponentEntity	findEntityByPN	(PartNumberForm partNumberForm) { String pn = partNumberForm.getPartNumber(); return pn!=null && !(pn = pn.replaceAll("[-\\s]", "")).isEmpty() ? componentRepository.findOneByPartNumber(pn) : null; }
-	private IrtComponentEntity	findEntityById	(PartNumberForm partNumberForm) { return partNumberForm.getId()!=null ? componentRepository.findById(partNumberForm.getId()).get() : null; }
+	private Optional<IrtComponentEntity>	findEntityByPN	(PartNumberForm partNumberForm) { return Optional.ofNullable(partNumberForm.getPartNumber()).map(pn->pn.replaceAll("[-\\s]", "")).filter(pn->!pn.isEmpty()).map(componentRepository::findOneByPartNumber); }
+	private Optional<IrtComponentEntity>	findEntityById	(PartNumberForm partNumberForm) { return Optional.ofNullable(partNumberForm.getId()).flatMap(componentRepository::findById); }
 	private Validator			getValidator	(PartNumberForm partNumberForm) { return (Validator) applicationContext.getBean("validator" + getExt(partNumberForm)); }
 	private EntityBuilder		getBuilder		(PartNumberForm partNumberForm) { return (EntityBuilder) applicationContext.getBean("entityBuilder" + getExt(partNumberForm)); }
 //	private EntityBuilder		getBuilder		(String firstThreeLetters) { return (EntityBuilder) applicationContext.getBean("entityBuilder" + firstThreeLetters); }
