@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import irt.controllers.components.PartNumberForm;
-import irt.entities.CountsRepository;
+import irt.entities.repository.CountsRepository;
 
 public abstract class EntityBuilderAbstract implements EntityBuilder {
 

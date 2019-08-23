@@ -12,21 +12,12 @@ import irt.controllers.components.options.OptionsFor00C;
 import irt.controllers.components.options.OptionsFor0CB;
 import irt.controllers.components.options.OptionsFor0CO;
 import irt.controllers.components.options.OptionsForA;
-import irt.controllers.components.options.OptionsForACA;
-import irt.controllers.components.options.OptionsForACB;
-import irt.controllers.components.options.OptionsForAEN;
-import irt.controllers.components.options.OptionsForAFL;
-import irt.controllers.components.options.OptionsForAKT;
-import irt.controllers.components.options.OptionsForASW;
-import irt.controllers.components.options.OptionsForAWG;
-import irt.controllers.components.options.OptionsForACO;
 import irt.controllers.components.validators.Validator;
 import irt.controllers.components.validators.Validator0;
 import irt.controllers.components.validators.Validator00A;
 import irt.controllers.components.validators.Validator00C;
 import irt.controllers.components.validators.Validator0CB;
 import irt.controllers.components.validators.Validator0CO;
-import irt.entities.ArrayEntityRepository;
 import irt.entities.builders.EntityBuilder;
 import irt.entities.builders.EntityBuilder0;
 import irt.entities.builders.EntityBuilder00A;
@@ -36,13 +27,14 @@ import irt.entities.builders.EntityBuilder0CO;
 import irt.entities.builders.EntityBuilderA;
 import irt.entities.builders.EntityBuilderACA;
 import irt.entities.builders.EntityBuilderACB;
+import irt.entities.builders.EntityBuilderACO;
 import irt.entities.builders.EntityBuilderAEN;
 import irt.entities.builders.EntityBuilderAFL;
 import irt.entities.builders.EntityBuilderAKT;
 import irt.entities.builders.EntityBuilderASW;
 import irt.entities.builders.EntityBuilderAWG;
-import irt.entities.builders.EntityBuilderACO;
 import irt.entities.builders.EntityBuilderAbstract;
+import irt.entities.repository.ArrayEntityRepository;
 
 @Configuration
 public class BeanDeclarations {
@@ -73,20 +65,22 @@ public class BeanDeclarations {
 	@Bean(name={"validator10C", "validator00C"})@Lazy public Validator validator10C(){ return new Validator00C(); }
 	@Bean(name={"validator1CO", "validator0CO"})@Lazy public Validator validator1CO(){ return new Validator0CO(); }
 
-	//Part Number options
+	//Part Number HTML options
 	@Bean(name={"optionsFor1", "optionsFor0"})		@Lazy public OptionFor	option1(){ return new OptionsFor0((EntityBuilderAbstract)entityBuilder1()); }
 	@Bean(name={"optionsFor1CB", "optionsFor0CB"})	@Lazy public OptionFor	option1CB(){ return new OptionsFor0CB((EntityBuilderAbstract)entityBuilder1CB()); }
 	@Bean(name={"optionsFor10A", "optionsFor00A"})	@Lazy public OptionFor	option10A(){ return new OptionsFor00A((EntityBuilderAbstract)entityBuilder10A()); }
 	@Bean(name={"optionsFor10C", "optionsFor00C"})	@Lazy public OptionFor	option10C(){ return new OptionsFor00C((EntityBuilderAbstract)entityBuilder10C()); }
 	@Bean(name={"optionsFor1CO", "optionsFor0CO"})	@Lazy public OptionFor	option1CO(){ return new OptionsFor0CO((EntityBuilderAbstract)entityBuilder1CO()); }
 
-	@Bean(name={"optionsFor2", "optionsForA"})		@Lazy public OptionFor	optionA(){ return new OptionsForA(); }
-	@Bean(name={"optionsFor2CA", "optionsForACA"})	@Lazy public OptionFor	optionACA(){ return new OptionsForACA(); }
-	@Bean(name={"optionsFor2CB", "optionsForACB"})	@Lazy public OptionFor	optionACB(){ return new OptionsForACB(); }
-	@Bean(name={"optionsFor2CO", "optionsForACO"})	@Lazy public OptionFor	optionACO(){ return new OptionsForACO(); }
-	@Bean(name={"optionsFor2EN", "optionsForAEN"})	@Lazy public OptionFor	optionAEN(){ return new OptionsForAEN(); }
-	@Bean(name={"optionsFor2KT", "optionsForAKT"})	@Lazy public OptionFor	optionAKT(){ return new OptionsForAKT(); }
-	@Bean(name={"optionsFor2SW", "optionsForASW"})	@Lazy public OptionFor	optionASW(){ return new OptionsForASW(); }
-	@Bean(name={"optionsFor2FL", "optionsForAFL"})	@Lazy public OptionFor	optionAFL(){ return new OptionsForAFL(); }
-	@Bean(name={"optionsFor2WG", "optionsForAWG"})	@Lazy public OptionFor	optionAWG(){ return new OptionsForAWG(); }
+	@Bean(
+			name={
+					"optionsFor2", "optionsForA",
+					"optionsFor2CA", "optionsForACA",
+					"optionsFor2CB", "optionsForACB",
+					"optionsFor2CO", "optionsForACO",
+					"optionsFor2EN", "optionsForAEN",
+					"optionsFor2KT", "optionsForAKT",
+					"optionsFor2SW", "optionsForASW",
+					"optionsFor2FL", "optionsForAFL",
+					"optionsFor2WG", "optionsForAWG"})		@Lazy public OptionFor	optionA(){ return new OptionsForA(); }
 }

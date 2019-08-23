@@ -17,17 +17,17 @@ import org.springframework.stereotype.Component;
 import irt.controllers.components.interfaces.OptionFor;
 import irt.controllers.components.interfaces.ValueText;
 import irt.entities.ArrayEntity;
-import irt.entities.ArrayEntityRepository;
 import irt.entities.ArrayNameEntity;
 import irt.entities.ClassIdHasArrayEntity;
 import irt.entities.FirstDigitsHasArrayNamesEntity;
-import irt.entities.FirstDigitsHasArrayNamesEntityRepository;
 import irt.entities.ManufactureEntity;
-import irt.entities.ManufactureRepository;
 import irt.entities.SecondAndThirdDigitEntity;
 import irt.entities.SecondAndThirdDigitPK;
-import irt.entities.SecondAndThirdDigitRepository;
 import irt.entities.builders.EntityBuilderAbstract;
+import irt.entities.repository.ArrayEntityRepository;
+import irt.entities.repository.FirstDigitsHasArrayNamesEntityRepository;
+import irt.entities.repository.ManufactureRepository;
+import irt.entities.repository.SecondAndThirdDigitRepository;
 
 @Component
 @Scope("session")
@@ -86,5 +86,10 @@ public class OptionsFor0 implements OptionFor{
 		List<ManufactureEntity> entities = manufactureRepository.findAll( Sort.by("name"));
 		if(entities!=null)
 			options[MFR] = entities.toArray(new ValueText[0]);
+	}
+
+
+	@Override
+	public void updateOptions(String partNumber) {
 	}
 }

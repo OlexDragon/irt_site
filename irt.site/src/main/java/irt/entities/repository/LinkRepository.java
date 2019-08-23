@@ -1,8 +1,10 @@
 
-package irt.entities;
+package irt.entities.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import irt.entities.LinkEntity;
 
 public interface LinkRepository extends JpaRepository<LinkEntity, Long> {
 

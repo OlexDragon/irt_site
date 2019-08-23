@@ -5,11 +5,11 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import irt.controllers.components.PartNumberForm;
-import irt.entities.FirstDigitsRepository;
 import irt.entities.IrtComponentEntity;
-import irt.entities.IrtComponentRepository;
 import irt.entities.ManufactureEntity;
-import irt.entities.ManufactureRepository;
+import irt.entities.repository.FirstDigitsRepository;
+import irt.entities.repository.IrtComponentRepository;
+import irt.entities.repository.ManufactureRepository;
 
 public class EntityBuilder0 extends EntityBuilderAbstract{
 

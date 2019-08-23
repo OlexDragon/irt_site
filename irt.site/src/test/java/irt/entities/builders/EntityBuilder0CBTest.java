@@ -18,8 +18,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import irt.IrtSiteApp;
 import irt.controllers.components.PartNumberForm;
 import irt.entities.IrtComponentEntity;
-import irt.entities.IrtComponentRepository;
 import irt.entities.ManufactureEntity;
+import irt.entities.repository.IrtComponentRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = IrtSiteApp.class)

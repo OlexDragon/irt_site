@@ -30,7 +30,7 @@
 					<input type="submit" name="submit_show_part_number" id="submit_show_part_number" value="Show Part Number" />
 					<input type="submit" name="submit-search" id="submit-search" value="Search" />
 					<input type="submit" name="submit-reset" id="submit-reset" value="Reset"/>
-					<input type="submit" name="submit-add" id="submit-add" value="Add" th:if="${error}==null and *{partNumber}!=null and not *{#strings.contains(partNumber, '_')}" />
+					<input type="submit" name="submit-add" id="submit-add" value="Add" th:if="${error}==null and *{isFilled}!=null and not *{#strings.contains(partNumber, '_')}" />
 					<input type="submit" name="submit-update" id="submit-update" value="Update" th:if="${error}==null and *{id}!=null"/><br/><br/>
 
 					<th:block th:each="f,s:${fields}">

@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import irt.controllers.components.validators.Validator;
-import irt.entities.FirstDigitsRepository;
 import irt.entities.IrtComponentEntity;
-import irt.entities.IrtComponentRepository;
 import irt.entities.builders.EntityBuilder;
+import irt.entities.repository.FirstDigitsRepository;
+import irt.entities.repository.IrtComponentRepository;
 
 @Service
 public class PartNumberService {
@@ -121,7 +121,12 @@ public class PartNumberService {
 		return errorMessage==null;
 	}
 
-	private Optional<IrtComponentEntity>	findEntityByPN	(PartNumberForm partNumberForm) { return Optional.ofNullable(partNumberForm.getPartNumber()).map(pn->pn.replaceAll("[-\\s]", "")).filter(pn->!pn.isEmpty()).map(componentRepository::findOneByPartNumber); }
+	private Optional<IrtComponentEntity>	findEntityByPN	(PartNumberForm partNumberForm) {
+		return Optional.ofNullable(partNumberForm.getPartNumber())
+				.map(pn->pn.replaceAll("[-\\s]", ""))
+				.filter(pn->!pn.isEmpty())
+				.map(componentRepository::findOneByPartNumber); }
+
 	private Optional<IrtComponentEntity>	findEntityById	(PartNumberForm partNumberForm) { return Optional.ofNullable(partNumberForm.getId()).flatMap(componentRepository::findById); }
 	private Validator			getValidator	(PartNumberForm partNumberForm) { return (Validator) applicationContext.getBean("validator" + getExt(partNumberForm)); }
 	private EntityBuilder		getBuilder		(PartNumberForm partNumberForm) { return (EntityBuilder) applicationContext.getBean("entityBuilder" + getExt(partNumberForm)); }

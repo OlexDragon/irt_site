@@ -8,4 +8,5 @@ import irt.entities.ArrayEntity;
 public interface OptionFor {
 	ValueText[][] getOptions();
 	List<ArrayEntity> getFields();
+	void updateOptions(String partNumber);
 }

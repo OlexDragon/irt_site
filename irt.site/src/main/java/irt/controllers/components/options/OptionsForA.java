@@ -1,7 +1,8 @@
 package irt.controllers.components.options;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
@@ -13,15 +14,15 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import irt.beans.ValueTextImpl;
+import irt.beans.assemblies.AssembliesRevisionBean;
 import irt.controllers.components.interfaces.OptionFor;
 import irt.controllers.components.interfaces.ValueText;
 import irt.entities.ArrayEntity;
-import irt.entities.ArrayEntityRepository;
-import irt.entities.ArrayNameEntity;
-import irt.entities.ClassIdHasArrayEntity;
-import irt.entities.FirstDigitsHasArrayNamesEntityRepository;
-import irt.entities.SecondAndThirdDigitPK;
-import irt.entities.SecondAndThirdDigitRepository;
+import irt.entities.repository.ArrayEntityRepository;
+import irt.entities.repository.FirstDigitsHasArrayNamesEntityRepository;
+import irt.entities.repository.IrtComponentRepository;
+import irt.entities.repository.SecondAndThirdDigitRepository;
 
 @Component
 @Scope("session")
@@ -32,26 +33,20 @@ public class OptionsForA implements OptionFor{
 	@Autowired @Lazy protected FirstDigitsHasArrayNamesEntityRepository firstDigitsHasArrayNamesEntityRepository;
 	@Autowired @Lazy protected SecondAndThirdDigitRepository secondAndThirdDigitRepository;
 	@Autowired @Lazy protected ArrayEntityRepository arrayEntityRepository;
+	@Autowired @Lazy protected IrtComponentRepository irtComponentRepository;
 
 	private final Integer FIRST_ID = 2;
-	private final int LENGTH = 3;
-	private final String SECOND_ID;
+	private final int LENGTH	= 3;
+	private final int OPTION	= 1;
+	private final int REVISION	= 2;
 
 	protected ValueText[][]		options;			  public ValueText[][] getOptions()		{ return options; }
 	protected List<ArrayEntity>	fields; 	@Override public List<ArrayEntity> getFields()	{ return fields; }
-
-
-	public OptionsForA() { this(null); }
-	public OptionsForA(String secondId) {
-
-		SECOND_ID = secondId;
-	}
 
 	@PostConstruct
 	private void fillProperties(){
 
 		setFields();
-		setFieldOptions();
 	}
 
 	@Transactional
@@ -59,28 +54,36 @@ public class OptionsForA implements OptionFor{
 
 		options = new ValueText[LENGTH][0];
 
-		if(SECOND_ID==null){
-			firstDigitsHasArrayNamesEntityRepository.findById(FIRST_ID)
-			.ifPresent(entity->fields = entity.getArrayNameEntity().getArrayEntities());
-		}else{
-			final SecondAndThirdDigitPK id = new SecondAndThirdDigitPK(SECOND_ID, FIRST_ID);
-//			logger.error(id);
-			secondAndThirdDigitRepository.findById(id)
-			.ifPresent(
-					entity->{
-						logger.error("setFields() \n{}", entity);
-						fields = entity.getHasArrayEntity()
-								.flatMap(ClassIdHasArrayEntity::getArrayNameEntity)
-								.map(ArrayNameEntity::getArrayEntities)
-								.orElseGet(
-										()->{
-											logger.warn("setFields(): Database doesn't have ArrayNameEntity.\nClassIdHasArrayEntity or ArrayNameEntity equals NULL {}", entity);
-											return new ArrayList<>();
-										});
-					});
-		}
+		firstDigitsHasArrayNamesEntityRepository.findById(FIRST_ID).ifPresent(entity->fields = entity.getArrayNameEntity().getArrayEntities());
 	}
 
-	protected void setFieldOptions() {
+	@Override
+	public void updateOptions(String partNumber) {
+		Optional.ofNullable(partNumber).map(pn->pn.replaceAll("[-_]", "")).filter(pn->!pn.isEmpty())
+		.ifPresent(
+				pn->{
+
+					int count = 0;
+					//Remove revision
+					if(pn.length()>9) {
+						pn = pn.substring(0, 9);
+						count = irtComponentRepository.findByPartNumberStartingWith(pn).size();
+					}
+
+					options[REVISION] = IntStream.rangeClosed(1, ++count).mapToObj(AssembliesRevisionBean::new).toArray(ValueText[]::new);
+
+					
+					//Remove revision
+					if(pn.length()>8) {
+						pn = pn.substring(0, 8);
+						count = irtComponentRepository.findByPartNumberStartingWith(pn).size();
+					}else
+						count = 0;
+
+					if(count>8)	//only one digit is used
+						count = 8;
+
+					options[OPTION] = IntStream.rangeClosed(1, ++count).mapToObj(ValueTextImpl::new).toArray(ValueText[]::new);
+				});
 	}
 }
