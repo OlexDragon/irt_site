@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import irt.entities.LinkEntity;
-import irt.entities.LinkRepository;
+import irt.entities.repository.LinkRepository;
 
 @RestController
 public class RestFileWorker {

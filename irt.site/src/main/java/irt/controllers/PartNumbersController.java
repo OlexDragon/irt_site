@@ -27,8 +27,8 @@ import irt.controllers.components.interfaces.ValueText;
 import irt.entities.ArrayEntity;
 import irt.entities.FirstDigitsEntity;
 import irt.entities.IrtComponentEntity;
-import irt.entities.IrtComponentRepository;
 import irt.entities.SecondAndThirdDigitEntity;
+import irt.entities.repository.IrtComponentRepository;
 
 @Controller
 @RequestMapping({"part-numbers", "irt/part-numbers"})
@@ -75,7 +75,7 @@ public class PartNumbersController {
 								HttpServletResponse response,
 								Model model){
 
-//		logger.error(form);
+		logger.error(form);
 		partNumberService.fillForm(form);
 //		logger.error(form);
 
@@ -183,34 +183,36 @@ public class PartNumbersController {
 
 	private List<SecondAndThirdDigitEntity> secondList(Integer first){ return secondDigitsService.setSecondDigitsEntities( first, partNumberComponent);}
 
-	/**
-	 * @param partNumbetForm
-	 * @param first - first part number digit 
-	 * @param second - second and third part number letters
-	 * @param model
-	 */
 	private void addAttributes( PartNumberForm form, Model model) {
 
 		Integer first = form.getFirst();
 		String second = form.getSecond();
 
 		model.addAttribute("secondList", secondList(first));
-		options(first, second, model);
+		options(first, second, form.getPartNumber(), model);
 
 		partNumberComponent.setPartNumberForm(form);
 		model.addAttribute("title", partNumberComponent.getPageTitle());
 	}
 
-	private void options(Integer first, String second, Model model) {
+	/**
+	 * @param partNumbetForm
+	 * @param first - first part number digit 
+	 * @param second - second and third part number letters
+	 * @param string 
+	 * @param model
+	 */
+	private void options(Integer first, String second, String partNumber, Model model) {
 
 		ValueText[][] options;
 		List<ArrayEntity> fields;
 
 		if(first!=null) {
-			String beanName = "optionsFor" + first + (second!=null ? second : "");
-			OptionFor bean = (OptionFor) applicationContext.getBean(beanName);
-			fields = bean.getFields();
-			options = bean.getOptions();
+			String beanName = Optional.ofNullable(second).map(sec->"optionsFor" + first + sec).orElse("optionsFor" + first);
+			OptionFor optionFor = (OptionFor) applicationContext.getBean(beanName);
+			optionFor.updateOptions(partNumber);
+			fields = optionFor.getFields();
+			options = optionFor.getOptions();
 		}else{
 			fields = null;
 			options = null;

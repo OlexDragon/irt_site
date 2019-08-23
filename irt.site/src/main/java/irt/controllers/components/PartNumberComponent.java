@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import irt.controllers.components.interfaces.FirstDiditsList;
 import irt.controllers.components.interfaces.SecondDiditsList;
 import irt.entities.FirstDigitsEntity;
-import irt.entities.FirstDigitsRepository;
 import irt.entities.SecondAndThirdDigitEntity;
+import irt.entities.repository.FirstDigitsRepository;
 
 @Component
 @Scope("session")

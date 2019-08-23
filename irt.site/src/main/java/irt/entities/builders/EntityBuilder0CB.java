@@ -6,9 +6,9 @@ import java.math.RoundingMode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import irt.controllers.components.PartNumberForm;
-import irt.entities.FirstDigitsRepository;
 import irt.entities.IrtComponentEntity;
-import irt.entities.ManufactureRepository;
+import irt.entities.repository.FirstDigitsRepository;
+import irt.entities.repository.ManufactureRepository;
 
 public class EntityBuilder0CB extends EntityBuilder0{
 

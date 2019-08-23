@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import irt.entities.SecondAndThirdDigitEntity;
-import irt.entities.SecondAndThirdDigitRepository;
+import irt.entities.repository.SecondAndThirdDigitRepository;
 
 @Service
 public class PartNumberSecondDigitsService {
