@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<style type="text/css">
+* {
+  box-sizing: border-box;
+}
+.m0{
+  margin: 0;
+}
+.mt0{
+  margin-top: 0;
+}
+.mb0{
+  margin-bottom: 0;
+}
+.p0{
+  padding: 0;
+}
+.pt0{
+  padding-top: 0;
+}
+header {
+  background-color: #F1F1F1;
+  text-align: center;
+  padding: 2px;
+}
+.column {
+  float: left;
+  padding: 5px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+</head>
+<body>
+	<h4>This is an automatically generated message. Do not reply to this message.</h4>
+	<h4 th:inline="text">A new ECO has been written. [[${user.firstname}]] [[${user.lastname}]] is requesting your approval. <a href="#" th:href="${host} + '/engineering/eco/' + ${eco.number}" >To approve this ESO click on this link.</a></h4>
+    <header><h3 th:text="'ECO #' + ${eco.number} + '; ' + ${eco.reason}">ECO #7; The reason for the change will be here.</h3></header>
+
+	<div>
+		<h6 class="mb0">ECO related to:</h6>
+		<div class="row"  th:each="relatedTo : ${eco.ecoRelatedTo}">
+			<div class="column"><h4 class="mt0" th:text="${relatedTo.idEcoRelatedTo.partNumber.partNumber}">0CO-020MSC-0241</h4></div>
+			<div class="column"><p class="mt0" th:text="${relatedTo.idEcoRelatedTo.partNumber.description}">Some Text</p></div>
+		</div>
+	</div>
+
+	<div>
+		<h6 class="mt0 mb0">Description of changes:</h6>
+		<div><p class="mt0" th:text="${eco.description}">Some Text</p></div>
+	</div>
+
+	<div>
+		<h6 class="mt0 mb0">Files attached to this ECO.:</h6>
+		<div th:if="${not #lists.isEmpty(eco.ecoFiles)}" th:each="file : ${eco.ecoFiles}"><p class="m0"><a href="#" th:text="${file.name}">File 1</a></p></div>
+		<div th:remove="all"><p class="m0"><a href="#">File 2</a></p></div>
+	</div>
+</body>
+</html>

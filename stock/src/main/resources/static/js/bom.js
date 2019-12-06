@@ -55,7 +55,7 @@ $('#savePOSelect').change(function() {
 
 //Add dashes to the part numbers
 $('#pns_out > option').each(function() {
-	option = $(this);
+	option = $(this); 
 	option.text(partNumberAddDashes(option.text()));
 });
 

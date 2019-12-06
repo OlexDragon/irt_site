@@ -2,9 +2,8 @@ package irt.stock.rest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,7 @@ import irt.stock.data.jpa.repositories.PartNumberRepository;
 @RestController
 @RequestMapping("/pn")
 public class PartNumberRestController {
-	private final static Logger logger = LogManager.getLogger();
+//	private final static Logger logger = LogManager.getLogger();
 
 	@Autowired private PartNumberRepository partNumberRepository;
 	@Autowired private ComponentRepository componentRepository;
@@ -28,8 +27,21 @@ public class PartNumberRestController {
 	public List<Component> postPartNambers(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
 
 		String pn = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
-		logger.debug("desiredPN: {}; pn: {}", desiredPN, pn);
 		return componentRepository.findDistinctByPartNumberContainingOrManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(pn, desiredPN, pn);
+	}
+
+	@PostMapping("/limit15")
+	public List<PartNumber> postPartNambersWithLimit15(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
+
+		String pn = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
+		return partNumberRepository.findFirst15ByPartNumberContainingOrderByPartNumber(pn);
+	}
+
+	@PostMapping("/limit20")
+	public List<PartNumber> postPartNambersWithLimit20(@RequestParam(name="desiredPN", required=false, defaultValue="")String desiredPN){
+
+		String pn = desiredPN.toUpperCase().replaceAll("[^A-Z0-9_%]", "");
+		return partNumberRepository.findFirst20ByPartNumberContainingOrderByPartNumber(pn);
 	}
 
 	@RequestMapping("like")
@@ -60,5 +72,24 @@ public class PartNumberRestController {
 	@PostMapping("testConnection")
 	public Boolean testConnection(){
 		return true;
+	}
+
+	@RequestMapping("new/revision")
+	public Integer getNewRevision(@RequestParam String partNumber){
+
+		String upperCase = partNumber.toUpperCase();
+		final int length = upperCase.length();
+		final int revIndex = length-3;
+
+		if(upperCase.length()<3 || upperCase.charAt(revIndex)!='R')
+			return null;
+
+		OptionalInt max = partNumberRepository.findByPartNumberLikeOrderByPartNumber(upperCase.substring(0, revIndex) + '%').parallelStream()
+		.map(PartNumber::getPartNumber)
+		.map(pn->pn.substring(revIndex+1))
+		.mapToInt(Integer::parseInt)
+		.max();
+
+		return max.orElse(0) + 1;
 	}
 }

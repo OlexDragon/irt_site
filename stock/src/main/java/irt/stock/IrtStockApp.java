@@ -25,5 +25,4 @@ public class IrtStockApp {
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(IrtStockApp.class, args);
 	}
-
 }

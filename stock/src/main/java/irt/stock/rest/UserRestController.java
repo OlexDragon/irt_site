@@ -30,18 +30,18 @@ public class UserRestController {
 			@RequestParam(required=false) Long userId,
 			@RequestParam String username,
 			@RequestParam String password,
-			@RequestParam(required=false) String firstName,
-			@RequestParam(required=false) String lastName,
+			@RequestParam(required=false) String firstname,
+			@RequestParam(required=false) String lastname,
 			@RequestParam(required=false) String extension,
 			@RequestParam(required=false) String email,
 			@RequestParam(required=false) User.Status status,
 			@RequestParam(name="permission[]") UserRoles[] permission){
 
-		return Optional.ofNullable(userId).map(editUser(username, password, firstName, lastName, extension, email, permission, status))
-				.orElseGet(addUser(username, password, firstName, lastName, extension, email, permission, status));
+		return Optional.ofNullable(userId).map(editUser(username, password, firstname, lastname, extension, email, permission, status))
+				.orElseGet(addUser(username, password, firstname, lastname, extension, email, permission, status));
 	}
 
-	private Supplier<? extends Boolean> addUser(String username, String password, String firstName, String lastName, String extension, String email, UserRoles[] permission, Status status) {
+	private Supplier<? extends Boolean> addUser(String username, String password, String firstname, String lastname, String extension, String email, UserRoles[] permission, Status status) {
 		return ()->{
 
 			try{
@@ -50,7 +50,7 @@ public class UserRestController {
 					return false;
 
 				long roles = UserRoles.toLong(permission);
-				final User user = new User(username, encodeToString(password), firstName, lastName, roles, extension, email, status);
+				final User user = new User(username, encodeToString(password), firstname, lastname, roles, extension, email, status);
 				userRepository.save(user);
 
 			}catch (Exception e) {
@@ -61,7 +61,7 @@ public class UserRestController {
 		};
 	}
 
-	private Function<Long, Boolean> editUser(String username, String password, String firstName, String lastName, String extension, String email, UserRoles[] userRoles, Status status) {
+	private Function<Long, Boolean> editUser(String username, String password, String firstname, String lastname, String extension, String email, UserRoles[] userRoles, Status status) {
 		return userId->{
 
 			final Optional<User> oUser = userRepository.findById(userId);
@@ -75,8 +75,8 @@ public class UserRestController {
 
 				user.setEmail(email);
 				user.setExtension(extension);
-				user.setFirstName(firstName);
-				user.setLastName(lastName);
+				user.setFirstname(firstname);
+				user.setLastname(lastname);
 				user.setPermission(UserRoles.toLong(userRoles));
 				user.setStatus(status);
 				user.setUsername(username);

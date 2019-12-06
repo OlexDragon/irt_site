@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,7 +23,15 @@ public class UserPrincipal implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return user.getPassword().equals("?") ? new ArrayList<>() : UserRoles.getAuthorities(user.getPermission());
+		boolean noPassword = user.getPassword().equals("?");
+		if(noPassword) {
+			LogManager.getLogger().warn("The user '{}' does not have password.", user.getUsername());
+			return new ArrayList<>();
+		}
+
+		Collection<? extends GrantedAuthority> authorities = UserRoles.getAuthorities(user.getPermission());
+
+		return authorities;
 	}
 
 	@Override

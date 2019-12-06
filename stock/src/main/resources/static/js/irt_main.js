@@ -42,6 +42,22 @@ function dropToBomMenu(ev)  {
     	alert('Part Number should start with "PCA..."')
 	}
 }
+//Search for the first fifteen part numbers containing 'str', search result returned by 'callback(array)' function.
+function first15PartNumbersContains(str, callback){
+	$.post("/pn/limit15", {desiredPN: str})
+		.done(function(pns) { callback(pns); })
+		.fail(function(error) {
+			alert('"partNumbers"\n' + error.responseText);
+		});
+}
+//Search for the first twenty part numbers containing 'str', search result returned by 'callback(array)' function.
+function first20PartNumbersContains(str, callback){
+	$.post("/pn/limit20", {desiredPN: str})
+		.done(function(pns) { callback(pns); })
+		.fail(function(error) {
+			alert('"partNumbers"\n' + error.responseText);
+		});
+}
 
 //function keyFilter(){
 //	alert('Yee');
