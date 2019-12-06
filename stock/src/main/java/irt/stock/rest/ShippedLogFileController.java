@@ -26,12 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import irt.stock.data.jpa.beans.PartNumber;
 import irt.stock.data.jpa.beans.production.CustomerOrder;
+import irt.stock.data.jpa.beans.production.CustomerOrderRepository;
 import irt.stock.data.jpa.beans.production.ProductionUnit;
+import irt.stock.data.jpa.beans.production.ProductionUnitRepository;
 import irt.stock.data.jpa.beans.production.SoftwareBuild;
+import irt.stock.data.jpa.beans.production.SoftwareBuildRepository;
 import irt.stock.data.jpa.repositories.PartNumberRepository;
-import irt.stock.data.jpa.repositories.production.CustomerOrderRepository;
-import irt.stock.data.jpa.repositories.production.ProductionUnitRepository;
-import irt.stock.data.jpa.repositories.production.SoftwareBuildRepository;
 import irt.stock.rest.helpers.ShippedLogHelper;
 
 @RestController

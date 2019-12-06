@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 
 import irt.stock.data.jpa.beans.PartNumber;
@@ -75,7 +75,7 @@ public class ShippedLogHelper {
 
 		return ofNullable
 				.filter(c->c.getCellType()==CellType.NUMERIC)
-				.filter(HSSFDateUtil::isCellDateFormatted)
+				.filter(DateUtil::isCellDateFormatted)
 				.map(Cell::getDateCellValue)
 				.map(Optional::of)
 				.orElseGet(()->{

@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 <th:block th:replace="home::links">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-	<link rel="stylesheet" href="/css/irt.css" >
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
 </th:block>
+	<link rel="stylesheet" href="../../static/css/irt.css" th:href="@{/css/irt.css}" >
 <style type="text/css"> .table_head{ cursor: pointer; } </style>
 </head>
     <body>
@@ -49,12 +49,10 @@
 				</div>
 				<form>
 				<div class="row p-2">
-					<select id="pns_out" name="pns_out" class="form-control w-100"
-						multiple="multiple" size="15" style="overflow-y: auto;">
+					<select id="pns_out" name="pns_out" class="form-control w-100" multiple="multiple" size="15" style="overflow-y: auto;">
 						<option class="font-weight-bold text-secondary"
 							sec:authorize="isAuthenticated()" th:each="pn : ${partNumbers}"
-							th:value="${pn.id}" th:text="${pn.partNumber}">Part
-							Number</option>
+							th:value="${pn.id}" th:text="${pn.partNumber}">Part Number</option>
 					</select>
 				</div>
 				<input id="selected_bom_component" type="hidden">
@@ -81,7 +79,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 </th:block>
-<script sec:authorize="isAuthenticated()" src="../static/js/bom.js" th:src="@{/js/bom.js}" type="text/javascript"></script>
+<script sec:authorize="isAuthenticated()" src="../../static/js/bom.js" th:src="@{/js/bom.js}" type="text/javascript"></script>
 <script type="text/javascript">
 	$('#bomMenu').addClass('active');
 	//# sourceURL=bom-inline.js

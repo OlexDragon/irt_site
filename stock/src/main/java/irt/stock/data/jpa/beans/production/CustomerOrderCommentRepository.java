@@ -1,10 +1,8 @@
-package irt.stock.data.jpa.repositories.production;
+package irt.stock.data.jpa.beans.production;
 
 import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
-
-import irt.stock.data.jpa.beans.production.CustomerOrderComment;
 
 public interface CustomerOrderCommentRepository extends CrudRepository<CustomerOrderComment, Long> {
 

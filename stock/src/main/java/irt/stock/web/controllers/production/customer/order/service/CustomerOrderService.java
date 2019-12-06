@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import irt.stock.data.jpa.beans.production.CustomerOrder;
-import irt.stock.data.jpa.repositories.production.CustomerOrderRepository;
-import irt.stock.data.jpa.repositories.production.ProductionUnitRepository;
+import irt.stock.data.jpa.beans.production.CustomerOrderRepository;
+import irt.stock.data.jpa.beans.production.ProductionUnitRepository;
 import irt.stock.web.beans.CustomerOrderWeb;
 import irt.stock.web.controllers.production.customer.order.filters.SearchByDateFilter;
 import irt.stock.web.controllers.production.customer.order.filters.SearchByOrderNumberFilter;

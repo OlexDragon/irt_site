@@ -30,6 +30,16 @@
 							<a id="coMenu" class="dropdown-item" href="/production/co">Customer Orders</a>
 							<a id="scanLogFile" class="dropdown-item" href="#" sec:authorize="hasAuthority('SCAN_LOG_FILE')">Scan Shipped Log.xlsx</a>
 					    </div>
+           			</li>
+
+<!--/* ENGINEERING MENU */-->
+           			<li id='engineeringMenu' class="nav-item dropdown">
+           				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Engineering</a>
+						<div class="dropdown-menu">
+							<a id="newEcoMenu" class="dropdown-item" href="/engineering/eco/new" sec:authorize="hasAuthority('ENGINEERING_ECO')" >Engineering Change Request</a>
+							<a id="ecoMenu" class="dropdown-item" href="/engineering/eco">Engineering Change Orders</a>
+					    </div>
+           			</li>
 
 <!--/* STOCK MENU */-->
            			<li id='stockMenu' class="nav-item dropdown">

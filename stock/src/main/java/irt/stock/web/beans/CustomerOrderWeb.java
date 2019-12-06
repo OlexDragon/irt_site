@@ -13,8 +13,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import irt.stock.data.jpa.beans.production.CustomerOrder;
 import irt.stock.data.jpa.beans.production.CustomerOrder.CustomerOrderStatus;
-import irt.stock.data.jpa.repositories.production.ProductionUnitRepository;
 import irt.stock.data.jpa.beans.production.ProductionUnit;
+import irt.stock.data.jpa.beans.production.ProductionUnitRepository;
 
 public class CustomerOrderWeb {
 

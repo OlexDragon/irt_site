@@ -33,11 +33,11 @@
 						<input id="u_password" name="u_password" type="password" class="form-control" required="required" placeholder="Password" th:value="${user!=null ? (user.password=='?' ? user.password : user.decodedPassword) : ''}">
 					</div>
 					<div class="input-group">
-						<input id="f_name" name="f_name" type="text" class="form-control" placeholder="First Name" th:value="${user!=null ? user.firstName : ''}">
+						<input id="f_name" name="f_name" type="text" class="form-control" placeholder="First Name" th:value="${user!=null ? user.firstname : ''}">
 						<div class="input-group-prepend">
 							<div class="input-group-text"> </div>
 						</div>
-						<input id="l_name" name="l_name" type="text" class="form-control" placeholder="Last Name" th:value="${user!=null ? user.lastName : ''}">
+						<input id="l_name" name="l_name" type="text" class="form-control" placeholder="Last Name" th:value="${user!=null ? user.lastname : ''}">
 					</div>
 					<div class="input-group">
 						<input id="u_extension" name="u_extension" type="text" class="form-control" placeholder="Extension" th:value="${user!=null ? user.extension : ''}">
@@ -100,7 +100,7 @@
 				user['username'] 	= $('#u_name').val();
 				user['password'] 	= $('#u_password').val();
 				user['firstName'] 	= $('#f_name').val();
-				user['lastName'] 	= $('#l_name').val();
+				user['lastname'] 	= $('#l_name').val();
 				user['extension'] 	= $('#u_extension').val();
 				user['email'] 		= $('#u_email').val();
 				user['status'] 		= $('#u_status option:selected').val();

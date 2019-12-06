@@ -9,6 +9,8 @@ import irt.stock.data.jpa.beans.PartNumber;
 
 public interface PartNumberRepository extends CrudRepository<PartNumber, Long> {
 
+	List<PartNumber> findFirst15ByPartNumberContainingOrderByPartNumber(String desiredPN);
+	List<PartNumber> findFirst20ByPartNumberContainingOrderByPartNumber(String desiredPN);
 	List<PartNumber> findByPartNumberContainingOrManufPartNumberContainingOrderByPartNumber(String desiredPN, String mfrPn);
 	List<PartNumber> findByPartNumberLikeOrderByPartNumber(String desiredPN);
 	Optional<PartNumber> findByPartNumber(String partNamber);

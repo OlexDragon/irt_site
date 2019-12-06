@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="en">
+<head>
+<title>ECR</title>
+
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<th:block th:replace="home::links">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}">
+</th:block>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" th:href="@{/webjars/jquery-ui/1.12.1/jquery-ui.css}">
+<link rel="stylesheet" href="../../../static/css/irt.css" th:href="@{/css/irt.css}">
+<script src="../../../static/js/irt_main.js" type="text/javascript" th:remove="ALL"></script>
+<script type="text/javascript" th:remove="ALL">
+	//This script use only for tect
+	function autocompletePNs(input) {
+		if (input) {
+			return [ {
+				id : 1,
+				partNumber : "ACA000002R01",
+				description : "Description #1"
+			}, {
+				id : 2,
+				partNumber : "ACA000091R01",
+				description : "Description #2"
+			}, {
+				id : 3,
+				partNumber : "ACB000012R01",
+				description : "Description #3"
+			}, {
+				id : 4,
+				partNumber : "ACO000031R02",
+				description : "Description #4"
+			}, {
+				id : 5,
+				partNumber : "AEN000043R01",
+				description : "Description #5"
+			}, {
+				id : 6,
+				partNumber : "APS0005301R01",
+				description : "Description #6"
+			}, {
+				id : 7,
+				partNumber : "AWG000301R01",
+				description : "Description #7"
+			}, {
+				id : 8,
+				partNumber : "MBR0059IC01R01",
+				description : "Description #8"
+			}, {
+				id : 9,
+				partNumber : "MBR0313CW01R01",
+				description : "Description #9"
+			}, {
+				id : 10,
+				partNumber : "MBR0433CW01R01",
+				description : "Description #10"
+			}, {
+				id : 11,
+				partNumber : "MBR0670CW01R02",
+				description : "Description #11"
+			}, {
+				id : 12,
+				partNumber : "MBR0757CW01R01",
+				description : "Description #12"
+			}, {
+				id : 13,
+				partNumber : "MBR0864IC01R03",
+				description : "Description #13"
+			}, {
+				id : 14,
+				partNumber : "MBR0918IC01R01",
+				description : "Description #14"
+			}, {
+				id : 15,
+				partNumber : "MBR1034IC01R02",
+				description : "Description #15"
+			}, {
+				id : 16,
+				partNumber : "MCA0032PS01R02",
+				description : "Description #16"
+			}, {
+				id : 17,
+				partNumber : "MCA1113PN01R01",
+				description : "Description #17"
+			}, {
+				id : 18,
+				partNumber : "MCV0082IC01R01",
+				description : "Description #18"
+			}, {
+				id : 19,
+				partNumber : "PCA00258HPS00R01",
+				description : "Description #19"
+			}, {
+				id : 20,
+				partNumber : "PCA0057RGINPTR01",
+				description : "Description #20"
+			}, {
+				id : 21,
+				partNumber : "PCB00018HGEN0R01",
+				description : "Description #21"
+			}, {
+				id : 22,
+				partNumber : "PCB00208HMP00R01",
+				description : "Description #22"
+			}, {
+				id : 23,
+				partNumber : "PCB00478HPS00R02",
+				description : "Description #23"
+			}, {
+				id : 24,
+				partNumber : "PCB00688HPS00R01",
+				description : "Description #23"
+			}, {
+				id : 25,
+				partNumber : "PCB0088RGGEN0R01",
+				description : "Description #25"
+			}, {
+				id : 26,
+				partNumber : "PGB0009RGINPTR01",
+				description : "Description #26"
+			} ].filter(function(value) {
+				return value.partNumber.indexOf(input) > -1;
+			});
+		} else
+			return null;
+	}
+	//# sourceURL=new-eco-only-for-test.js
+</script>
+<!-- <style type="text/css"> html,body { height:100%; margin:0; } </style> -->
+</head>
+<body>
+
+	<!--/* HEADER will be replaced */-->
+	<header th:replace="login::header">
+		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+			<a class="navbar-brand" href="http://irttechnologies:8080/irt/">IRT
+				Technologies</a> <a class="navbar-brand"
+				href="http://irttechnologies:8080/irt/">IRT Technologies</a>
+			<button class="navbar-toggler" aria-expanded="false"
+				aria-controls="navbarCollapse" aria-label="Toggle navigation"
+				type="button" data-toggle="collapse" data-target="#navbarCollapse">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarCollapse">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item"><a class="nav-link active" href="#">BOM</a>
+					</li>
+				</ul>
+				<form class="form-inline mt-2 mt-md-0" action="/login" method="POST" enctype="multipart/form-data" >
+					<input class="form-control mr-sm-2" type="text"
+						placeholder="Username" autofocus="autofocus" /> <input
+						class="form-control mr-sm-2" type="password"
+						placeholder="Password" />
+					<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+				</form>
+			</div>
+		</nav>
+	</header>
+	<!--/* END HEADER will be replaced */-->
+
+	<div class="container-fluid bg-white pt-5">
+		<div class="card">
+			<h5 class="card-header text-center">Engineering change request (ECO).</h5>
+			<div class="card-body">
+				<form id="eco_form" action="#">
+					<div id="eco_part_number_row" class="row eco_part_number_row">
+						<input id="eco_component_id" name="eco_component_id" type="hidden" class="eco_component_id required"/>
+						<div class="col-md-auto">
+							<div class="input-group">
+								<div class="input-group-prepend" title="Top Component's Irt Part Number">
+									<span class="input-group-text" id="prepend-pn">P/N:</span>
+								</div>
+								<input type="text" id="eco_part_number" class="form-control eco_part_number" placeholder="IRT Part Number" aria-label="IRT Part Number" aria-describedby="prepend-pn" />
+								<div class="input-group-append">
+									<button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<span class="sr-only">Toggle Dropdown</span>
+									</button>
+									<div class="dropdown-menu">
+										<a class="dropdown-item eco_add_project disabled" href="#">Add Related Project</a>
+										<div role="separator" class="dropdown-divider"></div>
+										<a class="dropdown-item eco_remove_project" href="#">Remove</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-auto">
+						<div class="row">
+						<div class="col-sm-auto pr-0">
+							<p class="card-text">New Rev.#</p>
+						</div>
+						<div class="col-sm-auto pl-0">
+							<p id="eco_new_rev" class="card-text eco_new_rev">Auto</p>
+						</div>
+						</div>
+						</div>
+						<div class="col-md">
+							<p id="eco_description" class="card-text eco_description bg-info text-white text-center">Enter the project part number to which this request relates.</p>
+						</div>
+					</div>
+					<div class="row mt-3">
+						<div class="col-sm-auto font-weight-bold">Category of change:</div>
+						<div class="col-md" th:remove="all-but-first">
+							<div class="form-check form-check-inline" th:each="ecoCategory : ${T(irt.stock.data.jpa.beans.engineering.eco.EcoCategory).values()}">
+								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_mechanical_design" th:id="${ecoCategory.name()}" value="1" title="Mechanical Design" th:value="${ecoCategory.ordinal()}" th:title="${ecoCategory.description}" />
+								<label class="form-check-label" for="eco_category_mechanical_design" th:for="${ecoCategory.name()}" th:text="${ecoCategory.description}">Mechanical Design</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_electrical_design" value="2" title="Electrical Design" />
+								<label class="form-check-label" for="eco_category_electrical_design">Electrical Design</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_pcb_design" value="4" title="PCB Design" />
+								<label class="form-check-label" for="eco_category_pcb_design">PCB Design</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_software_design" value="8" title="Software Design" />
+								<label class="form-check-label" for="eco_category_software_design">Software Design</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_bom" value="16" title="BOM" />
+								<label class="form-check-label" for="eco_category_bom">BOM</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_rework" value="32" title="Rework" />
+								<label class="form-check-label" for="eco_category_rework">Rework</label>
+							</div>
+						</div>
+					</div>
+					<div class="row form-group mt-3">
+						<label for="eco_reason" class="font-weight-bold">Reason for Change:</label>
+						<textarea class="form-control required" id="eco_reason" name="eco_reason" rows="2"></textarea>
+					</div>
+					<div class="row form-group">
+						<label for="eco_description" class="font-weight-bold">Description of changes:</label>
+						<textarea class="form-control required" id="eco_description" name="eco_description" rows="5"></textarea>
+					</div>
+					<div class="row eco_file_upload_row mb-3" id="eco_file_upload_row">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<select class="input-group-text eco_file_relation" id="eco_file_relation" name="eco_file_relation">
+									<option selected value="">Select</option>
+								</select>
+							</div>
+							<div class="custom-file">
+								<input type="file" class="custom-file-input eco_file_upload required" id="eco_file_upload" name="eco_file_upload" aria-describedby="eco_file_relation" disabled="disabled" />
+								<label class="custom-file-label" for="eco_file_upload">Choose file</label>
+							</div>
+							<div class="input-group-append">
+								<button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="sr-only">Toggle Dropdown</span>
+								</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item eco_add_file_upload" href="#">Add</a>
+									<div role="separator" class="dropdown-divider"></div>
+									<a class="dropdown-item eco_remove_file_upload" href="#">Remove</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row mt-3">
+						<div class="col-md-auto">
+							<div class="input-group">
+								<div class="input-group-prepend">
+									<label class="input-group-text" for="eco_send_to">Select the person to whom you want to send a request</label>
+								</div>
+								<select class="custom-select required" id="eco_send_to" name="eco_send_to">
+									<option selected value="">Select</option>
+									<option value="1" th:each="top : ${engineeringTop}" th:value="${top.id}" th:text="${top.firstname} + ' ' + ${top.lastname}">One</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-auto">
+							<button id="btn_send" type="submit" class="btn btn-primary" disabled="disabled">Send Request</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="modalLoad"></div>
+	<th:block th:replace="home::bootstrap_script">
+		<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+		<script src="https://unpkg.com/popper.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	</th:block>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" th:src="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.js}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js" th:src="@{/webjars/bs-custom-file-input/1.3.2-1/dist/bs-custom-file-input.min.js}"></script>
+<!-- 	<script src="../../../static/js/eco.js" th:src="@{/js/eco.js}"></script> -->
+	<script type="text/javascript" th:inline="javascript">
+		bsCustomFileInput.init();
+		$('#engineeringMenu').addClass('active');
+		$('#newEcoMenu').addClass('active');
+
+		//Warnibg beafor unloading this page
+		window
+				.addEventListener(
+						"beforeunload",
+						function(e) {
+							var confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+							(e || window.event).returnValue = confirmationMessage; //Gecko + IE
+							return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+						});
+
+		// Check file sizes
+		function f_check_files(){
+
+			var maxSize = /*[[${maxSize}]]*/ 1048576;
+			var maxRequest = /*[[${maxRequest}]]*/ 10485760;
+			var disable = false;
+			var totalSize = 0;
+			var files = [];
+
+			$('.eco_file_upload').each(function(){
+
+				if(this.files.length == 0)
+					return false;
+
+				var size = this.files[0].size;
+
+				if(size == 0){
+					disable = true;
+					alert('The file "' + this.files[0].name + '" is empty.');
+					return false;
+				}
+
+				if(size > maxSize){
+					disable = true;
+					alert('The file size is to big ("' + this.files[0].name + '"). Maximum allowed size is ' + maxSize + ' bytes');
+					return false;
+				}
+
+				totalSize += size;
+				if(totalSize > maxRequest){
+					disable = true;
+					alert('The total files size is to big . Maximum allowed size is ' + maxRequest + ' bytes');
+					return false;
+				}
+
+				files.push(this.files[0].name);
+			});
+
+			// Check for duplicate files
+			if(!disable && files.filter((value,index)=>files.indexOf(value) === index).length !== files.length){
+				alert('You have specified two or more links to the same file.');
+				disable = true
+			}
+
+			return disable;
+		}
+
+		// Enable/Bisable 'Send Request' button
+		function f_enableSendButton(){
+
+			var disable = false;
+
+			$('.required').each(
+					function(){
+
+						if(this.disabled)
+							return true;
+
+						if(!this.value){
+							disable = true;
+							return false;
+						}
+					});
+
+			if(!disable){
+				// On Categories checked
+				disable = true;
+				$('.form-check-input:checked').each(
+						function(){
+							disable = false;
+							return false;
+						});
+			}
+
+			if(!disable)
+				disable = f_check_files();
+
+			if(disable)
+				$('#btn_send').attr('disabled', 'disabled');
+			else
+				$('#btn_send').removeAttr('disabled');
+		}
+
+		//Autocomplete '#eco_part_number'
+		function f_autocomplete(request, response){
+
+			var input = request.term.replace(/-/g, "").toUpperCase();
+			/*[- */
+			partNumbers = autocompletePNs(input); // will be removed from the template.
+
+			response($.map(partNumbers, function(value, key) {
+				var pn = partNumberAddDashes(value.partNumber);
+				return pn;
+			}));//response($.map(
+			/* -]*/
+			/*[+
+
+			first20PartNumbersContains(input, function(pns){
+				partNumbers = pns;
+				response($.map(partNumbers, function (value, key) {
+			    	var pn = partNumberAddDashes(value.partNumber);
+			        return pn;
+				}));
+			});
+			+]*/
+		}
+		function f_get_new_revision(partNumber, index){
+
+			var revisionId = '#eco_new_rev' + index;
+			/*[- */
+				var currentRevision = partNumber.substring(partNumber.length-2, partNumber.length);
+				var newRevision = parseInt(currentRevision) + 1;
+				$(revisionId).text(newRevision);
+			/* -]*/
+			/*[+
+				$.post("/pn/new/revision", { partNumber : partNumber }, function(newRevision){
+					$(revisionId).text(newRevision);
+				});
+			+]*/
+		}
+		var partNumbers;
+		$(".eco_part_number").autocomplete({ source : f_autocomplete });
+		function f_onInputChange(){
+
+			var input = this;
+		if(partNumbers)	{
+			// print description
+			var index = input.id.replace('eco_part_number', '');
+
+			// Revision
+			var revisionId = '#eco_new_rev' + index;
+			var revision = $(revisionId);
+			revision.text('');
+
+			// Description
+			var descriptionId = '#eco_description' + index;
+			var description = $(descriptionId);
+			description.text('');
+
+			// Component ID
+			var hiddenComponentId = $('#eco_component_id' + index);
+			hiddenComponentId.val("");
+
+			var printedValue = input.value.replace(/-/g, "").toUpperCase()
+			partNumbers.filter(function(value) {
+				if (value.partNumber === printedValue){
+					description.text(value.description);
+					hiddenComponentId.val(value.id);
+				}
+			})
+
+			// Disable/Enable 'Add Project' links
+			var counter = 0;
+			var hiddenFields = $(".eco_component_id");
+			hiddenFields.each(function(){
+				if (this.value)
+					counter++;
+			});
+			if(hiddenFields.length==counter)
+				$('.eco_add_project').removeClass("disabled");
+			else
+				$('.eco_add_project').addClass("disabled");
+
+			f_enableSendButton();
+			f_get_new_revision(printedValue, index);
+		}}
+		$('.card-body').on('change', 'input', f_onInputChange);
+
+		function f_setNameAndId(dom, name){
+			dom.attr("id",name);
+// 			dom.attr("name",name);
+		}
+		//Add project links
+		function f_addProject(){
+			var parent = $(this).closest('.eco_part_number_row');
+			var clon = $('#eco_part_number_row').clone().removeAttr('id').insertAfter(parent);
+			// reset IDs
+			$('.eco_part_number_row').each(function(index){
+				var appender = index ? index : '';
+
+				f_setNameAndId($(this).find('.eco_component_id'), 'eco_component_id' + appender);
+				f_setNameAndId($(this).find('.eco_part_number')	, 'eco_part_number' + appender);
+				f_setNameAndId($(this).find('.eco_description')	, 'eco_description' + appender);
+				f_setNameAndId($(this).find('.eco_new_rev')		, 'eco_new_rev' + appender);
+			});
+
+			var input = clon.find('.eco_part_number');
+			input.autocomplete({ source : f_autocomplete });
+			input.val('');
+			f_enableSendButton();
+			clon.find('.dropdown-menu').dropdown('hide');
+			clon.find('.eco_add_project').click(f_addProject);
+			clon.find('.eco_remove_project').click(f_removeProject);
+			f_enableSendButton();
+		}
+		$('.eco_add_project').click(f_addProject);
+
+		// Remove project link
+		function f_removeProject(){
+			if($('.eco_part_number_row').length==1){
+				$('#eco_part_number').val('');
+			}else{
+				var row = $(this).closest('.eco_part_number_row');
+				if(row.find('.eco_part_number').val()){
+					if(confirm("Are you sure you want to remove this project?")){
+						row.remove();
+					}
+				}else{
+					row.remove();
+				}
+			}
+			f_enableSendButton();
+		}
+
+		function f_addFileRelation(){
+			var select = $('.eco_file_relation');
+			if(this.checked){
+				var option = new Option(this.title, this.value);
+				select.append(option);
+			}else{
+				select.find("option[value='" + this.value + "']").remove();
+				select.trigger('change');
+			}
+		}
+		$('.eco_remove_project').click(function(){f_removeProject(this);});
+		//anable 'Send request' button
+		$('.card-body').on('change', 'textarea', f_enableSendButton);
+		$('.card-body').on('change', 'input[type="checkbox"]', f_addFileRelation);
+		$('.card-body').on('change', 'input[type="checkbox"]', f_enableSendButton);
+		$('.card-body').on('change', 'select', f_enableSendButton);
+
+		function f_anableFileUpload(){
+
+			var fileInput = $(this).closest('.input-group').find("input");
+
+			if(this.value){
+				fileInput.attr('disabled',false)
+			}else{
+				fileInput.attr('disabled',true)
+			}
+
+			f_enableSendButton();
+		}
+		$('.card-body').on('change', 'select.eco_file_relation', f_anableFileUpload);
+
+
+		// Remove File Upload Row
+		function f_removeFileUpload(){
+			$(this).closest('.eco_file_upload_row').remove();
+		}
+		// Add File Upload Row
+		function f_addFileUpload(){
+			var parent = $(this).closest('.eco_file_upload_row')
+			var clon = $('#eco_file_upload_row').clone().removeAttr('id').insertAfter(parent);
+			// reset IDs
+			$('.eco_file_upload_row').each(function(index){
+
+				var appender = index ? index : '';
+
+				f_setNameAndId($(this).find('.eco_file_relation'), 'eco_file_relation' + appender);
+
+				var uploadId = 'eco_file_upload' + appender;
+				f_setNameAndId($(this).find('.eco_file_upload'), uploadId);
+				$(this).find('.custom-file-label').attr("for", uploadId);
+			});
+
+			var inp = clon.find("input")
+			inp.val(null);
+			inp.attr("disabled", true);
+			clon.find("label").text("Choose file");
+			clon.find(".eco_add_file_upload").click(f_addFileUpload);
+			clon.find(".eco_remove_file_upload").click(f_removeFileUpload);
+			clon.find('.dropdown-menu').dropdown('hide');
+			bsCustomFileInput.init()
+			f_enableSendButton();
+		}
+		$('.eco_add_file_upload').click(f_addFileUpload);
+		$('.eco_remove_file_upload').click(f_removeFileUpload);
+
+		$("#eco_form").submit(function(e){
+			e.preventDefault();
+
+			var data = new FormData($("#eco_form")[0]);
+			jQuery.ajax({
+			    url: '/engineering/eco/new',
+			    data: data,
+			    cache: false,
+			    contentType: false,
+			    processData: false,
+			    method: 'POST',
+			    type: 'POST', // For jQuery < 1.9
+			    success: function(data){
+
+			    	if(data)
+				        alert(data);
+
+			    	// Cancel onbeforeunload event handler.
+			    	window.onbeforeunload = function () {
+			    		  // blank function do nothing
+			    		}
+			    	window.location.replace("/engineering/eco");
+			    }
+			});
+	
+			$('#btn_send')				.attr('disabled', 'disabled');
+			$('.eco_part_number')		.attr('disabled', 'disabled');
+			$('.eco_change_category')	.attr('disabled', 'disabled');
+			$('#eco_reason')			.attr('disabled', 'disabled');
+			$('#eco_description')		.attr('disabled', 'disabled');
+			$('.eco_file_relation')		.attr('disabled', 'disabled');
+			$('.eco_file_upload')		.attr('disabled', 'disabled');
+			$('#eco_send_to')			.attr('disabled', 'disabled');
+		});
+		//# sourceURL=new-eco-page.js
+	</script>
+</body>
+</html>

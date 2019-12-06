@@ -25,7 +25,11 @@ public enum UserRoles implements GrantedAuthority{
 	SELLERS				(4194304, "Can add, edit, delete sellers"),
 	DATABASE			(8388608, "Database"),
 	EDIT_BOM			(16777216, "Can edit BOMs."),
-	STOCK_REPORT		(33554432, "Component report to CSV file.");
+	STOCK_REPORT		(33554432, "Download Component report to CSV file."),
+	ENGINEERING			(67108864, "Engineering Department."),
+	ENGINEERING_TOP		(134217728,"May approve the ECO."),
+	ENGINEERING_ECO		(268435456,"Cen creat new Engineering Change Request."),
+	ENGINEERING_FINAL	(536870912,"Final approval.");
 
 	private final long permission;
 	private String description;
@@ -36,7 +40,9 @@ public enum UserRoles implements GrantedAuthority{
 	}
 
 	public static Collection<? extends GrantedAuthority> getAuthorities(long permissions) {
-		return Arrays.stream(values()).filter(ur->(ur.permission&permissions)!=0).collect(Collectors.toList());
+
+		UserRoles[] values = values();
+		return Arrays.stream(values).filter(ur->(ur.permission&permissions)!=0).collect(Collectors.toList());
 	}
 
 	public long getPermission() {
