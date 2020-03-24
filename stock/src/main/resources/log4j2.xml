@@ -13,8 +13,8 @@
         </Console>
 
 		<RollingRandomAccessFile name="LogFile"
-								 fileName="${sys:user.home}/irt/stoclWeb.log"
-								 filePattern="${sys:user.home}/irt/stoclWeb-%d{yyyy-MM-dd}-%i.log.gz">
+								 fileName="${sys:user.home}/irt/stockWeb.log"
+								 filePattern="${sys:user.home}/irt/stockWeb-%d{yyyy-MM-dd}-%i.log.gz">
 			<PatternLayout pattern="${LOG_PATTERN}" />
 
 			<Policies>

@@ -36,7 +36,7 @@
            			<li id='engineeringMenu' class="nav-item dropdown">
            				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Engineering</a>
 						<div class="dropdown-menu">
-							<a id="newEcoMenu" class="dropdown-item" href="/engineering/eco/new" sec:authorize="hasAuthority('ENGINEERING_ECO')" >Engineering Change Request</a>
+							<a id="newEcoMenu" class="dropdown-item" href="/engineering/ecr/new" sec:authorize="hasAuthority('ENGINEERING_ECR') or hasAuthority('ENGINEERING_ECO')" >Engineering Change Request</a>
 							<a id="ecoMenu" class="dropdown-item" href="/engineering/eco">Engineering Change Orders</a>
 					    </div>
            			</li>

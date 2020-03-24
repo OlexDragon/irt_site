@@ -6,6 +6,8 @@ import javax.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import irt.stock.data.jpa.beans.User;
+import irt.stock.data.jpa.beans.engineering.eco.EcoStatus.Status;
+import irt.stock.data.jpa.beans.engineering.ecr.EcrCategory.Category;
 
 public class EcoSpecifications {
 
@@ -36,14 +38,14 @@ public class EcoSpecifications {
 		};
 	}
 
-	public static Specification<Eco> hasCategories(EcoCategory[] categories){
+	public static Specification<Eco> hasCategories(Category[] categories){
 
 		return (root, query, builder)->{
 
 			if(categories==null)
 				return null;
 
-			Path<EcoCategory> path = root.join("ecoRelatedCategories").get("idEcoCategories").get("ecoCategory");
+			Path<Category> path = root.join("ecoRelatedCategories").get("idEcoCategories").get("ecoCategory");
 
 			return path.in((Object[])categories);
 		};
@@ -57,7 +59,7 @@ public class EcoSpecifications {
 				return null;
 
 			Predicate sentTo = root.get("approvedBy").in(user);
-			Predicate satus = root.get("status").in(EcoStatus.CREATED);
+			Predicate satus = root.get("status").in(Status.CREATED);
 
 			return builder.and(sentTo, satus);
 		};

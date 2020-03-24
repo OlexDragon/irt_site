@@ -4,13 +4,13 @@ import java.util.Optional;
 
 import org.springframework.core.convert.converter.Converter;
 
-import irt.stock.data.jpa.beans.engineering.eco.EcoOption;
+import irt.stock.data.jpa.beans.engineering.ecr.EcrCategory.Category;
 
-public class EcoOptionConverter implements Converter<String, EcoOption>{
+public class EcrCategoryConverter implements Converter<String, Category> {
 
 	@Override
-	public EcoOption convert(String source) {
-		EcoOption[] values = EcoOption.values();
+	public Category convert(String source) {
+		Category[] values = Category.values();
 		return Optional.ofNullable(source).filter(s->s.replaceAll("\\D", "").length()==source.length()).map(Integer::parseInt).filter(index->index<values.length).map(index->values[index]).orElse(null);
 	}
 

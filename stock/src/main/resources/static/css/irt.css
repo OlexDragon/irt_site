@@ -41,3 +41,5 @@ select > option:hover{
 /* ::-webkit-input-placeholder.form-control { color: MistyRose; opacity:1; }  WebKit, Blink, Edge */
 /* :-moz-placeholder.form-control { color: MistyRose; opacity:1; }  Mozilla Firefox 4 to 18 */
 /* ::-moz-placeholder.form-control { color: MistyRose; opacity:1; }  Mozilla Firefox 19+ */
+
+.btn:not(.disabled) {cursor: pointer;}

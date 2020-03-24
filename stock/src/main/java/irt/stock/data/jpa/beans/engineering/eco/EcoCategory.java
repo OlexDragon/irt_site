@@ -1,37 +1,38 @@
 package irt.stock.data.jpa.beans.engineering.eco;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.io.Serializable;
+import java.util.Optional;
 
-public enum EcoCategory {
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-	MECHANICAL_DESIGN	("Mechanical Design"),
-	ELECTRICAL_DESIGN	("Electrical Design"),
-	PCB_DESIGN			("PCB Design"),
-	SOFTWARE_DESIGN		("Software Design"),
-	BOM					("BOM"),
-	REWORK				("Rework"),
-	BATABASE_CHANGE		("Database Change");
+import irt.stock.data.jpa.beans.engineering.ecr.EcrCategory.Category;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-	private final String description;
+@Entity
+@Table(name = "eco_categories")
+@Getter @Setter @NoArgsConstructor @EqualsAndHashCode
+public class EcoCategory implements Serializable{
+	private static final long serialVersionUID = 2175417557423496456L;
 
-	private EcoCategory(String description) {
-		this.description = description;
+	public EcoCategory(Category category, Eco eco) {
+		id = new EcoCategoryId();
+		id.setEco(eco);
+		id.setCategory(category);
 	}
 
-	public String getDescription() {
-		return description;
+	@EmbeddedId private EcoCategoryId id;
+
+	public Category getCategory() {
+		return id.getCategory();
 	}
 
-	public static List<EcoCategory> valuesOf(int... array) {
-		return IntStream.of(array)
-				.mapToObj(
-						id->
-						Stream.of(values())
-						.filter(category->category.ordinal()==id)
-						.findAny().orElse(null))
-				.collect(Collectors.toList());
+	@Override
+	public String toString() {
+		return "IdEcoRelatedTo -  Eco Number: " + Optional.ofNullable(id).map(EcoCategoryId::getEco).map(Eco::getNumber).orElse(null) + "; Eco Category: " + Optional.ofNullable(id).map(EcoCategoryId::getCategory).orElse(null);
 	}
 }

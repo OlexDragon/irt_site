@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="en">
+<head>
+<title th:text="'ECR ' + (${ecrs} == null ? 'Creator' : '#' + ${ecrs.get(0).number})">ECR</title>
+
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<th:block th:replace="home::links">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}">
+</th:block>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" th:href="@{/webjars/jquery-ui/1.12.1/jquery-ui.css}">
+<link rel="stylesheet" href="../../../static/css/irt.css" th:href="@{/css/irt.css}">
+<script src="../../../static/js/irt_main.js" type="text/javascript" th:remove="ALL"></script>
+<script type="text/javascript" th:remove="ALL">
+	//This script use only for tect
+	function autocompletePNs(input) {
+		if (input) {
+			return [ {
+				id : 1,
+				partNumber : "ACA000002R01",
+				description : "Description #1"
+			}, {
+				id : 2,
+				partNumber : "ACA000091R01",
+				description : "Description #2"
+			}, {
+				id : 3,
+				partNumber : "ACB000012R01",
+				description : "Description #3"
+			}, {
+				id : 4,
+				partNumber : "ACO000031R02",
+				description : "Description #4"
+			}, {
+				id : 5,
+				partNumber : "AEN000043R01",
+				description : "Description #5"
+			}, {
+				id : 6,
+				partNumber : "APS0005301R01",
+				description : "Description #6"
+			}, {
+				id : 7,
+				partNumber : "AWG000301R01",
+				description : "Description #7"
+			}, {
+				id : 8,
+				partNumber : "MBR0059IC01R01",
+				description : "Description #8"
+			}, {
+				id : 9,
+				partNumber : "MBR0313CW01R01",
+				description : "Description #9"
+			}, {
+				id : 10,
+				partNumber : "MBR0433CW01R01",
+				description : "Description #10"
+			}, {
+				id : 11,
+				partNumber : "MBR0670CW01R02",
+				description : "Description #11"
+			}, {
+				id : 12,
+				partNumber : "MBR0757CW01R01",
+				description : "Description #12"
+			}, {
+				id : 13,
+				partNumber : "MBR0864IC01R03",
+				description : "Description #13"
+			}, {
+				id : 14,
+				partNumber : "MBR0918IC01R01",
+				description : "Description #14"
+			}, {
+				id : 15,
+				partNumber : "MBR1034IC01R02",
+				description : "Description #15"
+			}, {
+				id : 16,
+				partNumber : "MCA0032PS01R02",
+				description : "Description #16"
+			}, {
+				id : 17,
+				partNumber : "MCA1113PN01R01",
+				description : "Description #17"
+			}, {
+				id : 18,
+				partNumber : "MCV0082IC01R01",
+				description : "Description #18"
+			}, {
+				id : 19,
+				partNumber : "PCA00258HPS00R01",
+				description : "Description #19"
+			}, {
+				id : 20,
+				partNumber : "PCA0057RGINPTR01",
+				description : "Description #20"
+			}, {
+				id : 21,
+				partNumber : "PCB00018HGEN0R01",
+				description : "Description #21"
+			}, {
+				id : 22,
+				partNumber : "PCB00208HMP00R01",
+				description : "Description #22"
+			}, {
+				id : 23,
+				partNumber : "PCB00478HPS00R02",
+				description : "Description #23"
+			}, {
+				id : 24,
+				partNumber : "PCB00688HPS00R01",
+				description : "Description #23"
+			}, {
+				id : 25,
+				partNumber : "PCB0088RGGEN0R01",
+				description : "Description #25"
+			}, {
+				id : 26,
+				partNumber : "PGB0009RGINPTR01",
+				description : "Description #26"
+			} ].filter(function(value) {
+				return value.partNumber.indexOf(input) > -1;
+			});
+		} else
+			return null;
+	}
+	//# sourceURL=new-eco-only-for-test.js
+</script>
+<!-- <style type="text/css"> html,body { height:100%; margin:0; } </style> -->
+</head>
+<body>
+
+	<!--/* HEADER will be replaced */-->
+	<header th:replace="login::header">
+		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+			<a class="navbar-brand" href="http://irttechnologies:8080/irt/">IRT
+				Technologies</a> <a class="navbar-brand"
+				href="http://irttechnologies:8080/irt/">IRT Technologies</a>
+			<button class="navbar-toggler" aria-expanded="false"
+				aria-controls="navbarCollapse" aria-label="Toggle navigation"
+				type="button" data-toggle="collapse" data-target="#navbarCollapse">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarCollapse">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item"><a class="nav-link active" href="#">BOM</a>
+					</li>
+				</ul>
+				<form class="form-inline mt-2 mt-md-0" action="/login" method="POST" enctype="multipart/form-data" >
+					<input class="form-control mr-sm-2" type="text"
+						placeholder="Username" autofocus="autofocus" /> <input
+						class="form-control mr-sm-2" type="password"
+						placeholder="Password" />
+					<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+				</form>
+			</div>
+		</nav>
+	</header>
+	<!--/* END HEADER will be replaced */-->
+
+	<div class="container-fluid bg-white pt-5">
+	<div class="accordion" id="ecr_accordion">
+<!-- th:fragment="ecr_card" -->
+			<div th:fragment="ecr_card"
+					 class="card border-dark mt-10"
+					 th:each="ecr : ${ecrs}"
+					 th:object="${ecr}"
+					 th:with="	lastStatus 		= *{getLastStatus()},
+					 			ecrNumber 		= 'ecr_' + *{number},
+					 			collapseId 		= ${ecrNumber} + '_collapse',
+					 			optionClass 	= ${ecrNumber} + '_option',
+					 			selectClass		= ${ecrNumber} + '_upload_category',
+					 			selectId		= ${selectClass} + '_row_1',
+					 			uploadFileClass	= ${ecrNumber} + '_upload_file',
+					 			uploadFileId	= ${uploadFileClass} + '_row_1',
+					 			comentId		= ${ecrNumber} + '_coment',
+					 			headerId 		= ${ecrNumber} + '_card_header'"  >
+<!-- Card header -->
+    			<div class="card-header" id="card_header" th:id="${headerId}">
+      				<h6 class="mb-0" th:inline="text">
+        				<button class="btn btn-link collapsed"
+        						type="button"
+        						data-toggle="collapse"
+        						data-target="#collapseTwo" aria-controls="collapseTwo"
+        						th:attr="data-target='#' + ${collapseId}, aria-controls=${collapseId}"
+        						aria-expanded="false"
+        						th:text="'ECR #' + *{number} + ' from ' + ${#dates.format(ecr.getLastStatus().date, 'MMMM dd, yyyy')} + ' by ' + ${lastStatus.changedBy.firstname} + ' ' + ${lastStatus.changedBy.lastname}">
+        						ECR #3434 of September 12, 2000 by OP
+        				</button>
+        				<!--/*/[[*{reason}]]/*/--><!--/*-->
+        				Reason of this ECR<!--*/-->
+      				</h6>
+    			</div>
+<!-- Card Body -->
+    			<div id="collapseTwo" th:id="${collapseId}"  class="collapse ecr_content" aria-labelledby="card_header" th:attr="aria-labelledby=${headerId}" data-parent="#ecr_accordion" >
+				<div class="card-body" id="ecr_card_body" th:id="${ecrNumber} + '_card_body'">
+					<a th:if="${ecrs.size()} > 1" href="#" target="_blank" th:href="@{__${url}__/engineering/ecr/__*{number}__}" >Open in new tab.</a>
+				<form
+						method="post"
+						action="/engineering/ecr/status"
+						onsubmit="f_submit(event, this)">
+
+					<input type="hidden" name="ecr_number" th:value="*{number}" />
+<!-- Categories -->
+					<div class="col-md btn-group" th:remove="all-but-first">
+
+						<label th:each="ecoCategory : ${T(irt.stock.data.jpa.beans.engineering.ecr.EcrCategory.Category).values()}"
+							class="btn btn-outline-primary btn-sm"
+							for="eco_category_mechanical_design"
+
+							th:with="isCategory=${ecr.containsCategory(ecoCategory)}"
+							th:classappend="${isCategory} ? 'active' : 'disabled'"
+							th:for="${ecoCategory.name()}"
+							th:text="${ecoCategory.description}" >Mechanical Design</label>
+
+						<label class="btn btn-outline-primary" for="eco_category_electrical_design">
+							<input class="form-check-input" type="checkbox" name='category' id="eco_category_electrical_design" autocomplete="off" value="2" title="Electrical Design" />
+							Electrical Design
+						</label>
+
+						<label class="btn btn-outline-primary active" for="eco_category_pcb_design">
+							<input class="form-check-input" type="checkbox" name='category' id="eco_category_pcb_design" value="4" title="PCB Design" checked="checked" />
+							PCB Design
+						</label>
+
+						<label class="btn btn-outline-primary" for="eco_category_software_design">
+							<input class="form-check-input" type="checkbox" name='category' id="eco_category_software_design" value="8" title="Software Design" />
+							Software Design
+						</label>
+
+						<label class="btn btn-outline-primary" for="eco_category_bom">
+							<input class="form-check-input" type="checkbox" name='category' id="eco_category_bom" value="16" title="BOM" />
+							BOM
+						</label>
+
+						<label class="btn btn-outline-primary" for="eco_category_rework">
+							<input class="form-check-input" type="checkbox" name='category' id="eco_category_rework" value="32" title="Rework" />
+							Rework
+						</label>
+					</div>
+
+<!-- Related to -->
+					<div>
+						<h6 class="mb0">ECR related to:</h6>
+						<div class="row" th:each="relatedTo : *{relatedTos}">
+							<div class="column"><h5 class="mt-0" th:text="${relatedTo.getPartNumber().partNumber}">0CO-020MSC-0241</h5></div>
+							<div class="column"><p class="mt-0 ml3" th:text="' - ' + ${relatedTo.getPartNumber().description}"> - Component description</p></div>
+						</div>
+					</div>
+
+<!-- Status History-->
+					<div th:fragment="status_history">
+
+						<h6 class="mt-0 mb-0" th:inline="text">[[${className}]] status change history:</h6>
+
+						<th:block th:each="st : *{status}">
+<!-- Status -->
+							<a th:if="${st.status.ordinal() == 2}" 		class="m-0" th:text="${st}" th:href="@{__${url}__/engineering/eco/__*{number}__}" target="_blank" >Open Linked ECO in the new tab</a>
+							<p th:unless="${st.status.ordinal() == 2}"  class="m-0" th:text="${st}"></p>
+<!-- Comments -->
+							<p class="m-0" th:if="${st.comment} != null" th:text="${st.comment.comment}"></p>
+<!-- Files -->
+							<p class="m-0" th:each="file : ${st.files}"><span th:text="${file.fileCategory.description} + ': '">File Related To: </span><a href="#" target="_blank" th:href="@{__${url}__/storage/ecr/__*{number}__/__${st.id}__/__${file.fileName}__}" th:text="${file.fileName}">File 1</a></p>
+						</th:block>
+					</div>
+
+<th:block sec:authorize="hasAuthority('ENGINEERING')" th:if="${lastStatus.status != T(irt.stock.data.jpa.beans.engineering.ecr.EcrStatus.Status).LINKED}" >
+<th:block th:replace="engineering/eco/new :: textAndFile(${ecrNumber} , 'Comments:')" >
+<!-- New Comment -->
+					<div class="row form-group mt-3" >
+						<label for="ecr_comments" class="font-weight-bold">Comments:</label>
+						<textarea class="form-control" id="ecr_comments" rows="2"></textarea>
+					</div>
+<!-- add File(s) -->
+					<div class="row mb-3" id="ecr_upload_row_1'" >
+
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<select class="input-group-text" id="ecr_upload_category" disabled="disabled">
+
+									<option selected value="">Select</option>
+									<option>Category Name</option>
+								</select>
+							</div>
+							<div class="custom-file">
+
+								<input
+										type="file"
+										class="custom-file-input"
+										id="ecr_upload_upload_file_row_1"
+										aria-describedby="eco_upload_category"
+										disabled="disabled" />
+
+								<label class="custom-file-label" for="eco_file_upload" >Choose file</label>
+							</div>
+							<div class="input-group-append">
+								<button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="sr-only">Toggle Dropdown</span>
+								</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item ecr_add_file_upload" href="#">Add</a>
+									<div role="separator" class="dropdown-divider"></div>
+									<a class="dropdown-item ecr_remove_file_upload" href="#">Remove</a>
+								</div>
+							</div>
+						</div>
+					</div>
+</th:block>
+<!-- Buttons -->
+						<input type="hidden" name="new_status">
+						<button
+								type="submit"
+								class="form-control btn btn-outline-success"
+
+								th:onclick="'f_setStatus(this,' +  ${T(irt.stock.data.jpa.beans.engineering.ecr.EcrStatus.Status).LINKED.ordinal()} + ')'" >Create ECO</button>
+						<button
+								type="submit"
+								class="form-control btn btn-outline-warning disabled to_enable"
+								disabled="disabled"
+
+								th:onclick="'f_setStatus(this,' +  ${T(irt.stock.data.jpa.beans.engineering.ecr.EcrStatus.Status).REJECTED.ordinal()} + ')'" >Reject</button>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<select name="forvard_to" class="disabled btn btn-outline-primary to_enable" disabled="disabled" onchange="f_enableForward(this)">
+									<option value="">Select</option>
+									<option value="1" th:each="engineer : ${engineers}" th:value="${engineer.id}" th:text="${engineer.firstname} + ' ' + ${engineer.lastname}">Oleksandr Potomkin</option>
+								</select></div>
+							<button
+									type="submit"
+									class="form-control btn btn-outline-primary disabled ecr_btn_forvard"
+									disabled="disabled"
+
+									th:onclick="'f_setStatus(this,' + ${T(irt.stock.data.jpa.beans.engineering.ecr.EcrStatus.Status).FORWARDED.ordinal()} + ')'" >Forward</button></div>
+</th:block>
+				</form>
+      			</div>
+    			</div>
+			</div>
+	</div>
+	</div>
+	<div id="modalLoad"></div>
+	<th:block th:replace="home::bootstrap_script">
+		<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+		<script src="https://unpkg.com/popper.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	</th:block>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" th:src="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.js}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js" th:src="@{/webjars/bs-custom-file-input/1.3.2-1/dist/bs-custom-file-input.min.js}"></script>
+	<script type="text/javascript" th:inline="javascript">
+		bsCustomFileInput.init();
+		$('#engineeringMenu').addClass('active');
+		$('#newEcoMenu').addClass('active');
+
+		//Warnibg beafor unloading this page
+		function f_beforeunload(e) {
+			var confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+			(e || window.event).returnValue = confirmationMessage; //Gecko + IE
+			return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+		}
+		window.addEventListener("beforeunload", f_beforeunload);
+
+		$('.ecr_content').collapse('show');
+
+		//# sourceURL=new-eco-page.js
+	</script>
+<script src="../../../static/js/eco/ecr.js" th:src="@{/js/eco/ecr.js}" type="text/javascript"></script>
+<script src="../../../static/js/eco/ec.js" th:src="@{/js/eco/ec.js}" type="text/javascript"></script>
+</body>
+</html>

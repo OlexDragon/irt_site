@@ -1,10 +1,11 @@
-package irt.stock.data.jpa.beans.engineering.eco;
+package irt.stock.data.jpa.beans.engineering.ecr;
 
 import static irt.stock.IrtStockApp.dateFormat;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,18 +25,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import irt.stock.data.jpa.beans.User;
 import irt.stock.data.jpa.beans.engineering.EngineeringChangeStatus;
 import irt.stock.data.jpa.beans.engineering.StatusOf;
-import irt.stock.data.jpa.beans.engineering.ecr.EcrForwardTo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-public class EcoStatus implements EngineeringChangeStatus {
+public class EcrStatus implements EngineeringChangeStatus{
 
-	public EcoStatus(Status status, Eco eco, User changedBy) {
+	public EcrStatus(Status status, Ecr ecr, User changedBy) {
 		this.status = status;
-		this.eco = eco;
+		this.ecr = ecr;
 		this.changedBy = changedBy;
 	}
 
@@ -51,23 +51,26 @@ public class EcoStatus implements EngineeringChangeStatus {
 
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "ecoNumber", referencedColumnName = "number", nullable = false, updatable = false)
-	private Eco eco;
+	@JoinColumn(name = "ecrNumber", referencedColumnName = "number", nullable = false, updatable = false)
+	private Ecr ecr;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "changedBy", referencedColumnName = "id", nullable = false, updatable = false)
 	private User changedBy;
 
-	@OneToOne(mappedBy = "ecoStatus", cascade = CascadeType.REMOVE)
-	private EcoComment comment;
+	@OneToOne(mappedBy = "ecrStatus", cascade = CascadeType.REMOVE)
+	private EcrComment comment;
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "ecoStatus", cascade = CascadeType.REMOVE)
-	private List<EcoFile> files;
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "ecrStatus", cascade = CascadeType.REMOVE)
+	private List<EcrFile> files;
 
-	public void addFile(EcoFile ecrFile) {
-		List<EcoFile> files = getFiles();
+	@OneToOne(mappedBy = "ecrStatus", cascade = CascadeType.REMOVE)
+	private EcrForwardTo forwardTo;
+
+	public void addFile(EcrFile ecrFile) {
+		List<EcrFile> files = getFiles();
 		if(files==null) {
-			files = new ArrayList<EcoFile>();
+			files = new ArrayList<EcrFile>();
 			setFiles(files);
 		}
 
@@ -77,19 +80,19 @@ public class EcoStatus implements EngineeringChangeStatus {
 	@Override
 	public String toString() {
 		User changedBy = getChangedBy();
-		return getStatus() + " by " + changedBy.getFirstname() + " " + changedBy.getLastname() + " on " + dateFormat.format(getDate());
+//		String forward = Optional.ofNullable(forwardTo).map(ft->" forvard to " + ft.getUser().getFirstname() + " " + ft.getUser().getLastname()).orElse("");
+		String forward = Optional.ofNullable(forwardTo).map(ft->" to " + ft.getUser().getFirstname() + " " + ft.getUser().getLastname()).orElse("");
+		return getStatus() + " by " + changedBy.getFirstname() + " " + changedBy.getLastname() + " on " + dateFormat.format(getDate()) + forward;
 	}
 
+	// ***** enum Status *****
 	public enum Status implements StatusOf{
-		CREATED,			//Created by engineer
-		UPDATED,
-		RELEASED,			//Released by executor
-		APPROVED;			//Approved by top engineer
-	}
 
-	@Override
-	public EcrForwardTo getForwardTo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	CREATED,			// Created
+	FORWARDED,			// Forwarded to some engineer to create ECO
+	LINKED,				// Linked to new ECO
+	REJECTED,			// Rejected by top engineer
+//	DELAYED			// Delayed for a while
+	;
+}
 }

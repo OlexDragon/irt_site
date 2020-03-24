@@ -6,8 +6,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import irt.stock.data.jpa.services.converters.EcoCategoryConverter;
-import irt.stock.data.jpa.services.converters.EcoOptionConverter;
+import irt.stock.data.jpa.services.converters.EcoStatusConverter;
+import irt.stock.data.jpa.services.converters.EcrCategoryConverter;
+import irt.stock.data.jpa.services.converters.EcrStatusConverter;
 
 @Configuration
 @EnableTransactionManagement
@@ -23,7 +24,8 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
-		registry.addConverter(new EcoOptionConverter());
-		registry.addConverter(new EcoCategoryConverter());
+		registry.addConverter(new EcrCategoryConverter());
+		registry.addConverter(new EcrStatusConverter());
+		registry.addConverter(new EcoStatusConverter());
 	}
 }
