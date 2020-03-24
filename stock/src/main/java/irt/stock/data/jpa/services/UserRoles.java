@@ -29,7 +29,7 @@ public enum UserRoles implements GrantedAuthority{
 	ENGINEERING			(67108864, "Engineering Department."),
 	ENGINEERING_TOP		(134217728,"May approve the ECO."),
 	ENGINEERING_ECO		(268435456,"Cen creat new Engineering Change Request."),
-	ENGINEERING_FINAL	(536870912,"Final approval.");
+	ENGINEERING_BCC	(536870912,"Final approval.");
 
 	private final long permission;
 	private String description;

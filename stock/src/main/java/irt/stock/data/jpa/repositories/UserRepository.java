@@ -1,5 +1,6 @@
 package irt.stock.data.jpa.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +15,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	Iterable<User> findAllByOrderByStatusDescFirstnameAsc();
 
 	@Query(value="SELECT * FROM users u WHERE (u.permission & :permission) > 0 ORDER BY u.firstname ASC", nativeQuery = true)
-	Iterable<User> findByPermission(Long permission);
+	List<User> findByPermission(Long permission);
 }

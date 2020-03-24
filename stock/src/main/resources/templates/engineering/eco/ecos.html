@@ -58,7 +58,7 @@
 
 			<input type="text" name="eco_search" id="eco_search" class="onchange" placeholder="Type to search" />
 
-			<label class="btn btn-primary" th:each="ecoCategory : ${T(irt.stock.data.jpa.beans.engineering.eco.EcoCategory).values()}" th:inline="text">
+			<label class="btn btn-primary" th:each="ecoCategory : ${T(irt.stock.data.jpa.beans.engineering.eco.EcoCategory.Category).values()}" th:inline="text">
 				<input type="checkbox" name="eco_category" id="eco_category1" class="onchange" th:id="${ecoCategory.name()}" autocomplete="off" th:value="${ecoCategory.ordinal()}" />  [[${ecoCategory.description}]]
 			</label>
 			<label class="btn btn-primary" th:remove="all">
@@ -83,7 +83,7 @@
 		<div class="card" th:fragment="eco_card"  th:each="eco : ${ecos}" th:inline="text" >
 			<div class="card-header" id="eco_card_header">
 				<h6 class="mb-0" th:inline="text">
-					<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" th:attr="data-target='#collapse'+${eco.number }"  aria-expanded="true" aria-controls="collapseOne"
+					<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" th:attr="data-target='#collapse'+${eco.number }" aria-expanded="true" aria-controls="collapseOne" th:attr="aria-controls='collapse'+${eco.number }"
 					 th:text="'ECO #' + ${eco.number} + ' from ' + ${#dates.format(eco.creationDate, 'MMMM dd, yyyy')} + ' by ' + ${eco.createdBy.firstname} + ' ' + ${eco.createdBy.lastname}">
 						ECO #1 from 25 December 2020
 					</button>
@@ -150,9 +150,9 @@
 </div>
 
 
-		<div>
+	<div>
 		<button id="eco_show_more" class="btn btn-outline-secondary btn-block">Show more</button>
-		</div>
+	</div>
 	</div>
 
 	<div id="modalLoad"></div>

@@ -1,4 +1,4 @@
-package irt.stock.data.jpa.beans.engineering.eco;
+package irt.stock.data.jpa.beans.engineering.ecr;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,38 +19,30 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "eco_files")
+@Table(name = "ecr_files")
 @Getter @Setter @NoArgsConstructor  @EqualsAndHashCode
-public class EcoFile implements Serializable {
-
+public class EcrFile implements Serializable {
 	private static final long serialVersionUID = -2339533054583331336L;
 
-	public EcoFile(EcoStatus ecoStatus, Category fileCategory, String fileName) {
-		this.ecoStatus = ecoStatus;
+	public EcrFile(EcrStatus ecrStatus, Category fileCategory, String fileName) {
+		this.ecrStatus = ecrStatus;
 		this.fileCategory = fileCategory;
 		this.fileName = fileName;
-		status = Status.ADDED;
 	}
 
 	@Id @GeneratedValue
 	private Long id;
 
 	@JsonIgnore
-	@ManyToOne
-	@JoinColumn(name = "ecoStatusId", referencedColumnName = "id",  nullable = true, updatable = false)
-	private EcoStatus ecoStatus;
+	@OneToOne
+	@JoinColumn(name = "ecrStatusId", referencedColumnName = "id",  nullable = true, updatable = false)
+	private EcrStatus ecrStatus;
 
 	private Category fileCategory;
 	private String fileName;
-	private Status status;
 
 	@Override
 	public String toString() {
-		return "IdEcoRelatedTo -  EcoStatus id: " + Optional.ofNullable(ecoStatus).map(EcoStatus::getId).orElse(null) + "; id: " + id + "; fileRelation: " + fileCategory + "; file name: " + fileName;
-	}
-
-	public enum Status {
-		DELETED,
-		ADDED
+		return "EcrFile -  Ecr Status: " + Optional.ofNullable(ecrStatus).map(EcrStatus::getStatus).orElse(null) + "; id: " + id + "; fileCategory: " + fileCategory + "; file name: " + fileName;
 	}
 }

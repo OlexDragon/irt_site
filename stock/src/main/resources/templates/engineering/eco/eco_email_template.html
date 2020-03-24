@@ -25,9 +25,17 @@ header {
   text-align: center;
   padding: 2px;
 }
-.column {
-  float: left;
+/* Create two equal columns that sits next to each other */
+.column1 {
+  flex: 20%;
   padding: 5px;
+}
+.column2 {
+  flex: 80%;
+  padding: 5px;
+}
+.row {
+  display: flex;
 }
 
 /* Clear floats after the columns */
@@ -38,28 +46,26 @@ header {
 }
 </style>
 </head>
-<body>
+<body th:object="${engineeringChange}" th:with="className = ${#strings.toUpperCase(engineeringChange.getClass().getSimpleName())}">
 	<h4>This is an automatically generated message. Do not reply to this message.</h4>
-	<h4 th:inline="text">A new ECO has been written. [[${user.firstname}]] [[${user.lastname}]] is requesting your approval. <a href="#" th:href="${host} + '/engineering/eco/' + ${eco.number}" >To approve this ESO click on this link.</a></h4>
-    <header><h3 th:text="'ECO #' + ${eco.number} + '; ' + ${eco.reason}">ECO #7; The reason for the change will be here.</h3></header>
+	<h4 th:inline="text">The [[${className}]] has been [[*{getLastStatus()}]]. <a href="#" th:href="@{__${url}__/engineering/__${#strings.toLowerCase(className)}__/__*{number}__}" >Click on this link to see this [[${className}]].</a></h4>
+    <header><h3 th:text="${className} + ' #' + *{number} + '; ' + *{reason}">ECO #7; The reason for the change will be here.</h3></header>
 
 	<div>
-		<h6 class="mb0">ECO related to:</h6>
-		<div class="row"  th:each="relatedTo : ${eco.ecoRelatedTo}">
-			<div class="column"><h4 class="mt0" th:text="${relatedTo.idEcoRelatedTo.partNumber.partNumber}">0CO-020MSC-0241</h4></div>
-			<div class="column"><p class="mt0" th:text="${relatedTo.idEcoRelatedTo.partNumber.description}">Some Text</p></div>
+		<h6 class="mb0" th:text="${className} + ' related to:'">ECO related to:</h6>
+		<div class="row"  th:each="relatedTo : *{relatedTos}">
+			<div class="column1"><h4 class="mt0" th:text="${relatedTo.id.partNumber.partNumber}">0CO-020MSC-0241</h4></div>
+			<div class="column2"><p class="mt0" th:text="${relatedTo.id.partNumber.description}">Some Text</p></div>
 		</div>
 	</div>
 
-	<div>
+	<div th:if="${#strings.equals(className, 'ECO')}">
 		<h6 class="mt0 mb0">Description of changes:</h6>
-		<div><p class="mt0" th:text="${eco.description}">Some Text</p></div>
+		<div><p class="mt0" th:text="*{description}">Some Text</p></div>
 	</div>
 
-	<div>
-		<h6 class="mt0 mb0">Files attached to this ECO.:</h6>
-		<div th:if="${not #lists.isEmpty(eco.ecoFiles)}" th:each="file : ${eco.ecoFiles}"><p class="m0"><a href="#" th:text="${file.name}">File 1</a></p></div>
-		<div th:remove="all"><p class="m0"><a href="#">File 2</a></p></div>
+<!-- Status History-->
+	<div th:replace="engineering/eco/ecr :: status_history">
 	</div>
 </body>
 </html>

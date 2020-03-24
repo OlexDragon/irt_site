@@ -134,7 +134,7 @@
 </script>
 <!-- <style type="text/css"> html,body { height:100%; margin:0; } </style> -->
 </head>
-<body>
+<body th:with="prepend='ecr'">
 
 	<!--/* HEADER will be replaced */-->
 	<header th:replace="login::header">
@@ -152,7 +152,7 @@
 					<li class="nav-item"><a class="nav-link active" href="#">BOM</a>
 					</li>
 				</ul>
-				<form class="form-inline mt-2 mt-md-0" action="/login" method="POST" enctype="multipart/form-data" >
+				<form class="form-inline mt-2 mt-md-0" action="/login" method="POST" enctype="multipart/form-data">
 					<input class="form-control mr-sm-2" type="text"
 						placeholder="Username" autofocus="autofocus" /> <input
 						class="form-control mr-sm-2" type="password"
@@ -164,124 +164,361 @@
 	</header>
 	<!--/* END HEADER will be replaced */-->
 
-	<div class="container-fluid bg-white pt-5">
+	<div class="container-fluid bg-white pt-5" id="content">
 		<div class="card">
-			<h5 class="card-header text-center">Engineering change request (ECO).</h5>
+			<h5 class="card-header text-center">Engineering change request (ECR).</h5>
 			<div class="card-body">
-				<form id="eco_form" action="#">
-					<div id="eco_part_number_row" class="row eco_part_number_row">
-						<input id="eco_component_id" name="eco_component_id" type="hidden" class="eco_component_id required"/>
+				<form
+						id="ecr_form"
+						method="post"
+						action="/engineering/ecr/request"
+						onsubmit="f_submit(event, this)"
+
+						th:id="${pepend} + '_form'"
+						th:with="labelText='Reason for Request:'">
+
+					<div class="row part_number_row" th:fragment="related( partNumber )">
+						<input
+								type="hidden"
+								class="component_id required"
+								name="component_id"
+
+								th:value="${partNumber}==null ? '' : ${partNumber.id}" />
+
 						<div class="col-md-auto">
 							<div class="input-group">
 								<div class="input-group-prepend" title="Top Component's Irt Part Number">
-									<span class="input-group-text" id="prepend-pn">P/N:</span>
+									<span class="input-group-text" >P/N:</span>
 								</div>
-								<input type="text" id="eco_part_number" class="form-control eco_part_number" placeholder="IRT Part Number" aria-label="IRT Part Number" aria-describedby="prepend-pn" />
+								<input
+										type="text"
+										class="form-control part_number controlled_text"
+										placeholder="IRT Part Number"
+										aria-label="IRT Part Number"
+										onchange="f_onPartNumberChange(this)"
+
+										th:value="${partNumber}==null ? '' : ${partNumber.partNumber}"
+										 />
 								<div class="input-group-append">
 									<button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-											<span class="sr-only">Toggle Dropdown</span>
+										<span class="sr-only">Toggle Dropdown</span>
 									</button>
 									<div class="dropdown-menu">
-										<a class="dropdown-item eco_add_project disabled" href="#">Add Related Project</a>
+										<a class="dropdown-item" href="#" onclick="f_addProject(this);" >Add Related Project</a>
 										<div role="separator" class="dropdown-divider"></div>
-										<a class="dropdown-item eco_remove_project" href="#">Remove</a>
+										<a class="dropdown-item" href="#" onclick="f_removeProject(this)" >Remove</a>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="col-md-auto">
-						<div class="row">
-						<div class="col-sm-auto pr-0">
-							<p class="card-text">New Rev.#</p>
-						</div>
-						<div class="col-sm-auto pl-0">
-							<p id="eco_new_rev" class="card-text eco_new_rev">Auto</p>
-						</div>
-						</div>
-						</div>
 						<div class="col-md">
-							<p id="eco_description" class="card-text eco_description bg-info text-white text-center">Enter the project part number to which this request relates.</p>
+							<p class="card-text component_description bg-info text-white text-center" th:text="${partNumber}==null ? 'Enter the part number of the project this request relates to.' : ${partNumber.description}">Enter the part number of the project this request relates to.</p>
 						</div>
 					</div>
+
 					<div class="row mt-3">
 						<div class="col-sm-auto font-weight-bold">Category of change:</div>
-						<div class="col-md" th:remove="all-but-first">
-							<div class="form-check form-check-inline" th:each="ecoCategory : ${T(irt.stock.data.jpa.beans.engineering.eco.EcoCategory).values()}">
-								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_mechanical_design" th:id="${ecoCategory.name()}" value="1" title="Mechanical Design" th:value="${ecoCategory.ordinal()}" th:title="${ecoCategory.description}" />
-								<label class="form-check-label" for="eco_category_mechanical_design" th:for="${ecoCategory.name()}" th:text="${ecoCategory.description}">Mechanical Design</label>
+						<div class="col-md btn-group btn-group-toggle" id="ecr_categories_row" th:id="${prepend} + '_categories_row'" data-toggle="buttons" th:remove="all-but-first" th:fragment="categories( engineeringChange )">
+
+							<label
+									for="ecr_category_mechanical_design"
+									th:for="${ecoCategory.name()}"
+									class="btn btn-outline-primary btn-sm"
+
+									th:each="ecoCategory : ${T(irt.stock.data.jpa.beans.engineering.ecr.EcrCategory.Category).values()}"
+									th:with="isCategory= ${ engineeringChange }!=null ? ${engineeringChange.containsCategory( ecoCategory )} : false"
+									th:classappend="${isCategory} ? 'active'"
+									th:inline="text" >
+								<input
+										type="checkbox"
+										class="form-check-input required_at_least_one"
+										name="category"
+										title="Mechanical Design"
+										autocomplete="off"
+										value="1"
+										onchange="f_addFileRelation(this);"
+
+										th:value="${ecoCategory.ordinal()}"
+										th:title="${ecoCategory.description}"
+										th:checked="${isCategory}" /><!--/*-->Mechanical Design<!--*/--><!--/*/[[${ecoCategory.description}]]/*/--></label>
+
+							<label class="btn btn-outline-primary" for="ecr_category_electrical_design">
+								<input class="form-check-input ecr_category required_at_least_one" type="checkbox" name='ecr_category' id="ecr_category_electrical_design" autocomplete="off" value="2" title="Electrical Design" onchange="f_addFileRelation(this)" />
+								Electrical Design
+							</label>
+
+							<label class="btn btn-outline-primary" for="ecr_category_pcb_design">
+								<input class="form-check-input ecr_category required_at_least_one" type="checkbox" name='ecr_category' id="ecr_category_pcb_design" value="4" title="PCB Design" onchange="f_addFileRelation(this)" />
+								PCB Design
+							</label>
+
+							<label class="btn btn-outline-primary" for="ecr_category_software_design">
+								<input class="form-check-input ecr_category required_at_least_one" type="checkbox" name='ecr_category' id="ecr_category_software_design" value="8" title="Software Design" onchange="f_addFileRelation(this)" />
+								Software Design
+							</label>
+
+							<label class="btn btn-outline-primary" for="ecr_category_bom">
+								<input class="form-check-input ecr_category required_at_least_one" type="checkbox" name='ecr_category' id="ecr_category_bom" value="16" title="BOM" onchange="f_addFileRelation(this)" />
+								BOM
+							</label>
+
+							<label class="btn btn-outline-primary" for="ecr_category_rework">
+								<input class="form-check-input ecr_category required_at_least_one" type="checkbox" name='ecr_category' id="ecr_category_rework" value="32" title="Rework" onchange="f_addFileRelation(this" />
+								Rework
+							</label>
+						</div>
+					</div>
+
+<th:block th:fragment="textAndFile(prepend, labelText)">
+
+<!-- Reason for Change -->
+					<div 	class="row form-group mt-3"
+							th:with="textAreaName = ${prepend} + '_text_area'" >
+						<label
+								for="ecr_text_area"
+								class="font-weight-bold"
+
+								th:for="${textAreaName}"
+								th:text="${labelText}">
+							Reason for Request:
+						</label>
+						<textarea
+								class="form-control controlled_text required"
+								id="ecr_text_area"
+								name="text_area"
+								oninput="f_enableButtons(this)"
+
+								th:id="${textAreaName}" ></textarea>
+					</div>
+<!-- File upload -->
+					<div class="file_upload_row row mb-3" >
+
+						<div class="input-group ecr_file_upload_row" th:fragment="file_upload" >
+							<div class="input-group-prepend">
+								<select class="input-group-text btn btn-outline-secondary file_upload_category"
+								name="file_category"
+								onchange="f_addRequiredClass(this, 'file_upload')"  >
+
+									<option selected value="">Select</option>
+<!--/*/								<option th:if="*{categories}"
+											th:each="category : *{categories}"
+											th:with="ecoCategory = ${category.id.category}"
+											th:value="${ecoCategory.ordinal()}"
+											th:text="${ecoCategory.toString()}">
+											Category Name
+									</option>/*/-->
+								</select>
 							</div>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_electrical_design" value="2" title="Electrical Design" />
-								<label class="form-check-label" for="eco_category_electrical_design">Electrical Design</label>
+							<div class="custom-file" th:with="fileUploadID = ${prepend} + '_file_upload'">
+								<input
+										type="file"
+										class="custom-file-input file_upload"
+										id="ecr_file_upload"
+										name="file_upload"
+										aria-describedby="ecr_file_category"
+										onchange="f_addRequiredClass(this, 'file_upload_category'); f_checkFiles(this);"
+
+										th:id="${fileUploadID}" />
+								<label
+										class="custom-file-label btn btn-outline-secondary"
+										for="ecr_file_upload"
+
+										th:for="${fileUploadID}">Choose file</label>
 							</div>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_pcb_design" value="4" title="PCB Design" />
-								<label class="form-check-label" for="eco_category_pcb_design">PCB Design</label>
-							</div>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_software_design" value="8" title="Software Design" />
-								<label class="form-check-label" for="eco_category_software_design">Software Design</label>
-							</div>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_bom" value="16" title="BOM" />
-								<label class="form-check-label" for="eco_category_bom">BOM</label>
-							</div>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="checkbox" name='eco_change_category' id="eco_category_rework" value="32" title="Rework" />
-								<label class="form-check-label" for="eco_category_rework">Rework</label>
+							<div class="input-group-append">
+								<button
+										type="button"
+										class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+										data-toggle="dropdown"
+										aria-haspopup="true"
+										aria-expanded="false">
+									<span class="sr-only">Toggle Dropdown</span>
+								</button>
+								<div class="dropdown-menu">
+									<a
+											class="dropdown-item"
+											href="#"
+											onclick="f_addFileRow(this)" >Add</a>
+									<div role="separator" class="dropdown-divider"></div>
+									<a
+											class="dropdown-item"
+											href="#"
+											onclick="f_removeFileRow(this)" >Remove</a>
+								</div>
 							</div>
 						</div>
 					</div>
-					<div class="row form-group mt-3">
-						<label for="eco_reason" class="font-weight-bold">Reason for Change:</label>
-						<textarea class="form-control required" id="eco_reason" name="eco_reason" rows="2"></textarea>
+</th:block>
+					<div class="row mt-3">
+						<button
+								id="btn_send"
+								type="submit"
+								class="form-control btn btn-outline-success disabled to_enable"
+								disabled="disabled">
+							Send Request
+						</button>
 					</div>
-					<div class="row form-group">
-						<label for="eco_description" class="font-weight-bold">Description of changes:</label>
-						<textarea class="form-control required" id="eco_description" name="eco_description" rows="5"></textarea>
+				</form>
+			</div>
+		</div>
+<button class="btn btn-outline-secondary dropdown-toggle form-control" type="button" id="showECRs" data-toggle="collapse" data-target="#ECRs" aria-controls="ECRs" aria-expanded="false"></button>
+<div id="ECRs" class="collapse" >
+		<div class="row">
+
+<!-- Filter by ECR Status -->
+		<div id="ecr_filter" class="btn-group btn-group-toggle input-group" data-toggle="buttons">
+			<label class="btn btn-outline-info" th:each="ecrStatus : ${T(irt.stock.data.jpa.beans.engineering.ecr.EcrStatus.Status).values()}" th:inline="text">
+				<input
+						type="checkbox"
+						name="ecr_status"
+						id="ecr_status"
+						autocomplete="off"
+
+						th:id="${ecrStatus.name()}"
+						th:value="${ecrStatus.ordinal()}" /><!--/*/[[${ecrStatus.toString()}]]/*/--><!--/*--> Created<!--*/--></label>
+		</div>
+		</div>
+
+<!-- accordion -->
+		<div class="accordion" id="ecr_accordion" th:remove="body">
+
+<!-- th:fragment="ecr_card" -->
+			<div class="card border-dark mt-10"  >
+<!-- Card header -->
+    			<div class="card-header" id="card_header" >
+      				<h6 class="mb-0">
+        				<button class="btn btn-link collapsed"
+        						type="button"
+        						data-toggle="collapse"
+        						data-target="#collapseTwo" aria-controls="collapseTwo"
+        						aria-expanded="false" >
+        						ECR #3434 of September 12, 2000 by OP
+        				</button>
+        				Reason of this ECR
+      				</h6>
+    			</div>
+<!-- Card Body -->
+    			<div id="collapseTwo" class="collapse" aria-labelledby="card_header" data-parent="#ecr_accordion" >
+				<div class="card-body" id="ecr_card_body">
+<!-- Categories -->
+					<div class="col-md btn-group btn-group-toggle" data-toggle="buttons">
+
+						<label class="btn btn-outline-primary btn-sm" for="ecr_category_mechanical_design"  >
+							<input class="form-check-input"
+									type="checkbox"
+									name='ecr_category'
+									autocomplete="off"
+									id="ecr_category_mechanical_design"
+									value="1"
+									title="Mechanical Design" />
+							Mechanical Design 
+						</label>
+
+						<label class="btn btn-outline-primary" for="ecr_category_electrical_design">
+							<input class="form-check-input" type="checkbox" name='ecr_category' id="ecr_category_electrical_design" autocomplete="off" value="2" title="Electrical Design" />
+							Electrical Design
+						</label>
+
+						<label class="btn btn-outline-primary active" for="ecr_category_pcb_design">
+							<input class="form-check-input" type="checkbox" name='ecr_category' id="ecr_category_pcb_design" value="4" title="PCB Design" checked="checked" />
+							PCB Design
+						</label>
+
+						<label class="btn btn-outline-primary" for="ecr_category_software_design">
+							<input class="form-check-input" type="checkbox" name='ecr_category' id="ecr_category_software_design" value="8" title="Software Design" />
+							Software Design
+						</label>
+
+						<label class="btn btn-outline-primary" for="ecr_category_bom">
+							<input class="form-check-input" type="checkbox" name='ecr_category' id="ecr_category_bom" value="16" title="BOM" />
+							BOM
+						</label>
+
+						<label class="btn btn-outline-primary" for="ecr_category_rework">
+							<input class="form-check-input" type="checkbox" name='ecr_category' id="ecr_category_rework" value="32" title="Rework" />
+							Rework
+						</label>
 					</div>
-					<div class="row eco_file_upload_row mb-3" id="eco_file_upload_row">
+
+<!-- Related to -->
+					<div>
+						<h6 class="mb0">ECR related to:</h6>
+						<div class="row">
+							<div class="column"><h5 class="mt-0">0CO-020MSC-0241</h5></div>
+							<div class="column"><p class="mt-0 ml3" > - Component description</p></div>
+						</div>
+					</div>
+
+<!-- Status History-->
+					<div>
+
+						<h6 class="mt-0 mb-0" th:inline="text">ECR status change history:</h6>
+<!-- Status -->
+							<p class="m-0"></p>
+<!-- Comments -->
+							<p class="m-0"></p>
+<!-- Files -->
+							<p class="m-0"><a href="#" >File 1</a></p>
+					</div>
+<!-- New Comment -->
+					<div class="row form-group mt-3" > <label for="ecr_comments" class="font-weight-bold"> Comments: </label> <textarea class="form-control" id="ecr_comments" rows="2"> </textarea> </div>
+<!-- add File(s) -->
+					<div class="row mb-3" id="ecr_upload_row_1'" >
+
 						<div class="input-group">
+
 							<div class="input-group-prepend">
-								<select class="input-group-text eco_file_relation" id="eco_file_relation" name="eco_file_relation">
+								<select class="input-group-text" id="ecr_upload_category" disabled="disabled">
+
 									<option selected value="">Select</option>
+									<option>Category Name</option>
 								</select>
 							</div>
 							<div class="custom-file">
-								<input type="file" class="custom-file-input eco_file_upload required" id="eco_file_upload" name="eco_file_upload" aria-describedby="eco_file_relation" disabled="disabled" />
-								<label class="custom-file-label" for="eco_file_upload">Choose file</label>
+
+								<input
+										type="file"
+										class="custom-file-input"
+										id="ecr_upload_upload_file_row_1"
+										aria-describedby="ecr_upload_category"
+										disabled="disabled" />
+
+								<label class="custom-file-label" for="ecr_file_upload" >
+									Choose file
+								</label>
 							</div>
 							<div class="input-group-append">
 								<button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									<span class="sr-only">Toggle Dropdown</span>
 								</button>
 								<div class="dropdown-menu">
-									<a class="dropdown-item eco_add_file_upload" href="#">Add</a>
+									<a class="dropdown-item ecr_add_file_upload" href="#">Add</a>
 									<div role="separator" class="dropdown-divider"></div>
-									<a class="dropdown-item eco_remove_file_upload" href="#">Remove</a>
+									<a class="dropdown-item ecr_remove_file_upload" href="#">Remove</a>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="row mt-3">
-						<div class="col-md-auto">
-							<div class="input-group">
-								<div class="input-group-prepend">
-									<label class="input-group-text" for="eco_send_to">Select the person to whom you want to send a request</label>
-								</div>
-								<select class="custom-select required" id="eco_send_to" name="eco_send_to">
-									<option selected value="">Select</option>
-									<option value="1" th:each="top : ${engineeringTop}" th:value="${top.id}" th:text="${top.firstname} + ' ' + ${top.lastname}">One</option>
+<!-- Buttons -->
+						<button id="ecr_btn_reject" class="form-control btn btn-outline-warning disabled ecr_btn_reject" disabled="disabled">Reject</button>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<select id="ecr_forvard_to" class="disabled btn btn-outline-primary" disabled="disabled">
+									<option value="">Select</option>
+									<option value="1" >Oleksandr Potomkin</option>
 								</select>
 							</div>
+							<button id="ecr_btn_forvard" class="form-control btn btn-outline-primary disabled ecr_btn_forvard" disabled="disabled">Forward</button>
 						</div>
-						<div class="col-md-auto">
-							<button id="btn_send" type="submit" class="btn btn-primary" disabled="disabled">Send Request</button>
-						</div>
-					</div>
-				</form>
+						<button id="ecr_btn_to_eco" class="form-control btn btn-outline-success ecr_btn_to_eco">Create ECO</button>
+      			</div>
+    			</div>
 			</div>
 		</div>
+		<div class="row">
+			<button id="ecr_show_more" class="btn btn-outline-secondary btn-block">Show more</button>
+		</div>
+</div>
 	</div>
 	<div id="modalLoad"></div>
 	<th:block th:replace="home::bootstrap_script">
@@ -292,106 +529,20 @@
 	</th:block>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" th:src="@{/webjars/jquery-ui/1.12.1/jquery-ui.min.js}"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js" th:src="@{/webjars/bs-custom-file-input/1.3.2-1/dist/bs-custom-file-input.min.js}"></script>
-<!-- 	<script src="../../../static/js/eco.js" th:src="@{/js/eco.js}"></script> -->
 	<script type="text/javascript" th:inline="javascript">
 		bsCustomFileInput.init();
 		$('#engineeringMenu').addClass('active');
 		$('#newEcoMenu').addClass('active');
 
 		//Warnibg beafor unloading this page
-		window
-				.addEventListener(
-						"beforeunload",
-						function(e) {
-							var confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
-							(e || window.event).returnValue = confirmationMessage; //Gecko + IE
-							return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-						});
-
-		// Check file sizes
-		function f_check_files(){
-
-			var maxSize = /*[[${maxSize}]]*/ 1048576;
-			var maxRequest = /*[[${maxRequest}]]*/ 10485760;
-			var disable = false;
-			var totalSize = 0;
-			var files = [];
-
-			$('.eco_file_upload').each(function(){
-
-				if(this.files.length == 0)
-					return false;
-
-				var size = this.files[0].size;
-
-				if(size == 0){
-					disable = true;
-					alert('The file "' + this.files[0].name + '" is empty.');
-					return false;
-				}
-
-				if(size > maxSize){
-					disable = true;
-					alert('The file size is to big ("' + this.files[0].name + '"). Maximum allowed size is ' + maxSize + ' bytes');
-					return false;
-				}
-
-				totalSize += size;
-				if(totalSize > maxRequest){
-					disable = true;
-					alert('The total files size is to big . Maximum allowed size is ' + maxRequest + ' bytes');
-					return false;
-				}
-
-				files.push(this.files[0].name);
-			});
-
-			// Check for duplicate files
-			if(!disable && files.filter((value,index)=>files.indexOf(value) === index).length !== files.length){
-				alert('You have specified two or more links to the same file.');
-				disable = true
-			}
-
-			return disable;
+		function f_beforeunload(e) {
+			var confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+			(e || window.event).returnValue = confirmationMessage; //Gecko + IE
+			return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
 		}
+		window.addEventListener("beforeunload", f_beforeunload);
 
-		// Enable/Bisable 'Send Request' button
-		function f_enableSendButton(){
-
-			var disable = false;
-
-			$('.required').each(
-					function(){
-
-						if(this.disabled)
-							return true;
-
-						if(!this.value){
-							disable = true;
-							return false;
-						}
-					});
-
-			if(!disable){
-				// On Categories checked
-				disable = true;
-				$('.form-check-input:checked').each(
-						function(){
-							disable = false;
-							return false;
-						});
-			}
-
-			if(!disable)
-				disable = f_check_files();
-
-			if(disable)
-				$('#btn_send').attr('disabled', 'disabled');
-			else
-				$('#btn_send').removeAttr('disabled');
-		}
-
-		//Autocomplete '#eco_part_number'
+		//Autocomplete '#ecr_part_number'
 		function f_autocomplete(request, response){
 
 			var input = request.term.replace(/-/g, "").toUpperCase();
@@ -414,41 +565,21 @@
 			});
 			+]*/
 		}
-		function f_get_new_revision(partNumber, index){
+		$(".part_number").autocomplete({ source : f_autocomplete });
 
-			var revisionId = '#eco_new_rev' + index;
-			/*[- */
-				var currentRevision = partNumber.substring(partNumber.length-2, partNumber.length);
-				var newRevision = parseInt(currentRevision) + 1;
-				$(revisionId).text(newRevision);
-			/* -]*/
-			/*[+
-				$.post("/pn/new/revision", { partNumber : partNumber }, function(newRevision){
-					$(revisionId).text(newRevision);
-				});
-			+]*/
-		}
 		var partNumbers;
-		$(".eco_part_number").autocomplete({ source : f_autocomplete });
-		function f_onInputChange(){
+		function f_onPartNumberChange(input){
 
-			var input = this;
 		if(partNumbers)	{
 			// print description
-			var index = input.id.replace('eco_part_number', '');
-
-			// Revision
-			var revisionId = '#eco_new_rev' + index;
-			var revision = $(revisionId);
-			revision.text('');
+			var row = $(input).closest('.part_number_row');
 
 			// Description
-			var descriptionId = '#eco_description' + index;
-			var description = $(descriptionId);
-			description.text('');
+			var description = row.find('.component_description');
+			description.text('Enter the part number of the project this request relates to.');
 
 			// Component ID
-			var hiddenComponentId = $('#eco_component_id' + index);
+			var hiddenComponentId = row.find('.component_id');
 			hiddenComponentId.val("");
 
 			var printedValue = input.value.replace(/-/g, "").toUpperCase()
@@ -461,167 +592,22 @@
 
 			// Disable/Enable 'Add Project' links
 			var counter = 0;
-			var hiddenFields = $(".eco_component_id");
+			var hiddenFields = row.closest('.card-header').find(".component_id");
 			hiddenFields.each(function(){
 				if (this.value)
 					counter++;
 			});
 			if(hiddenFields.length==counter)
-				$('.eco_add_project').removeClass("disabled");
+				row.find('.ecr_add_project').removeClass("disabled");
 			else
-				$('.eco_add_project').addClass("disabled");
+				row.find('.ecr_add_project').addClass("disabled");
 
-			f_enableSendButton();
-			f_get_new_revision(printedValue, index);
+			f_enableButtons(input);
 		}}
-		$('.card-body').on('change', 'input', f_onInputChange);
 
-		function f_setNameAndId(dom, name){
-			dom.attr("id",name);
-// 			dom.attr("name",name);
-		}
-		//Add project links
-		function f_addProject(){
-			var parent = $(this).closest('.eco_part_number_row');
-			var clon = $('#eco_part_number_row').clone().removeAttr('id').insertAfter(parent);
-			// reset IDs
-			$('.eco_part_number_row').each(function(index){
-				var appender = index ? index : '';
-
-				f_setNameAndId($(this).find('.eco_component_id'), 'eco_component_id' + appender);
-				f_setNameAndId($(this).find('.eco_part_number')	, 'eco_part_number' + appender);
-				f_setNameAndId($(this).find('.eco_description')	, 'eco_description' + appender);
-				f_setNameAndId($(this).find('.eco_new_rev')		, 'eco_new_rev' + appender);
-			});
-
-			var input = clon.find('.eco_part_number');
-			input.autocomplete({ source : f_autocomplete });
-			input.val('');
-			f_enableSendButton();
-			clon.find('.dropdown-menu').dropdown('hide');
-			clon.find('.eco_add_project').click(f_addProject);
-			clon.find('.eco_remove_project').click(f_removeProject);
-			f_enableSendButton();
-		}
-		$('.eco_add_project').click(f_addProject);
-
-		// Remove project link
-		function f_removeProject(){
-			if($('.eco_part_number_row').length==1){
-				$('#eco_part_number').val('');
-			}else{
-				var row = $(this).closest('.eco_part_number_row');
-				if(row.find('.eco_part_number').val()){
-					if(confirm("Are you sure you want to remove this project?")){
-						row.remove();
-					}
-				}else{
-					row.remove();
-				}
-			}
-			f_enableSendButton();
-		}
-
-		function f_addFileRelation(){
-			var select = $('.eco_file_relation');
-			if(this.checked){
-				var option = new Option(this.title, this.value);
-				select.append(option);
-			}else{
-				select.find("option[value='" + this.value + "']").remove();
-				select.trigger('change');
-			}
-		}
-		$('.eco_remove_project').click(function(){f_removeProject(this);});
-		//anable 'Send request' button
-		$('.card-body').on('change', 'textarea', f_enableSendButton);
-		$('.card-body').on('change', 'input[type="checkbox"]', f_addFileRelation);
-		$('.card-body').on('change', 'input[type="checkbox"]', f_enableSendButton);
-		$('.card-body').on('change', 'select', f_enableSendButton);
-
-		function f_anableFileUpload(){
-
-			var fileInput = $(this).closest('.input-group').find("input");
-
-			if(this.value){
-				fileInput.attr('disabled',false)
-			}else{
-				fileInput.attr('disabled',true)
-			}
-
-			f_enableSendButton();
-		}
-		$('.card-body').on('change', 'select.eco_file_relation', f_anableFileUpload);
-
-
-		// Remove File Upload Row
-		function f_removeFileUpload(){
-			$(this).closest('.eco_file_upload_row').remove();
-		}
-		// Add File Upload Row
-		function f_addFileUpload(){
-			var parent = $(this).closest('.eco_file_upload_row')
-			var clon = $('#eco_file_upload_row').clone().removeAttr('id').insertAfter(parent);
-			// reset IDs
-			$('.eco_file_upload_row').each(function(index){
-
-				var appender = index ? index : '';
-
-				f_setNameAndId($(this).find('.eco_file_relation'), 'eco_file_relation' + appender);
-
-				var uploadId = 'eco_file_upload' + appender;
-				f_setNameAndId($(this).find('.eco_file_upload'), uploadId);
-				$(this).find('.custom-file-label').attr("for", uploadId);
-			});
-
-			var inp = clon.find("input")
-			inp.val(null);
-			inp.attr("disabled", true);
-			clon.find("label").text("Choose file");
-			clon.find(".eco_add_file_upload").click(f_addFileUpload);
-			clon.find(".eco_remove_file_upload").click(f_removeFileUpload);
-			clon.find('.dropdown-menu').dropdown('hide');
-			bsCustomFileInput.init()
-			f_enableSendButton();
-		}
-		$('.eco_add_file_upload').click(f_addFileUpload);
-		$('.eco_remove_file_upload').click(f_removeFileUpload);
-
-		$("#eco_form").submit(function(e){
-			e.preventDefault();
-
-			var data = new FormData($("#eco_form")[0]);
-			jQuery.ajax({
-			    url: '/engineering/eco/new',
-			    data: data,
-			    cache: false,
-			    contentType: false,
-			    processData: false,
-			    method: 'POST',
-			    type: 'POST', // For jQuery < 1.9
-			    success: function(data){
-
-			    	if(data)
-				        alert(data);
-
-			    	// Cancel onbeforeunload event handler.
-			    	window.onbeforeunload = function () {
-			    		  // blank function do nothing
-			    		}
-			    	window.location.replace("/engineering/eco");
-			    }
-			});
-	
-			$('#btn_send')				.attr('disabled', 'disabled');
-			$('.eco_part_number')		.attr('disabled', 'disabled');
-			$('.eco_change_category')	.attr('disabled', 'disabled');
-			$('#eco_reason')			.attr('disabled', 'disabled');
-			$('#eco_description')		.attr('disabled', 'disabled');
-			$('.eco_file_relation')		.attr('disabled', 'disabled');
-			$('.eco_file_upload')		.attr('disabled', 'disabled');
-			$('#eco_send_to')			.attr('disabled', 'disabled');
-		});
 		//# sourceURL=new-eco-page.js
 	</script>
+<script src="../../../static/js/eco/ecr.js" th:src="@{/js/eco/ecr.js}" type="text/javascript"></script>
+<script src="../../../static/js/eco/ec.js" th:src="@{/js/eco/ec.js}" type="text/javascript"></script>
 </body>
 </html>

@@ -10,6 +10,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface EcoRepository extends PagingAndSortingRepository<Eco, Long>, JpaSpecificationExecutor<Eco> {
 
 	List<Eco> findByStatusIn(Collection<EcoStatus> status, Pageable pageable);
-
 	List<Eco> findByStatusInAndNumber(List<EcoStatus> ecoStatus, String ecoNumber, Pageable pageable);
 }

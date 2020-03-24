@@ -16,11 +16,15 @@
 
 package irt.stock;
 
+import java.text.SimpleDateFormat;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class IrtStockApp {
+
+	public final static SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm");
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(IrtStockApp.class, args);
