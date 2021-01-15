@@ -1,6 +1,7 @@
 package irt.stock.rest;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -13,12 +14,10 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import irt.stock.data.jpa.beans.Company;
 import irt.stock.data.jpa.beans.Company.CompanyType;
@@ -35,7 +34,7 @@ import irt.stock.data.jpa.repositories.CostRepository;
 import irt.stock.data.jpa.repositories.ManufactureRepository;
 import irt.stock.rest.helpers.StockReport;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class ComponentRestControllerTest {
 	private final static Logger logger = LogManager.getLogger();
@@ -50,7 +49,7 @@ public class ComponentRestControllerTest {
 
 	private Company company;
 
-	@Before
+	@BeforeTestClass
 	public void befor() {
 
 		final Manufacture manufacture = manufactureRepository.save(new Manufacture("CA", "name", "link"));

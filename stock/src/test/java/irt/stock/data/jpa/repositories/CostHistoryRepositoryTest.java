@@ -1,7 +1,8 @@
 package irt.stock.data.jpa.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,12 +10,10 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import irt.stock.data.jpa.beans.Company;
 import irt.stock.data.jpa.beans.Company.CompanyType;
@@ -25,7 +24,7 @@ import irt.stock.data.jpa.beans.Cost.OrderType;
 import irt.stock.data.jpa.beans.CostHistory;
 import irt.stock.data.jpa.beans.Manufacture;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class CostHistoryRepositoryTest {
 
@@ -40,7 +39,7 @@ public class CostHistoryRepositoryTest {
 	private Component component;
 	private List<CostHistory> costHistoryList = new ArrayList<>();
 
-	@Before
+	@BeforeTestClass
 	public void before() {
 		Manufacture manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
 		component = componentRepository.save(new Component("partNumber", manufacture, null));

@@ -1,22 +1,21 @@
 package irt.stock.data.jpa.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import irt.stock.data.jpa.beans.Component;
 import irt.stock.data.jpa.beans.ComponentAlternative;
 import irt.stock.data.jpa.beans.Manufacture;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class ComponentAlternativeRepositoryTest {
 
@@ -29,7 +28,7 @@ public class ComponentAlternativeRepositoryTest {
 	private Component component;
 	private Manufacture manufacture;
 
-	@Before
+	@BeforeTestClass
 	public void before() {
 		manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
 		component = componentRepository.save(new Component("partNumber", null, null));

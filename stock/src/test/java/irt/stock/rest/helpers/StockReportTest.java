@@ -1,10 +1,12 @@
 package irt.stock.rest.helpers;
 
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import irt.stock.data.jpa.beans.Cost.Currency;
 import irt.stock.rest.helpers.StockReport.SumCollector;

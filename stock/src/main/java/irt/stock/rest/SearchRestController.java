@@ -77,97 +77,97 @@ public class SearchRestController {
 					switch (switchCase) {
 
 					case PN:
-						return componentRepository.findByPartNumberContaining(partNumber);
+						return componentRepository.findByPartNumberContainingOrderByPartNumber(partNumber);
 
 					case MFR_PN:
-						return componentRepository.findDistinctByManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContaining(mfrPN, mfrPN);
+						return componentRepository.findDistinctByManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(mfrPN, mfrPN);
 
 					case MFR:
-						return componentRepository.findByManufactureNameContaining(mfr);
+						return componentRepository.findByManufactureNameContainingOrderByPartNumber(mfr);
 
 					case VAL:
-						return componentRepository.findByValueContaining(val);
+						return componentRepository.findByValueContainingOrderByPartNumber(val);
 
 					case DESCRIPTION:
-						return componentRepository.findByDescriptionContaining(description);
+						return componentRepository.findByDescriptionContainingOrderByPartNumber(description);
 
 					case PN + MFR_PN:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContaining(partNumber, mfrPN);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingOrderByPartNumber(partNumber, mfrPN);
 
 					case PN + MFR:
-						return componentRepository.findByPartNumberContainingAndManufactureNameContaining(partNumber, mfr);
+						return componentRepository.findByPartNumberContainingAndManufactureNameContainingOrderByPartNumber(partNumber, mfr);
 
 					case PN + DESCRIPTION:
-						return componentRepository.findByPartNumberContainingAndDescriptionContaining(partNumber, description);
+						return componentRepository.findByPartNumberContainingAndDescriptionContainingOrderByPartNumber(partNumber, description);
 
 					case PN + VAL:
-						return componentRepository.findByPartNumberContainingAndValueContaining(partNumber, val);
+						return componentRepository.findByPartNumberContainingAndValueContainingOrderByPartNumber(partNumber, val);
 
 					case PN + DESCRIPTION + VAL:
-						return componentRepository.findByPartNumberContainingAndDescriptionContainingAndValueContaining(partNumber, description, val);
+						return componentRepository.findByPartNumberContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(partNumber, description, val);
 
 					case PN + MFR + DESCRIPTION:
-						return componentRepository.findByPartNumberContainingAndManufactureNameContainingAndDescriptionContaining(partNumber, mfr, description);
+						return componentRepository.findByPartNumberContainingAndManufactureNameContainingAndDescriptionContainingOrderByPartNumber(partNumber, mfr, description);
 
 					case PN + MFR + VAL:
-						return componentRepository.findByPartNumberContainingAndManufactureNameContainingAndValueContaining(partNumber, mfr, val);
+						return componentRepository.findByPartNumberContainingAndManufactureNameContainingAndValueContainingOrderByPartNumber(partNumber, mfr, val);
 
 					case PN + MFR + DESCRIPTION + VAL:
-						return componentRepository.findByPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContaining(partNumber, mfr, description, val);
+						return componentRepository.findByPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(partNumber, mfr, description, val);
 
 					case PN + MFR_PN + MFR:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContaining(partNumber, mfrPN, mfr);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingOrderByPartNumber(partNumber, mfrPN, mfr);
 
 					case PN + MFR_PN + MFR + DESCRIPTION:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContaining(partNumber, mfrPN, mfr, description);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingOrderByPartNumber(partNumber, mfrPN, mfr, description);
 
 					case PN + MFR_PN + DESCRIPTION:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContaining(partNumber, mfrPN, description);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContainingOrderByPartNumber(partNumber, mfrPN, description);
 
 					case PN + MFR_PN + VAL:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndValueContaining(partNumber, mfrPN, val);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndValueContainingOrderByPartNumber(partNumber, mfrPN, val);
 
 					case PN + MFR_PN + DESCRIPTION + VAL:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContainingAndValueContaining(partNumber, mfrPN, description, val);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(partNumber, mfrPN, description, val);
 
 					case PN + MFR_PN + MFR + VAL:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndValueContaining(partNumber, mfrPN, mfr, val);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndValueContainingOrderByPartNumber(partNumber, mfrPN, mfr, val);
 
 					case PN + MFR_PN + MFR + DESCRIPTION + VAL:
-						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContaining(partNumber, mfrPN, mfr, description, val);
+						return componentRepository.findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(partNumber, mfrPN, mfr, description, val);
 
 					case  MFR_PN + MFR:
-						return componentRepository.findByManufPartNumberContainingAndManufactureNameContaining(mfrPN, mfr);
+						return componentRepository.findByManufPartNumberContainingAndManufactureNameContainingOrderByPartNumber(mfrPN, mfr);
 
 					case MFR_PN + DESCRIPTION:
-						return componentRepository.findByManufPartNumberContainingAndDescriptionContaining(mfrPN, description);
+						return componentRepository.findByManufPartNumberContainingAndDescriptionContainingOrderByPartNumber(mfrPN, description);
 
 					case MFR_PN + VAL:
-						return componentRepository.findByManufPartNumberContainingAndValueContaining(mfrPN, val);
+						return componentRepository.findByManufPartNumberContainingAndValueContainingOrderByPartNumber(mfrPN, val);
 
 					case MFR_PN + DESCRIPTION + VAL:
-						return componentRepository.findByManufPartNumberContainingAndDescriptionContainingAndValueContaining(mfrPN, description, val);
+						return componentRepository.findByManufPartNumberContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(mfrPN, description, val);
 
 					case MFR_PN + MFR + DESCRIPTION:
-						return componentRepository.findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContaining(mfrPN, mfr, description);
+						return componentRepository.findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingOrderByPartNumber(mfrPN, mfr, description);
 
 					case MFR_PN + MFR + VAL:
-						return componentRepository.findByManufPartNumberContainingAndManufactureNameContainingAndValueContaining(mfrPN, mfr, val);
+						return componentRepository.findByManufPartNumberContainingAndManufactureNameContainingAndValueContainingOrderByPartNumber(mfrPN, mfr, val);
 
 					case MFR_PN + MFR + DESCRIPTION + VAL:
-						return componentRepository.findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContaining(mfrPN, mfr, description, val);
+						return componentRepository.findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(mfrPN, mfr, description, val);
 
 					case MFR + DESCRIPTION:
-						return componentRepository.findByManufactureNameContainingAndDescriptionContaining(mfr, description);
+						return componentRepository.findByManufactureNameContainingAndDescriptionContainingOrderByPartNumber(mfr, description);
 
 					case MFR + VAL:
-						return componentRepository.findByManufactureNameContainingAndValueContaining(mfr, val);
+						return componentRepository.findByManufactureNameContainingAndValueContainingOrderByPartNumber(mfr, val);
 
 					case MFR + DESCRIPTION + VAL:
-						return componentRepository.findByManufactureNameContainingAndDescriptionContainingAndValueContaining(mfr, description, val);
+						return componentRepository.findByManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(mfr, description, val);
 
 					case DESCRIPTION + VAL:
-						return componentRepository.findByDescriptionContainingAndValueContaining(description, val);
+						return componentRepository.findByDescriptionContainingAndValueContainingOrderByPartNumber(description, val);
 					}
 					return null;
 				});

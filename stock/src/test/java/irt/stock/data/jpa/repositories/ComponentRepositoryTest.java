@@ -1,9 +1,10 @@
 package irt.stock.data.jpa.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,13 +13,11 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.AfterTestClass;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import irt.stock.data.jpa.beans.Company;
 import irt.stock.data.jpa.beans.Company.CompanyType;
@@ -29,7 +28,7 @@ import irt.stock.data.jpa.beans.Cost;
 import irt.stock.data.jpa.beans.Cost.Currency;
 import irt.stock.data.jpa.beans.Manufacture;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class ComponentRepositoryTest {
 
@@ -51,7 +50,7 @@ public class ComponentRepositoryTest {
 
 	private Cost cost;
 
-	@Before
+	@BeforeTestClass
 	public void before() {
 		company = companyRepository.save(new Company("Company Name", CompanyType.VENDOR));
 		manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
@@ -122,7 +121,7 @@ public class ComponentRepositoryTest {
 		assertEquals(component, get);
 	}
 
-	@After
+	@AfterTestClass
 	public void after(){
 		costRepository.deleteAll();
 		componentRepository.deleteAll();

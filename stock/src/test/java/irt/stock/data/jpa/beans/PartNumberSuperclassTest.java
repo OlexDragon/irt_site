@@ -1,8 +1,9 @@
 package irt.stock.data.jpa.beans;
 
-import static org.junit.Assert.*;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class PartNumberSuperclassTest {
 

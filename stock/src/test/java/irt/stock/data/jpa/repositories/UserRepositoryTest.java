@@ -1,24 +1,23 @@
 package irt.stock.data.jpa.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import irt.stock.data.jpa.beans.User;
 import irt.stock.data.jpa.beans.User.Status;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserRepositoryTest {
 
@@ -29,7 +28,7 @@ public class UserRepositoryTest {
 
 	private User user;
 
-	@Before
+	@BeforeTestClass
 	public void before() {
 		user = repository.save(new User( "username", "password", "firstName", "lastName", 7777777L, "extension", "email", Status.ACTIVE));
 	}

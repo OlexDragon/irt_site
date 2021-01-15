@@ -32,6 +32,10 @@ select > option:hover{
     background-image: none;
 	
 }
+.obsolete{
+	background-color: #D7A5A2;
+}
+
 /* placeholder */
 .form-control::placeholder { color: MistyRose; opacity:1; } /* Chrome, Firefox */
 :-ms-input-placeholder.form-control { color: MistyRose; opacity:1; }  /* Internet Explorer 10-11 */

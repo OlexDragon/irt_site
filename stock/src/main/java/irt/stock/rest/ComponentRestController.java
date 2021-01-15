@@ -41,6 +41,7 @@ import irt.stock.data.jpa.beans.Component;
 import irt.stock.data.jpa.beans.ComponentAlternative;
 import irt.stock.data.jpa.beans.ComponentMovement;
 import irt.stock.data.jpa.beans.ComponentMovementDetail;
+import irt.stock.data.jpa.beans.ComponentObsolete;
 import irt.stock.data.jpa.beans.Cost;
 import irt.stock.data.jpa.beans.Cost.Currency;
 import irt.stock.data.jpa.beans.Cost.OrderType;
@@ -322,6 +323,12 @@ public class ComponentRestController {
 		final String collect = StreamSupport
 
 				.stream( allComponents.spliterator(), false)
+
+				.filter(
+						component -> {
+							ComponentObsolete componentObsolete = component.getComponentObsolete();
+							return componentObsolete == null || componentObsolete.getStatus() == ComponentObsolete.Status.ACTIVE;
+						})
 				.map(
 						component->{
 							final int i = index.getAndIncrement();

@@ -12,74 +12,74 @@ public interface ComponentRepository extends CrudRepository<Component, Long> {
 	Optional<Component> findByPartNumber(String partNumber);
 
 	//	PN
-	List<Component> findByPartNumberContaining(String desired);
+	List<Component> findByPartNumberContainingOrderByPartNumber(String desired);
 	//	MFR_PN
-	List<Component> findDistinctByManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContaining(String mfrPN, String aMfrPN);
+	List<Component> findDistinctByManufPartNumberContainingOrAlternativeComponentsAltMfrPartNumberContainingOrderByPartNumber(String mfrPN, String aMfrPN);
 	//	MFR
-	List<Component> findByManufactureNameContaining(String desired);
+	List<Component> findByManufactureNameContainingOrderByPartNumber(String desired);
 	//	DESCRIPTION
-	List<Component> findByDescriptionContaining(String desired);
+	List<Component> findByDescriptionContainingOrderByPartNumber(String desired);
 	//	VAL
-	List<Component> findByValueContaining(String desired);
+	List<Component> findByValueContainingOrderByPartNumber(String desired);
 
 	//	PN + MFR_PN
-	List<Component> findByPartNumberContainingAndManufPartNumberContaining(String pn, String mfrPN);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingOrderByPartNumber(String pn, String mfrPN);
 	//	PN + MFR
-	List<Component> findByPartNumberContainingAndManufactureNameContaining(String pn, String mfr);
+	List<Component> findByPartNumberContainingAndManufactureNameContainingOrderByPartNumber(String pn, String mfr);
 	//	PN + VAL
-	List<Component> findByPartNumberContainingAndValueContaining(String pn, String value);
+	List<Component> findByPartNumberContainingAndValueContainingOrderByPartNumber(String pn, String value);
 	//	PN + DESCRIPTION
-	List<Component> findByPartNumberContainingAndDescriptionContaining(String pn, String description);
+	List<Component> findByPartNumberContainingAndDescriptionContainingOrderByPartNumber(String pn, String description);
 	//	PN + DESCRIPTION + VAL
-	List<Component> findByPartNumberContainingAndDescriptionContainingAndValueContaining(String pn, String description, String valu);
+	List<Component> findByPartNumberContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(String pn, String description, String valu);
 
 	//	PN + MFR_PN + MFR
-	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContaining(String pn, String mfrPN, String mfrName);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingOrderByPartNumber(String pn, String mfrPN, String mfrName);
 	//	PN + MFR_PN + MFR + DESCRIPTION
-	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContaining(String pn, String mfrPN, String mfrName, String description);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingOrderByPartNumber(String pn, String mfrPN, String mfrName, String description);
 	//	PN + MFR + DESCRIPTION
-	List<Component> findByPartNumberContainingAndManufactureNameContainingAndDescriptionContaining(String pn, String mfrName, String description);
+	List<Component> findByPartNumberContainingAndManufactureNameContainingAndDescriptionContainingOrderByPartNumber(String pn, String mfrName, String description);
 	//	PN + MFR + VAL
-	List<Component> findByPartNumberContainingAndManufactureNameContainingAndValueContaining(String pn, String mfrName, String value);
+	List<Component> findByPartNumberContainingAndManufactureNameContainingAndValueContainingOrderByPartNumber(String pn, String mfrName, String value);
 	//	PN + MFR + DESCRIPTION + VAL
-	List<Component> findByPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContaining(String pn, String mfrName, String description, String value);
+	List<Component> findByPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(String pn, String mfrName, String description, String value);
 	//	PN + MFR_PN + DESCRIPTION
-	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContaining(String pn, String mfrPN, String description);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContainingOrderByPartNumber(String pn, String mfrPN, String description);
 	//	PN + MFR_PN + VAL
-	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndValueContaining(String pn, String mfrPN, String value);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndValueContainingOrderByPartNumber(String pn, String mfrPN, String value);
 	//	PN + MFR_PN + DESCRIPTION + VAL
-	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContainingAndValueContaining(String pn, String mfrPN, String description, String value);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(String pn, String mfrPN, String description, String value);
 
 	//	MFR_PN + MFR
-	List<Component> findByManufPartNumberContainingAndManufactureNameContaining(String mfrPN, String mfrName);
+	List<Component> findByManufPartNumberContainingAndManufactureNameContainingOrderByPartNumber(String mfrPN, String mfrName);
 	//	MFR + DESCRIPTION
-	List<Component> findByManufactureNameContainingAndDescriptionContaining(String mfrName, String description);
+	List<Component> findByManufactureNameContainingAndDescriptionContainingOrderByPartNumber(String mfrName, String description);
 	//	MFR + VAL
-	List<Component> findByManufactureNameContainingAndValueContaining(String mfrName, String value);
+	List<Component> findByManufactureNameContainingAndValueContainingOrderByPartNumber(String mfrName, String value);
 	//	MFR + DESCRIPTION + VAL
-	List<Component> findByManufactureNameContainingAndDescriptionContainingAndValueContaining(String mfrName, String description, String value);
+	List<Component> findByManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(String mfrName, String description, String value);
 	//	MFR_PN + DESCRIPTION
-	List<Component> findByManufPartNumberContainingAndDescriptionContaining(String pn, String description);
+	List<Component> findByManufPartNumberContainingAndDescriptionContainingOrderByPartNumber(String pn, String description);
 	//	MFR_PN + VAL
-	List<Component> findByManufPartNumberContainingAndValueContaining(String pn, String value);
+	List<Component> findByManufPartNumberContainingAndValueContainingOrderByPartNumber(String pn, String value);
 	//	MFR_PN + DESCRIPTION + VAL
-	List<Component> findByManufPartNumberContainingAndDescriptionContainingAndValueContaining(String pn, String value, String description);
+	List<Component> findByManufPartNumberContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(String pn, String value, String description);
 
 	//	PN + MFR_PN + MFR + VAL
-	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndValueContaining(String pn, String mfrPN, String mfrName, String value);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndValueContainingOrderByPartNumber(String pn, String mfrPN, String mfrName, String value);
 
 	//	PN + MFR_PN + MFR + VAL
-	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContaining(String pn, String mfrPN, String mfrName, String description, String value);
+	List<Component> findByPartNumberContainingAndManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(String pn, String mfrPN, String mfrName, String description, String value);
 
 	//	PN + MFR_PN + MFR + DESCRIPTION
-	List<Component> findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContaining(String mfrPN, String mfrName, String description);
+	List<Component> findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingOrderByPartNumber(String mfrPN, String mfrName, String description);
 	//	PN + MFR_PN + MFR + VAL
-	List<Component> findByManufPartNumberContainingAndManufactureNameContainingAndValueContaining(String mfrPN, String mfrName, String value);
+	List<Component> findByManufPartNumberContainingAndManufactureNameContainingAndValueContainingOrderByPartNumber(String mfrPN, String mfrName, String value);
 	//	PN + MFR_PN + MFR + DESCRIPTION + VAL
-	List<Component> findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContaining(String mfrPN, String mfrName, String descrption, String value);
+	List<Component> findByManufPartNumberContainingAndManufactureNameContainingAndDescriptionContainingAndValueContainingOrderByPartNumber(String mfrPN, String mfrName, String descrption, String value);
 
 	//	DESCRIPTION + VAL
-	List<Component> findByDescriptionContainingAndValueContaining(String description, String value);
+	List<Component> findByDescriptionContainingAndValueContainingOrderByPartNumber(String description, String value);
 
 	Iterable<Component> findAllByOrderByPartNumberAsc();
 

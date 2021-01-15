@@ -46,6 +46,7 @@
            				<a class="nav-link dropdown-toggle pull-right" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Stock</a>
 						<div class="dropdown-menu">
 							<a id="componentsMenu" class="dropdown-item " href="/">Components</a>
+							<a sec:authorize="hasAuthority('STOCK')" id="obsolete" class="dropdown-item " href="/component/obsolete">Obsolete Old Revisions</a>
    							<a id="fullReport" class="dropdown-item" href="/component/report" target="_blank">Full Stock Report</a>
    							<a class="dropdown-item" href="/apks/barcode.apk" download>APP Android</a>
 					    </div>

@@ -4,12 +4,19 @@ import java.util.Optional;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @MappedSuperclass
+@NoArgsConstructor @Getter @Setter @ToString
 public class PartNumberSuperclass{
 
-	protected PartNumberSuperclass() { }
 	public PartNumberSuperclass(String partNumber, String manufPartNumber, String description) {
 
 		this.partNumber 	 = Optional.ofNullable(partNumber).map(String::toUpperCase).map(pn->pn.replaceAll("[^A-Z0-9]", "")).filter(pn->!pn.isEmpty() && pn.length()>2).map(String::toUpperCase).orElseThrow(()->new NullPointerException("Part number can not be empty."));
@@ -22,19 +29,9 @@ public class PartNumberSuperclass{
 	private String partNumber;
 	private String manufPartNumber;
 	private String description;
-
-	public Long getId() 				{ return id; }
-	public String getPartNumber() 		{ return partNumber; }
-	public String getManufPartNumber() 	{ return manufPartNumber; }
-	public String getDescription() 		{ return description; }
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public void setPartNumber(String partNumber) {
-		this.partNumber = partNumber;
-	}
+    @OneToOne
+    @JoinColumn(name="id", referencedColumnName="componentsId", nullable=true, insertable=false, updatable=false)
+    private ComponentObsolete componentObsolete;
 
 	public void setDescription(String description) {
 		this.description = Optional.ofNullable(description).map(String::trim).map(d->d.replaceAll("\\s+", " ")).map(d->d.replaceAll("\\p{C}", "")).filter(d->!d.isEmpty()).map(d->(d.length()>50 ? d.substring(0,47) + "..." : d)).orElse(null);
@@ -76,12 +73,6 @@ public class PartNumberSuperclass{
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + " [id=" + id + ", partNumber=" + partNumber + ", manufPartNumber=" + manufPartNumber
-				+ ", description=" + description + "]";
 	}
 
 	public static String addDashes(String partNumber){

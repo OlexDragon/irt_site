@@ -1,18 +1,17 @@
 package irt.stock.data.jpa.repositories;
 
-import static org.junit.Assert.*;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import irt.stock.data.jpa.beans.ComponentImage;
 import irt.stock.data.jpa.beans.ImageLink;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class ComponentImageRepositoryTest {
 
@@ -21,7 +20,7 @@ public class ComponentImageRepositoryTest {
 
 	private ComponentImage ref;
 
-	@Before
+	@BeforeTestClass
 	public void before() {
 		ImageLink save = linkRepository.save(new ImageLink("test"));
 		ref = repository.save(new ComponentImage(10L, save));

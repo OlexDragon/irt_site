@@ -1,19 +1,18 @@
 package irt.stock.data.jpa.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.AfterTestClass;
+import org.springframework.test.context.event.annotation.BeforeTestExecution;
 
 import irt.stock.data.jpa.beans.BomComponent;
 import irt.stock.data.jpa.beans.BomReference;
@@ -21,7 +20,7 @@ import irt.stock.data.jpa.beans.Component;
 import irt.stock.data.jpa.beans.Manufacture;
 import irt.stock.data.jpa.beans.PartNumber;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class BomRepositoryTest {
 
@@ -35,7 +34,7 @@ public class BomRepositoryTest {
 	private BomReference ref1;
 	private BomReference ref2;
 
-	@Before
+	@BeforeTestExecution
 	public void before() {
 		Manufacture manufacture = manufactureRepository.save(new Manufacture("ID", "name", "link"));
 		top = componentRepository.save(new Component("top component", manufacture, null));
@@ -82,7 +81,7 @@ public class BomRepositoryTest {
 		assertEquals(top, topComponents.get(0));		
 	}
 
-	@After
+	@AfterTestClass
 	public void after(){
 		bomRepository.deleteAll();
 		bomReferenceRepository.deleteAll();

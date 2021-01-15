@@ -1,4 +1,5 @@
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestClass {
 	private final static Logger logger = LogManager.getLogger();

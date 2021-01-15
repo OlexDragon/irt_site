@@ -91,7 +91,7 @@ $('#savePriceForm').submit(function(event){
 		data['currency'] 	= $('#selectCurrency option:selected').val();
 	}
 
-	$.post('/component/price', data)
+	$.post('/component/price', component)
 	.done(function() {
 		fillFields();
 	})
@@ -141,7 +141,7 @@ function fillFields(){
 
 		fill = $.get("/pn/details", {pnId : componentId})
 		.done(
-				function(data) {
+				function(component) {
 
 					//fill selected tabs
 					if($('#price-hystory-tab').hasClass( 'active' ))
@@ -150,7 +150,7 @@ function fillFields(){
 						fillComponentHistoryTab();
 
 					//Bulk and 'TO CO MFR' buttons
-					stockQty = data ? data.qty : 0;
+					stockQty = component ? component.qty : 0;
 					if(stockQty>0)
 						$('.fromStockBtn').removeClass('d-none');
 					else
@@ -158,8 +158,8 @@ function fillFields(){
 
 					//'TO STOCK' buttons
 					var maxQt
-					if(data){
-						companyQties = data.companyQties ? data.companyQties : 0;
+					if(component){
+						companyQties = component.companyQties ? component.companyQties : 0;
 						maxQty = companyQties ? Math.max.apply( Math, companyQties.map(function(o){return o.qty;})) : 0;
 					}else{
 						maxQty = 0;
@@ -167,7 +167,7 @@ function fillFields(){
 					if(maxQty>0){
 						$('.fromMfrBtn').removeClass('d-none');
 						//'TO PCA' button
-						if(data.partNumber.indexOf('PCB')==0){
+						if(component.partNumber.indexOf('PCB')==0){
 							var _csrf = $( "input[name='_csrf']" ).val();
 							$.post('/bom/exists/' + componentId, {_csrf : _csrf})
 							.done(function(data){
@@ -187,25 +187,29 @@ function fillFields(){
 						$('#toAssenbly').addClass('d-none');
 					}
 
-					$('#infoPN').text(partNumberAddDashes(data.partNumber)).prop('title', 'component ID: ' + componentId);
-					$('#infoDescription').text(data.description ? data.description : "N/A");
+					var infoPN = $('#infoPN')
+					var backgroundClass = component.componentObsolete ==null || component.componentObsolete.status=='ACTIVE' ? 'bg-success' : 'obsolete'
+
+					infoPN.removeClass('bg-success obsolete');
+					infoPN.text(partNumberAddDashes(component.partNumber)).prop('title', 'component ID: ' + componentId).addClass(backgroundClass);
+					$('#infoDescription').text(component.description ? component.description : "N/A");
 
 					var mfrPN = $('#infoMfrPN').empty();
-					if(data.link)
-						mfrPN.append($('<a>', {href : 'http://irttechnologies:8080' + data.link.link, target : '_blank', text : data.manufPartNumber ? data.manufPartNumber : "N/A" }));
+					if(component.link)
+						mfrPN.append($('<a>', {href : 'http://irttechnologies:8080' + component.link.link, target : '_blank', text : component.manufPartNumber ? component.manufPartNumber : "N/A" }));
 					else
-						mfrPN.text(data.manufPartNumber ? data.manufPartNumber : "N/A");
+						mfrPN.text(component.manufPartNumber ? component.manufPartNumber : "N/A");
 
-					$('#infoMfr').text(data.manufacture ? data.manufacture.name : "N/A");
+					$('#infoMfr').text(component.manufacture ? component.manufacture.name : "N/A");
 //Quantity
 
-					var qty = data.qty!='null' ? data.qty : "N/A";
+					var qty = component.qty!='null' ? component.qty : "N/A";
 					var $qty = $('<dd>', { class : 'col-sm-8',  text : qty ? qty + ' pc.' : 'N/A'});
 					var hasAutority = $('#hasAutority').val();
 
 					if(hasAutority && qty!="N/A"){
 
-						var price = stockPrice(qty, data.costs);
+						var price = stockPrice(qty, component.costs);
 						var p = '';
 
 						if(price['USD'])
@@ -228,7 +232,7 @@ function fillFields(){
 					}))
 					.append($qty);
 
-					$(data.companyQties).each(function(){
+					$(component.companyQties).each(function(){
 						$('#infoQty')
 						.append($('<dt>', { 
 							class : 'col-sm-4',
@@ -241,9 +245,9 @@ function fillFields(){
 						}));
 					});
 //Alternative Part Numbers
-		var selectMfrPN = $('<select>', {id : 'selectMfrPN', class : 'form-control' }).append($('<option>', { value : 0,  text : data.manufPartNumber }));// Used in the Edit tub; 0 -> not alternative
+		var selectMfrPN = $('<select>', {id : 'selectMfrPN', class : 'form-control' }).append($('<option>', { value : 0,  text : component.manufPartNumber }));// Used in the Edit tub; 0 -> not alternative
 		$('#infoAlternative').empty();
-		$(data.alternatives).each(function(){
+		$(component.alternatives).each(function(){
 			$('#infoAlternative').append($('<dt>', { 
 				class : 'col-sm-4',
 		        text : this.altMfrPartNumber
@@ -282,10 +286,10 @@ function fillFields(){
 			.append($('<td>').append(selectCurrency))
 			.append($('<td>').append(buttonSet));
 
-		$(data.costs).each(function(){
+		$(component.costs).each(function(){
 			$('#infoCost')
 			.append($('<tr>'))
-		    .append($('<th>', { text : this.alternative ? this.alternative.altMfrPartNumber : data.manufPartNumber }))
+		    .append($('<th>', { text : this.alternative ? this.alternative.altMfrPartNumber : component.manufPartNumber }))
 		    .append($('<td>', { text : this.company ? this.company.companyName : 'N/A' }))
 		    .append($('<td>', { text : this.id.forQty }))
 		    .append($('<td>', { text : this.cost }))
@@ -295,7 +299,7 @@ function fillFields(){
 
 			$('#editCost')
 			.append($('<tr>'))
-			.append($('<th>', { text : this.alternative ? this.alternative.altMfrPartNumber : data.manufPartNumber }))
+			.append($('<th>', { text : this.alternative ? this.alternative.altMfrPartNumber : component.manufPartNumber }))
 		    .append($('<td>', { text : this.company ? this.company.companyName : 'N/A' }))
 			.append($('<td>', { text : this.id.forQty }))
 			.append($('<td>', { text : this.cost }))
@@ -304,7 +308,7 @@ function fillFields(){
 					.append($('<form>', {
 						class : 'deleteCostForm',
 						method : 'POST',
-						action : ('/component/cost/delete/' + componentId + '/' + (this.alternative ? this.alternative.id : 0) + '/' + (this.company ? this.company.id : 0)+ '/' + this.id.forQty)
+						action : ('/component/cost/delete/' + componentId + '/' + this.id.componentAlternativeId + '/' + this.id.companyId + '/' + this.id.forQty)
 					})
 					.append($('<button>',{type : 'submit', text : 'Delete', class : 'btn-sm btn-outline-warning'}))));
 		});
@@ -340,7 +344,7 @@ function fillFields(){
 													var responseText = error.responseText
 													alert('$.post( action, {_csrf : _csrf})\n' + responseText);
 												})
-												
+
 											})
 									)
 							)
@@ -349,7 +353,7 @@ function fillFields(){
 		.on('hidden.bs.modal', function (e) {
 			$(this).remove();
 		});
-			
+
 	});
 
 		$('#selectDivider')	.change(buttonSaveEnable);//On select quantity change ( 'selectDivider' )
@@ -542,11 +546,11 @@ function partNumbers(str){
 			pnsOut.empty();
 
 			if(pns){
-				$.each( pns, function(key, partNumber) {
+				$.each( pns, function(key, component) {
 
 					pnsOut.append($('<option>', { 
-						value: partNumber.id,
-						text : partNumberAddDashes(partNumber.partNumber)
+						value: component.id,
+						text : partNumberAddDashes(component.partNumber)
 					}));
 				});
 

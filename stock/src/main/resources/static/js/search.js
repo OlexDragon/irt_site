@@ -134,15 +134,20 @@ function search($this){
 					$tdMfrPN.text(manufPartNumber);
 			}
 
-			tableBody
-			.append($('<tr>')
+			var row = $('<tr>')
 					.append($('<td>', {text : this.id}))
 					.append($thPN)
 					.append($tdMfrPN)
 					.append($('<td>', {text : this.manufacture ? this.manufacture.name : ''}))
 					.append($('<td>', {text : this.description}))
 					.append($('<td>', {text : this.qty}))
-					.append($('<td>', {text : this.value})));
+					.append($('<td>', {text : this.value}));
+
+			if(this.componentObsolete!=null && this.componentObsolete.status=='OBSOLETE')
+				row.addClass('obsolete');
+
+			tableBody
+			.append(row);
 		});
 	})
 	.fail(function(error) {
