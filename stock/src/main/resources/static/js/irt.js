@@ -91,7 +91,7 @@ $('#savePriceForm').submit(function(event){
 		data['currency'] 	= $('#selectCurrency option:selected').val();
 	}
 
-	$.post('/component/price', component)
+	$.post('/component/price', data)
 	.done(function() {
 		fillFields();
 	})
